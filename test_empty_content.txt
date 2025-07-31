@@ -1,0 +1,3 @@
+This is content without any section markers.
+Just plain text with no [SECTION] markers.
+Nothing to process here.

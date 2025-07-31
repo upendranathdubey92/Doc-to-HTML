@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Content Update IDE - Production Ready</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            overflow: hidden;
+        }
+
+        .ide-container {
+            display: grid;
+            grid-template-columns: 350px 1fr 1fr;
+            grid-template-rows: 60px 1fr 40px;
+            height: 100vh;
+            gap: 1px;
+            background: #333;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background: #2d2d30;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007acc;
+        }
+
+        .version {
+            font-size: 12px;
+            color: #999;
+            background: #4a4a4a;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        .sidebar {
+            background: #252526;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .input-panel {
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output-panel {
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: #2d2d30;
+            padding: 10px 15px;
+            border-bottom: 1px solid #3e3e42;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .file-upload {
+            border: 2px dashed #007acc;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: #252526;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .file-upload:hover {
+            border-color: #1f9cf0;
+            background: #2a2a2b;
+        }
+
+        .file-upload.dragover {
+            border-color: #1f9cf0;
+            background: #2a2a2b;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #007acc;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .upload-subtext {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .text-editor {
+            width: 100%;
+            height: 100%;
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            color: #d4d4d4;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .text-editor:focus {
+            border-color: #007acc;
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 100%;
+            background: #1e1e1e;
+            border: none;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            color: #d4d4d4;
+            resize: none;
+            outline: none;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+
+        .btn {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #1f9cf0;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #5a5a5a;
+        }
+
+        .btn-secondary:hover {
+            background: #6a6a6a;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+            width: auto;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        .detected-sections {
+            margin-bottom: 20px;
+            background: #2d2d30;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #007acc;
+        }
+
+        .detected-sections h4 {
+            margin-bottom: 12px;
+            color: #007acc;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-count {
+            background: #007acc;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .section-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            background: #007acc;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            gap: 4px;
+        }
+
+        .section-tag.not-found {
+            background: #5a5a5a;
+            opacity: 0.6;
+        }
+
+        .section-tag .check {
+            font-size: 10px;
+        }
+
+        .status {
+            padding: 12px 15px;
+            background: #2d2d30;
+            font-size: 12px;
+            border-top: 1px solid #3e3e42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .success {
+            color: #4ec9b0;
+        }
+
+        .error {
+            color: #f44747;
+        }
+
+        .warning {
+            color: #ffcc02;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #555;
+            border-radius: 50%;
+            border-top-color: #007acc;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .file-info {
+            background: #2d2d30;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            border-left: 4px solid #4ec9b0;
+        }
+
+        .file-info strong {
+            color: #4ec9b0;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #007acc;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
+        }
+
+        .toast.success {
+            background: #4ec9b0;
+        }
+
+        .toast.error {
+            background: #f44747;
+        }
+
+        .toast.warning {
+            background: #ffcc02;
+            color: #000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .stats {
+            background: #2d2d30;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: #3e3e42;
+            border-radius: 4px;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007acc;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .supported-sections {
+            background: #2d2d30;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 11px;
+        }
+
+        .supported-sections h5 {
+            color: #007acc;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .supported-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .supported-item {
+            background: #4a4a4a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+
+        .word-processing {
+            background: #f4b942;
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ide-container">
+        <div class="header">
+            <div class="logo">📄 Page Content Update IDE</div>
+            <div class="version">Production Ready</div>
+        </div>
+
+        <div class="sidebar">
+            <h3 style="margin-bottom: 15px; color: #007acc; display: flex; align-items: center; gap: 8px;">
+                <span>📁</span> File Input
+            </h3>
+            
+            <div class="word-processing">
+                ✨ Now supports Real Word Documents!
+            </div>
+            
+            <div class="file-upload" id="fileUpload">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Drop your document here</div>
+                <div class="upload-subtext">Supports .txt, .doc, .docx files<br>Real Word documents supported!</div>
+                <input type="file" id="fileInput" accept=".txt,.doc,.docx" />
+            </div>
+
+            <div id="fileInfo" class="file-info" style="display: none;">
+                <strong>File:</strong> <span id="fileName"></span><br>
+                <strong>Size:</strong> <span id="fileSize"></span><br>
+                <strong>Type:</strong> <span id="fileType"></span><br>
+                <strong>Status:</strong> <span id="fileStatus">Processing...</span>
+            </div>
+
+            <div id="detectedSections" class="detected-sections" style="display: none;">
+                <h4>
+                    <span>🎯</span> Detected Sections 
+                    <span class="section-count" id="sectionCount">0</span>
+                </h4>
+                <div class="section-tags" id="sectionTags"></div>
+            </div>
+
+            <div class="stats" id="statsPanel" style="display: none;">
+                <div style="color: #007acc; font-weight: bold; margin-bottom: 8px;">📊 Processing Stats</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="lineCount">0</div>
+                        <div class="stat-label">Lines</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="wordCount">0</div>
+                        <div class="stat-label">Words</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn" id="processBtn" disabled>
+                    <span id="processIcon">⚡</span> Generate HTML
+                </button>
+                <button class="btn btn-secondary" id="clearBtn">
+                    🗑️ Clear All
+                </button>
+                <button class="btn btn-secondary" id="aiConfigBtn">
+                    🤖 AI Settings
+                </button>
+            </div>
+            
+            <div id="aiConfig" style="display: none; margin-top: 15px; padding: 12px; background: #2d2d30; border-radius: 6px;">
+                <h5 style="color: #007acc; margin-bottom: 8px;">🤖 AI Configuration</h5>
+                <p style="font-size: 11px; margin-bottom: 8px;">Get free API key from <a href="https://console.groq.com/" target="_blank" style="color: #007acc;">Groq Console</a></p>
+                <input type="text" id="apiKeyInput" placeholder="Enter Groq API key (gsk_...)" style="width: 100%; padding: 6px; background: #1e1e1e; border: 1px solid #3e3e42; color: #d4d4d4; border-radius: 3px; font-size: 11px; margin-bottom: 8px;">
+                <label style="font-size: 11px; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="useAICheckbox" checked> Enable AI parsing
+                </label>
+            </div>
+
+            <div class="supported-sections">
+                <h5>📋 Supported Sections</h5>
+                <div class="supported-list">
+                    <span class="supported-item">HERO</span>
+                    <span class="supported-item">SERVICES_GRID</span>
+                    <span class="supported-item">SERVICES_ACCORDION</span>
+                    <span class="supported-item">FAQ</span>
+                    <span class="supported-item">CTA_SIMPLE</span>
+                    <span class="supported-item">PROCESS</span>
+                    <span class="supported-item">TECHNOLOGY</span>
+                    <span class="supported-item">INDUSTRIES</span>
+                    <span class="supported-item">PORTFOLIO</span>
+                    <span class="supported-item">TESTIMONIAL</span>
+                    <span class="supported-item">BENEFITS</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-panel">
+            <div class="panel-header">
+                <span>📝 Document Content</span>
+                <div>
+                </div>
+            </div>
+            <div class="panel-content">
+                <textarea 
+                    class="text-editor" 
+                    id="inputContent" 
+                    placeholder="Paste your content here or upload a Word document...&#10;&#10;The tool automatically detects sections from real Word docs!&#10;&#10;Example format:&#10;[HERO]&#10;Heading: Your Service Title&#10;Description: Your service description...&#10;Bullet 1: First benefit&#10;&#10;[FAQ]&#10;Heading: Frequently Asked Questions&#10;Question 1: What is this?&#10;Answer 1: This is..."></textarea>
+            </div>
+        </div>
+
+        <div class="output-panel">
+            <div class="panel-header">
+                <span>💻 Generated HTML Code</span>
+                <div>
+                    <button class="btn btn-secondary btn-small" id="copyBtn" disabled>📋 Copy</button>
+                    <button class="btn btn-secondary btn-small" id="downloadBtn" disabled>💾 Download</button>
+                </div>
+            </div>
+            <div class="panel-content">
+                <textarea 
+                    class="code-editor" 
+                    id="outputCode" 
+                    readonly 
+                    placeholder="Generated HTML code will appear here...&#10;&#10;Upload a Word document or paste structured content to get started!"></textarea>
+            </div>
+        </div>
+
+        <div class="status">
+            <div class="status-item">
+                <span>🚀</span>
+                <span>Ready for Production</span>
+            </div>
+            <div class="status-item">
+                <span id="statusText">Upload a Word document or paste content to get started</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Content Processing Engine with AI Support
+        class RealDocumentProcessor {
+            constructor() {
+                this.useAI = true; // Enable AI processing
+                this.sectionTemplates = {
+                    'HERO': `<section class="pt70 pb40 hero-section">
+<div class="container-xl">
+<div class="row align-items-center">
+<div class="col-lg-7 col-md-12 banner-text">
+<nav aria-label="breadcrumbs" class="rank-math-breadcrumb mb-3 mt-3"><p><a href="/" class="local" style="text-decoration: unset;">Home</a><span class="separator"> &gt; </span><a href="/services/" class="local" style="text-decoration: unset;">Services</a><span class="separator"> &gt; </span><span class="last">{breadcrumb_title}</span></p></nav>
+<h1 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h1>
+<p class="fonts-18 mb-3">{description} <strong>The result?</strong></p>
+<ul class="bullet mb-5 fonts-18">
+{bullet_points}
+</ul>
+
+<div class="rating-section d-flex"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
+<a href="https://clutch.co/profile/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/clutch-rating.svg" alt="Clutch" width="99" height="56" /></a>
+<a href="https://www.goodfirms.co/company/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/goodfirm-rating.svg" alt="GoodFirms" width="135" height="56" /></a></div>
+</div>
+<div class="col-lg-5 col-md-12 text-form-section">
+<div class="homen_form">
+<p class="fonts-24 font-weight-bold mt-0 mb-2 text-center line-height-1">{form_heading}</p>
+<form id="other-form" class="footer_form append-form blur-form" action="" method="post" name="popup-form" novalidate="">
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-user"></i><input id="name" class="form-control" name="name" required="" size="40" type="text" value="" placeholder="Name*" data-name="Please enter your name" /><small class="error"></small></p>
+<div class="clearfix"></div>
+</div>
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-envelope"></i><input id="email" class="form-control" name="email" required="" size="40" type="email" value="" placeholder="Email*" data-name="Please enter your email" /><small class="error"></small></p>
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-phone"></i><input id="number" class="form-control" name="number" required="" size="15" type="tel" value="" placeholder="Phone*" data-name="Please enter your number" /><small class="error"></small><span id="error-msg" class="d-none"></span></p>
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 mb-0 text-left"><textarea id="Comment" class="form-control" cols="40" name="comment" required="" rows="3" placeholder="Write your message.*" data-name="Please enter your description"></textarea><small class="error"></small></div>
+</div>
+<div class="row">
+<div class="form-group col-md-12">
+<div class="footer_txt_block mt-2">
+<input id="form_type" name="form_type" type="hidden" value="footer_form" />
+[spaceo_get_permalink][spaceo_get_referal]
+<div id="loadingmessage" class="loader"><img src="/wp-content/uploads/2021/04/ajax-loader.gif" alt="Ajax loader" width="30" height="30" /></div>
+<input id="submit" class="btn btn-pop mb0" name="submit" type="submit" value="{form_button_text}" data-medium="BF_1" />
+</div>
+</div>
+</div>
+</form></div>
+</div>
+</div>
+</div>
+</section>`,
+                    // Add other templates...
+                    'FAQ': `<div class="faq pt80 pb50" style="background: linear-gradient(var(--bg-color-9), #fff);">
+  <div class="container-xl">
+    <h2 class="fonts-40 font-weight-bold text-center">{main_heading}</h2>
+    <div id="accordion" class="text-left px-4">
+{faq_items}
+    </div>
+  </div>
+</div>`,
+                    // ... other templates
+                };
+
+                this.supportedSections = ['HERO', 'FAQ', 'CTA_SIMPLE', 'CTA_ENHANCED', 'CTA_TWO', 'PROCESS', 'TECHNOLOGY', 'INDUSTRIES', 'SERVICES_GRID', 'SERVICES_ACCORDION', 'PORTFOLIO', 'TESTIMONIAL', 'BENEFITS', 'BENEFITS_TWO', 'CONTENT_FORM'];
+            }
+
+            // Smart document parsing for real Word docs
+            async parseRealDocument(content) {
+                const sections = {};
+                
+                // Find section markers - handle both [SECTION] and [SECTION END] format
+                const lines = content.split('\n');
+                let currentSection = null;
+                let currentContent = [];
+                
+                for (let line of lines) {
+                    const trimmedLine = line.trim();
+                    
+                    // Check for section start markers
+                    const sectionStartMatch = trimmedLine.match(/^\[([A-Z_\s]+)\]$/);
+                    if (sectionStartMatch && !sectionStartMatch[1].endsWith(' END')) {
+                        // Save previous section if exists
+                        if (currentSection && currentContent.length > 0) {
+                            const contentText = currentContent.join('\n').trim();
+                            sections[currentSection] = await this.parseSection(currentSection, contentText);
+                        }
+                        
+                        // Start new section
+                        currentSection = sectionStartMatch[1].trim();
+                        currentContent = [];
+                    }
+                    // Check for section end markers
+                    else if (trimmedLine.match(/^\[([A-Z_\s]+) END\]$/)) {
+                        // End current section
+                        if (currentSection && currentContent.length > 0) {
+                            const contentText = currentContent.join('\n').trim();
+                            sections[currentSection] = await this.parseSection(currentSection, contentText);
+                        }
+                        currentSection = null;
+                        currentContent = [];
+                    }
+                    // Add content to current section
+                    else if (currentSection && trimmedLine) {
+                        currentContent.push(line);
+                    }
+                }
+                
+                // Handle last section if no END marker
+                if (currentSection && currentContent.length > 0) {
+                    const contentText = currentContent.join('\n').trim();
+                    sections[currentSection] = await this.parseSection(currentSection, contentText);
+                }
+                
+                return sections;
+            }
+
+            async parseSection(sectionName, content) {
+                switch (sectionName) {
+                    case 'HERO':
+                        return await this.parseHeroSection(content);
+                    case 'FAQ':
+                        return await this.parseFaqSection(content);
+                    case 'CTA_SIMPLE':
+                    case 'CTA SIMPLE':
+                    case 'CTA_ENHANCED':
+                        return this.parseCtaSection(content);
+                    case 'PROCESS':
+                        return this.parseProcessSection(content);
+                    case 'TECHNOLOGY':
+                        return this.parseTechnologySection(content);
+                    case 'INDUSTRIES':
+                        return this.parseIndustriesSection(content);
+                    case 'SERVICES_GRID':
+                        return await this.parseServicesGridSection(content);
+                    case 'SERVICES_ACCORDION':
+                        return await this.parseServicesAccordionSection(content);
+                    case 'PORTFOLIO':
+                        return await this.parsePortfolioSection(content);
+                    case 'TESTIMONIAL':
+                        return this.parseTestimonialSection(content);
+                    case 'BENEFITS':
+                        return this.parseBenefitsSection(content);
+                    case 'BENEFITS_TWO':
+                        return this.parseBenefitsTwoSection(content);
+                    case 'CONTENT_FORM':
+                        return this.parseContentFormSection(content);
+                    case 'CTA_TWO':
+                        return this.parseCtaTwoSection(content);
+                    default:
+                        return { raw_content: content };
+                }
+            }
+
+            async parseHeroSection(content) {
+                if (this.useAI) {
+                    try {
+                        return await this.parseWithAI(content, 'HERO');
+                    } catch (error) {
+                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
+                    }
+                }
+                
+                // Split by actual line breaks to preserve spacing
+                const allLines = content.split('\n');
+                const nonEmptyLines = allLines.filter(line => line.trim());
+                
+                let main_heading = '';
+                let description = '';
+                let bullet_intro = '';
+                let bullet_points = [];
+                
+                let currentIndex = 0;
+                
+                // First line is heading
+                if (nonEmptyLines.length > 0) {
+                    main_heading = nonEmptyLines[0].trim();
+                    currentIndex = 1;
+                }
+                
+                // Find where bullets start
+                let bulletStartIndex = -1;
+                for (let i = currentIndex; i < nonEmptyLines.length; i++) {
+                    const line = nonEmptyLines[i].trim();
+                    if (line.match(/^[●\-\*•‑]\s*/) || line.match(/^\d+[\.\)]\s+/)) {
+                        bulletStartIndex = i;
+                        break;
+                    }
+                }
+                
+                // If no bullets found, everything else is description
+                if (bulletStartIndex === -1) {
+                    const descriptionLines = nonEmptyLines.slice(currentIndex);
+                    
+                    // Look for lines after the main description that should be preserved as bullet_intro
+                    let descEndIndex = descriptionLines.length;
+                    
+                    // Check each line to see if it's a separate short statement
+                    for (let i = 1; i < descriptionLines.length; i++) {
+                        const line = descriptionLines[i].trim();
+                        const prevLine = descriptionLines[i - 1].trim();
+                        
+                        // Check if this line appears after a gap in the original content
+                        const lineIndex = allLines.findIndex((l, idx) => l.trim() === line && idx > 0);
+                        const prevLineIndex = allLines.findIndex((l, idx) => l.trim() === prevLine && idx < lineIndex);
+                        
+                        // If there's a gap (empty line) before this line, it might be bullet_intro
+                        if (lineIndex > prevLineIndex + 1) {
+                            // This line is separated by empty line(s)
+                            description = descriptionLines.slice(0, i).join(' ');
+                            bullet_intro = descriptionLines.slice(i).join(' ');
+                            break;
+                        }
+                    }
+                    
+                    if (bullet_intro === '') {
+                        description = descriptionLines.join(' ');
+                    }
+                } else {
+                    // Process description up to bullets
+                    const descriptionLines = nonEmptyLines.slice(currentIndex, bulletStartIndex);
+                    
+                    // Check if there's a line immediately before bullets that should be bullet_intro
+                    if (descriptionLines.length > 1) {
+                        const lastLine = descriptionLines[descriptionLines.length - 1].trim();
+                        
+                        // Check if the last line looks like a bullet intro title:
+                        // - Short line (typically under 50 chars)
+                        // - Ends with dash, colon, or no punctuation
+                        // - Not a continuation of previous sentence
+                        const isIntroTitle = (
+                            lastLine.length < 50 && 
+                            (lastLine.endsWith('-') || lastLine.endsWith(':') || lastLine.endsWith('?') || 
+                             !lastLine.endsWith('.') && !lastLine.endsWith(',') && !lastLine.endsWith(';'))
+                        );
+                        
+                        if (isIntroTitle) {
+                            // Treat as bullet intro title
+                            description = descriptionLines.slice(0, -1).join(' ');
+                            bullet_intro = lastLine;
+                        } else {
+                            // All lines are part of description
+                            description = descriptionLines.join(' ');
+                        }
+                    } else if (descriptionLines.length === 1) {
+                        // Only one line before bullets, it's the description
+                        description = descriptionLines[0];
+                    } else {
+                        description = '';
+                    }
+                    
+                    // Extract bullets
+                    for (let i = bulletStartIndex; i < nonEmptyLines.length; i++) {
+                        const line = nonEmptyLines[i].trim();
+                        if (line.match(/^[●\-\*•‑]\s*/) || line.match(/^\d+[\.\)]\s+/)) {
+                            const cleanBullet = line.replace(/^[●\-\*•‑]\s*/, '').replace(/^\d+[\.\)]\s+/, '');
+                            bullet_points.push(cleanBullet);
+                        }
+                    }
+                }
+                
+                return {
+                    main_heading: this.convertBoldMarkers(main_heading || "Service Title"),
+                    description: this.convertBoldMarkers(description || "Service description"),
+                    bullet_points: bullet_points.map(point => this.convertBoldMarkers(point)),
+                    bullet_intro: this.convertBoldMarkers(bullet_intro),
+                    form_heading: "Dream It, We Build It",
+                    form_button_text: "Book Your Free Consultation"
+                };
+            }
+
+            async parseWithAI(content, sectionType) {
+                const prompt = this.createPromptForSection(content, sectionType);
+                const apiKey = localStorage.getItem('groqApiKey');
+                
+                if (!apiKey) {
+                    throw new Error('No API key configured. Please add your Groq API key in AI Settings.');
+                }
+                
+                // Using Groq's free AI API
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-8b-instant',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are a content parser. Return only JSON responses.'
+                            },
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        max_tokens: 1000,
+                        temperature: 0.1
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('AI API request failed');
+                }
+
+                const data = await response.json();
+                const result = JSON.parse(data.choices[0].message.content);
+                return result;
+            }
+
+            createPromptForSection(content, sectionType) {
+                if (sectionType === 'HERO') {
+                    return `Parse this HERO section content and extract the components as JSON:
+
+Content:
+${content}
+
+Return JSON in this exact format:
+{
+  "main_heading": "extracted heading text",
+  "description": "extracted description text (without 'The result?' phrase)",
+  "bullet_points": ["bullet 1", "bullet 2", "bullet 3"],
+  "form_heading": "Dream It, We Build It",
+  "form_button_text": "Book Your Free Consultation"
+}
+
+Rules:
+- Extract the main heading (usually first line)
+- Extract description text (everything before bullet points, excluding "The result?")
+- Extract bullet points (lines starting with ●, -, *, or numbers)
+- Remove bullet markers from bullet_points array
+- Do not include "The result?" in description`;
+                }
+                
+                if (sectionType === 'FAQ') {
+                    return `Parse this FAQ section content and extract Q&As as JSON:
+
+Content:
+${content}
+
+Return JSON in this exact format:
+{
+  "main_heading": "extracted heading",
+  "faqs": [
+    {"question": "question text?", "answer": "answer text"},
+    {"question": "question text?", "answer": "answer text"}
+  ]
+}
+
+Rules:
+- Questions end with "?"
+- Everything after a question until the next question is the answer
+- First line might be the section heading if it doesn't end with "?"`;
+                }
+                
+                if (sectionType === 'SERVICES_GRID') {
+                    return `Parse this SERVICES_GRID section content and extract services as JSON:
+
+Content:
+${content}
+
+Return JSON in this exact format:
+{
+  "main_heading": "extracted main heading",
+  "description": "extracted main description",
+  "services": [
+    {
+      "title": "service title",
+      "description": "service description",
+      "bullets": ["bullet 1", "bullet 2"]
+    }
+  ]
+}
+
+Rules:
+- Extract the main heading (first line)
+- Extract main description (second line if not a service title)
+- Service structure: Title → Description → Bullet points (●, -, *, •, ‑)
+- Each service should have exactly one title and one description
+- Lines starting with ●, -, *, •, or ‑ are bullet points for the current service
+- Parse all services in the content`;
+                }
+                
+                if (sectionType === 'SERVICES_ACCORDION') {
+                    return `Parse this SERVICES_ACCORDION section content and extract accordion services as JSON:
+
+Content:
+${content}
+
+Return JSON in this exact format:
+{
+  "services": [
+    {
+      "title": "service title",
+      "description": "service description",
+      "bullets": ["bullet 1", "bullet 2"]
+    }
+  ]
+}
+
+Rules:
+- Structure: Service Title → Service Description → Bullet Points (●, -, *, •, ‑) → Next Service Title
+- After bullet points, the next non-bullet line is a new service title
+- Each service has exactly one title and one description paragraph
+- Lines starting with ●, -, *, •, or ‑ belong to the current service
+- Parse each service completely before moving to the next
+- Example: "Security & Compliance Advisory" = title, next paragraph = description, bullet lines = bullets, "Cloud & Infrastructure Planning" = new service title`;
+                }
+                
+                if (sectionType === 'PORTFOLIO') {
+                    return `Parse this PORTFOLIO section content and extract multiple projects as JSON:
+
+Content:
+${content}
+
+Return JSON in this exact format:
+{
+  "main_heading": "extracted main heading",
+  "description": "extracted section description", 
+  "projects": [
+    {
+      "title": "project title",
+      "description": "detailed project description"
+    },
+    {
+      "title": "project title", 
+      "description": "detailed project description"
+    }
+  ]
+}
+
+Rules:
+- First line is the main heading
+- Second line is the section description
+- Each project has a short title (usually under 100 characters) followed by a longer detailed description
+- Projects are typically separated by blank lines or can be identified by context
+- Extract ALL projects from the content, not just the first one
+- Project titles are usually concise and descriptive (e.g., "An eCommerce Marketplace for Waste Management Equipment")
+- Project descriptions are longer paragraphs explaining the technical implementation and results
+- Look for patterns like: Short Title → Long Description → Short Title → Long Description`;
+                }
+                
+                return `Parse this ${sectionType} section content and return appropriate JSON structure.`;
+            }
+
+            convertBoldMarkers(text) {
+                // Return text as-is, no bold conversion
+                return text;
+            }
+
+            extractBulletPoints(content) {
+                // This method is now handled in parseHeroSection
+                return [];
+            }
+
+            async parseFaqSection(content) {
+                if (this.useAI) {
+                    try {
+                        return await this.parseWithAI(content, 'FAQ');
+                    } catch (error) {
+                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
+                    }
+                }
+                
+                // Fallback to rule-based parsing - preserve empty lines for paragraph breaks
+                const lines = content.split('\n');
+                const faqs = [];
+                let main_heading = '';
+                
+                let currentQuestion = '';
+                let currentAnswerLines = [];
+                
+                for (let line of lines) {
+                    const trimmedLine = line.trim();
+                    
+                    // Skip empty lines but preserve them for answer formatting
+                    if (!trimmedLine) {
+                        if (currentQuestion) {
+                            currentAnswerLines.push(line); // Preserve empty lines in answers
+                        }
+                        continue;
+                    }
+                    
+                    // First line is usually the heading
+                    if (!main_heading && !trimmedLine.endsWith('?')) {
+                        main_heading = trimmedLine;
+                        continue;
+                    }
+                    
+                    // Questions end with ?
+                    if (trimmedLine.endsWith('?')) {
+                        // Save previous Q&A if exists
+                        if (currentQuestion && currentAnswerLines.length > 0) {
+                            faqs.push({
+                                question: currentQuestion,
+                                answer: this.formatAnswerContent(currentAnswerLines)
+                            });
+                        }
+                        
+                        // Start new question
+                        currentQuestion = trimmedLine;
+                        currentAnswerLines = [];
+                    }
+                    // Everything else is answer content
+                    else if (currentQuestion) {
+                        currentAnswerLines.push(line); // Push original line, not trimmed
+                    }
+                }
+                
+                // Add the last Q&A
+                if (currentQuestion && currentAnswerLines.length > 0) {
+                    faqs.push({
+                        question: currentQuestion,
+                        answer: this.formatAnswerContent(currentAnswerLines)
+                    });
+                }
+                
+                return {
+                    main_heading: main_heading || "Frequently Asked Questions",
+                    faqs: faqs
+                };
+            }
+
+            formatAnswerContent(lines) {
+                let result = '';
+                let currentParagraph = [];
+                let inBulletList = false;
+                let bulletItems = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    const trimmedLine = line.trim();
+                    
+                    // Check if this line is a bullet point
+                    const isBullet = trimmedLine.match(/^[●\-\*•‑]\s*/);
+                    
+                    if (trimmedLine === '') {
+                        // Empty line - process what we have so far
+                        if (inBulletList && bulletItems.length > 0) {
+                            // End bullet list
+                            result += '<ul class="bullet">\n';
+                            bulletItems.forEach(item => {
+                                result += `<li>${item}</li>\n`;
+                            });
+                            result += '</ul>\n';
+                            bulletItems = [];
+                            inBulletList = false;
+                        } else if (currentParagraph.length > 0) {
+                            // End paragraph
+                            result += '<p>' + currentParagraph.join(' ') + '</p>\n';
+                            currentParagraph = [];
+                        }
+                    } else if (isBullet) {
+                        // This is a bullet point
+                        if (currentParagraph.length > 0) {
+                            // End current paragraph before starting bullets
+                            result += '<p>' + currentParagraph.join(' ') + '</p>\n';
+                            currentParagraph = [];
+                        }
+                        
+                        // Extract bullet content
+                        const bulletContent = trimmedLine.replace(/^[●\-\*•‑]\s*/, '');
+                        bulletItems.push(this.convertBoldMarkers(bulletContent));
+                        inBulletList = true;
+                    } else {
+                        // Regular text line
+                        if (inBulletList && bulletItems.length > 0) {
+                            // End bullet list before starting new paragraph
+                            result += '<ul class="bullet">\n';
+                            bulletItems.forEach(item => {
+                                result += `<li>${item}</li>\n`;
+                            });
+                            result += '</ul>\n';
+                            bulletItems = [];
+                            inBulletList = false;
+                        }
+                        
+                        currentParagraph.push(this.convertBoldMarkers(trimmedLine));
+                    }
+                }
+                
+                // Process any remaining content
+                if (inBulletList && bulletItems.length > 0) {
+                    result += '<ul class="bullet">\n';
+                    bulletItems.forEach(item => {
+                        result += `<li>${item}</li>\n`;
+                    });
+                    result += '</ul>\n';
+                } else if (currentParagraph.length > 0) {
+                    result += '<p>' + currentParagraph.join(' ') + '</p>\n';
+                }
+                
+                return result.trim();
+            }
+            
+            formatSingleParagraph(lines) {
+                let result = '';
+                let bulletPoints = [];
+                let regularText = [];
+                
+                for (let line of lines) {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine) continue;
+                    
+                    if (trimmedLine.match(/^[●\-\*•‑]\s*/)) {
+                        // Add any regular text before bullets
+                        if (regularText.length > 0) {
+                            result += '<p>' + regularText.join(' ') + '</p>';
+                            regularText = [];
+                        }
+                        // Collect bullet point
+                        bulletPoints.push(trimmedLine.replace(/^[●\-\*•‑]\s*/, '').trim());
+                    } else {
+                        // Add any pending bullets before regular text
+                        if (bulletPoints.length > 0) {
+                            result += '<ul class="bullet">';
+                            bulletPoints.forEach(bullet => {
+                                result += `<li>${bullet}</li>`;
+                            });
+                            result += '</ul>';
+                            bulletPoints = [];
+                        }
+                        regularText.push(trimmedLine);
+                    }
+                }
+                
+                // Add remaining content
+                if (regularText.length > 0) {
+                    result += '<p>' + regularText.join(' ') + '</p>';
+                }
+                if (bulletPoints.length > 0) {
+                    result += '<ul class="bullet">';
+                    bulletPoints.forEach(bullet => {
+                        result += `<li>${bullet}</li>`;
+                    });
+                    result += '</ul>';
+                }
+                
+                return result;
+            }
+
+            parseCtaSection(content) {
+                const lines = content.split('\n').filter(line => line.trim());
+                
+                // CTA has 3 components: heading, description, button text
+                const main_heading = lines[0] || 'Ready to Get Started?';
+                
+                // Always use last line as button text (no keyword checking)
+                const button_text = lines[lines.length - 1] || 'Get Started';
+                
+                // Everything between first and last line is description
+                const description_lines = lines.slice(1, -1);
+                const description = description_lines.join(' ') || 'Let us help you achieve your goals';
+                
+                return {
+                    main_heading: main_heading,
+                    description: description,
+                    button_text: button_text
+                };
+            }
+
+            extractButtonText(content) {
+                const words = content.toLowerCase().split(/\s+/);
+                const buttonWords = ['book', 'get', 'start', 'contact', 'schedule', 'request'];
+                
+                for (let word of buttonWords) {
+                    const index = words.indexOf(word);
+                    if (index !== -1 && index < words.length - 2) {
+                        return words.slice(index, index + 3).map(w => 
+                            w.charAt(0).toUpperCase() + w.slice(1)
+                        ).join(' ');
+                    }
+                }
+                
+                return "Get Started";
+            }
+
+            parseProcessSection(content) {
+                const lines = content.split(/[.!]/).filter(line => line.trim().length > 10);
+                const steps = [];
+                
+                // Look for step patterns
+                const stepKeywords = ['Discovery', 'Analysis', 'Planning', 'Design', 'Development', 'Testing', 'Deployment'];
+                
+                stepKeywords.forEach((keyword, index) => {
+                    if (content.includes(keyword)) {
+                        const stepText = lines.find(line => line.includes(keyword)) || `${keyword} step`;
+                        steps.push({
+                            title: keyword,
+                            description: stepText.replace(keyword, '').trim() || `${keyword} process description`
+                        });
+                    }
+                });
+                
+                return {
+                    main_heading: lines[0]?.trim() || "Our Process",
+                    description: lines[1]?.trim() || "How we work with you",
+                    steps: steps.slice(0, 6)
+                };
+            }
+
+            parseTechnologySection(content) {
+                const lines = content.split(/[.!]/).filter(line => line.trim().length > 10);
+                
+                // Common tech stack items
+                const commonTech = ['React', 'Node.js', 'Python', 'Laravel', 'MySQL', 'PostgreSQL', 'AWS', 'Docker', 'JavaScript', 'PHP'];
+                const foundTech = commonTech.filter(tech => content.includes(tech));
+                
+                return {
+                    main_heading: lines[0]?.trim() || "Technology Stack",
+                    description: lines[1]?.trim() || "Technologies we use",
+                    technologies: foundTech.length > 0 ? foundTech : commonTech
+                };
+            }
+
+            parseIndustriesSection(content) {
+                const lines = content.split(/[.!]/).filter(line => line.trim().length > 10);
+                
+                return {
+                    main_heading: lines[0]?.trim() || "Industries We Serve",
+                    description: lines[1]?.trim() || "We serve various industries across different sectors"
+                };
+            }
+
+            async parseServicesGridSection(content) {
+                if (this.useAI) {
+                    try {
+                        return await this.parseWithAI(content, 'SERVICES_GRID');
+                    } catch (error) {
+                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
+                    }
+                }
+                
+                // Fallback to rule-based parsing
+                const lines = content.split('\n').filter(line => line.trim());
+                const services = [];
+                let main_heading = '';
+                let description = '';
+                
+                let currentService = null;
+                let currentMode = 'heading';
+                let awaitingServiceDescription = false;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const trimmedLine = lines[i].trim();
+                    
+                    // First line is usually main heading
+                    if (currentMode === 'heading' && !main_heading) {
+                        main_heading = trimmedLine;
+                        currentMode = 'description';
+                        continue;
+                    }
+                    
+                    // Second line might be main description
+                    if (currentMode === 'description' && !description && !trimmedLine.startsWith('●')) {
+                        description = trimmedLine;
+                        currentMode = 'services';
+                        continue;
+                    }
+                    
+                    // In services mode
+                    if (currentMode === 'services') {
+                        // Handle bullets (●, -, *, •, ‑)
+                        if (trimmedLine.match(/^[●\-\*•‑]\s*/)) {
+                            const bulletText = trimmedLine.replace(/^[●\-\*•‑]\s*/, '').trim();
+                            if (currentService) {
+                                currentService.bullets.push(bulletText);
+                            }
+                            awaitingServiceDescription = false;
+                        }
+                        // Service title - line that's not a bullet and comes after bullets or at start
+                        else if (!awaitingServiceDescription) {
+                            // Save previous service
+                            if (currentService) services.push(currentService);
+                            
+                            // Start new service
+                            currentService = {
+                                title: trimmedLine,
+                                description: '',
+                                bullets: []
+                            };
+                            awaitingServiceDescription = true;
+                        }
+                        // Service description - line immediately after title
+                        else if (awaitingServiceDescription && currentService) {
+                            currentService.description = trimmedLine;
+                            awaitingServiceDescription = false;
+                        }
+                    }
+                }
+                
+                // Add last service
+                if (currentService) services.push(currentService);
+                
+                return {
+                    main_heading: main_heading || "Our Services",
+                    description: description || "Services we provide",
+                    services: services
+                };
+            }
+
+            async parseServicesAccordionSection(content) {
+                if (this.useAI) {
+                    try {
+                        return await this.parseWithAI(content, 'SERVICES_ACCORDION');
+                    } catch (error) {
+                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
+                    }
+                }
+                
+                // Fallback to rule-based parsing
+                const lines = content.split('\n').filter(line => line.trim());
+                const services = [];
+                
+                let currentService = null;
+                let awaitingDescription = false;
+                let inBullets = false;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const trimmedLine = lines[i].trim();
+                    
+                    // Handle bullets (●, -, *, •, ‑)
+                    if (trimmedLine.match(/^[●\-\*•‑]\s*/)) {
+                        const bulletText = trimmedLine.replace(/^[●\-\*•‑]\s*/, '').trim();
+                        if (currentService) {
+                            currentService.bullets.push(bulletText);
+                            inBullets = true;
+                            awaitingDescription = false;
+                        }
+                    }
+                    // Non-bullet line
+                    else if (trimmedLine) {
+                        // If we were in bullets and hit a non-bullet line, this might be a new service title
+                        if (inBullets) {
+                            // Save previous service
+                            if (currentService) services.push(currentService);
+                            
+                            // Start new service
+                            currentService = {
+                                title: trimmedLine,
+                                description: '',
+                                bullets: []
+                            };
+                            awaitingDescription = true;
+                            inBullets = false;
+                        }
+                        // If we're awaiting description after a title
+                        else if (awaitingDescription && currentService) {
+                            currentService.description = trimmedLine;
+                            awaitingDescription = false;
+                        }
+                        // First service title (no current service yet)
+                        else if (!currentService) {
+                            currentService = {
+                                title: trimmedLine,
+                                description: '',
+                                bullets: []
+                            };
+                            awaitingDescription = true;
+                        }
+                        // Additional description text
+                        else if (currentService && !inBullets) {
+                            if (currentService.description) {
+                                currentService.description += ' ' + trimmedLine;
+                            } else {
+                                currentService.description = trimmedLine;
+                            }
+                        }
+                    }
+                }
+                
+                // Add last service
+                if (currentService) services.push(currentService);
+                
+                return {
+                    services: services
+                };
+            }
+
+            async parsePortfolioSection(content) {
+                if (this.useAI) {
+                    try {
+                        return await this.parseWithAI(content, 'PORTFOLIO');
+                    } catch (error) {
+                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
+                    }
+                }
+                
+                // Fallback to rule-based parsing
+                const lines = content.split('\n');
+                const projects = [];
+                let main_heading = '';
+                let description = '';
+                
+                // Filter out empty lines for easier processing
+                const nonEmptyLines = lines.filter(line => line.trim());
+                
+                if (nonEmptyLines.length >= 2) {
+                    main_heading = nonEmptyLines[0];
+                    description = nonEmptyLines[1];
+                }
+                
+                // Find project titles and descriptions
+                let projectLines = nonEmptyLines.slice(2); // Skip heading and description
+                let currentProject = null;
+                
+                for (let i = 0; i < projectLines.length; i++) {
+                    const line = projectLines[i].trim();
+                    
+                    // Check if this line is a button text (like "See Project Details")
+                    const isButtonText = line.match(/^(See Project Details|Check Project Details|View Project|Learn More)$/i);
+                    
+                    if (isButtonText) {
+                        // This is button text, add it to current project and don't include in description
+                        if (currentProject) {
+                            currentProject.buttonText = line;
+                        }
+                        continue;
+                    }
+                    
+                    // Detect if this line is likely a project title
+                    // Project titles are usually shorter and don't start with common description words
+                    const isLikelyTitle = (
+                        line.length < 150 && // Titles are usually shorter
+                        !line.startsWith('Space-O Technologies') && // Descriptions often start with company name
+                        !line.startsWith('We designed') && // Common description starters
+                        !line.startsWith('At Space-O Technologies') &&
+                        !line.startsWith('The platform') &&
+                        !line.startsWith('The system') &&
+                        (line.includes('—') || line.includes('for ') || line.includes('System') || line.includes('Platform') || line.includes('Marketplace') || line.includes('Using AI'))
+                    );
+                    
+                    if (isLikelyTitle || currentProject === null) {
+                        // Save previous project if exists
+                        if (currentProject && currentProject.description.trim()) {
+                            // Final cleanup: remove any remaining button text from description
+                            let cleanDescription = currentProject.description.trim();
+                            cleanDescription = cleanDescription.replace(/\s+See\s+(?:the\s+)?Project\s+Details\.?$/i, '');
+                            cleanDescription = cleanDescription.replace(/\s+Check\s+(?:the\s+)?Project\s+Details\.?$/i, '');
+                            cleanDescription = cleanDescription.replace(/\s+View\s+Project\.?$/i, '');
+                            cleanDescription = cleanDescription.replace(/\s+Learn\s+More\.?$/i, '');
+                            
+                            projects.push({
+                                title: currentProject.title,
+                                description: cleanDescription,
+                                buttonText: currentProject.buttonText || 'See Project Details',
+                                image: '/wp-content/uploads/2025/06/CCTV-Data-Management-Platform-for-Public-Safety.png',
+                                link: '#'
+                            });
+                        }
+                        
+                        // Start new project
+                        currentProject = {
+                            title: this.convertBoldMarkers(line),
+                            description: '',
+                            buttonText: ''
+                        };
+                    } else {
+                        // This line is part of the description
+                        if (currentProject) {
+                            // Check for various button text patterns at the end of line
+                            let processedLine = line;
+                            let foundButton = false;
+                            
+                            // More comprehensive button text patterns
+                            const buttonPatterns = [
+                                /^(.*?)\s+See\s+(?:the\s+)?Project\s+Details\.?$/i,
+                                /^(.*?)\s+Check\s+(?:the\s+)?Project\s+Details\.?$/i,
+                                /^(.*?)\s+View\s+Project\.?$/i,
+                                /^(.*?)\s+Learn\s+More\.?$/i
+                            ];
+                            
+                            for (let pattern of buttonPatterns) {
+                                const match = processedLine.match(pattern);
+                                if (match) {
+                                    // Found button text at end of line
+                                    const descriptionPart = match[1].trim();
+                                    const buttonText = processedLine.substring(match[1].length).trim();
+                                    
+                                    if (descriptionPart) {
+                                        currentProject.description += (currentProject.description ? ' ' : '') + this.convertBoldMarkers(descriptionPart);
+                                    }
+                                    currentProject.buttonText = buttonText;
+                                    foundButton = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!foundButton) {
+                                // No button text found, add entire line to description
+                                currentProject.description += (currentProject.description ? ' ' : '') + this.convertBoldMarkers(processedLine);
+                            }
+                        }
+                    }
+                }
+                
+                // Don't forget the last project
+                if (currentProject && currentProject.description.trim()) {
+                    // Final cleanup: remove any remaining button text from description
+                    let cleanDescription = currentProject.description.trim();
+                    cleanDescription = cleanDescription.replace(/\s+See\s+(?:the\s+)?Project\s+Details\.?$/i, '');
+                    cleanDescription = cleanDescription.replace(/\s+Check\s+(?:the\s+)?Project\s+Details\.?$/i, '');
+                    cleanDescription = cleanDescription.replace(/\s+View\s+Project\.?$/i, '');
+                    cleanDescription = cleanDescription.replace(/\s+Learn\s+More\.?$/i, '');
+                    
+                    projects.push({
+                        title: currentProject.title,
+                        description: cleanDescription,
+                        buttonText: currentProject.buttonText || 'See Project Details',
+                        image: '/wp-content/uploads/2025/06/CCTV-Data-Management-Platform-for-Public-Safety.png',
+                        link: '#'
+                    });
+                }
+                
+                return {
+                    main_heading: this.convertBoldMarkers(main_heading || 'Proven Results: Real Projects That Drive Business Growth'),
+                    description: this.convertBoldMarkers(description || 'See how we\'ve transformed complex business challenges.'),
+                    projects: projects
+                };
+            }
+
+            parseTestimonialSection(content) {
+                const lines = content.split('\n');
+                const nonEmptyLines = lines.filter(line => line.trim());
+                
+                let main_heading = '';
+                let testimonial_text = '';
+                let client_name = '';
+                let client_title = '';
+                let button_text = '';
+                
+                if (nonEmptyLines.length >= 1) {
+                    main_heading = nonEmptyLines[0];
+                }
+                
+                // Find client name and title - they are usually at the end before button
+                let testimonialLines = [];
+                let clientInfoFound = false;
+                
+                for (let i = 1; i < nonEmptyLines.length; i++) {
+                    const line = nonEmptyLines[i].trim();
+                    
+                    // Check if this line looks like a button text
+                    if (line.match(/^(View all Testimonials|See More Reviews|Read More)$/i)) {
+                        button_text = line;
+                        continue;
+                    }
+                    
+                    // Check if this line looks like a client title (CEO, Manager, etc.)
+                    if (line.match(/^(CEO|CTO|Manager|Director|Founder|President|VP|Head|Chief),?\s/i)) {
+                        client_title = line;
+                        clientInfoFound = true;
+                        continue;
+                    }
+                    
+                    // If we found client title, the previous non-testimonial line should be client name
+                    if (clientInfoFound && !client_name && i > 1) {
+                        // Look backwards for the client name
+                        for (let j = i - 1; j >= 1; j--) {
+                            const prevLine = nonEmptyLines[j].trim();
+                            if (!prevLine.match(/^(CEO|CTO|Manager|Director)/i) && 
+                                prevLine.length < 50 && 
+                                !testimonialLines.includes(prevLine)) {
+                                client_name = prevLine;
+                                break;
+                            }
+                        }
+                        continue;
+                    }
+                    
+                    // If no client info found yet and line is short, it might be client name
+                    if (!clientInfoFound && line.length < 50 && !line.match(/\.\s+/)) {
+                        // Check if next line is a title
+                        if (i + 1 < nonEmptyLines.length) {
+                            const nextLine = nonEmptyLines[i + 1].trim();
+                            if (nextLine.match(/^(CEO|CTO|Manager|Director|Founder|President|VP|Head|Chief),?\s/i)) {
+                                client_name = line;
+                                continue;
+                            }
+                        }
+                    }
+                    
+                    // Otherwise, it's part of the testimonial
+                    if (!clientInfoFound || (clientInfoFound && client_name && client_title)) {
+                        // Don't add client info to testimonial
+                        if (line !== client_name && line !== client_title) {
+                            testimonialLines.push(line);
+                        }
+                    } else {
+                        testimonialLines.push(line);
+                    }
+                }
+                
+                testimonial_text = testimonialLines.join(' ');
+                
+                return {
+                    main_heading: this.convertBoldMarkers(main_heading || "Client Testimonials"),
+                    testimonial_text: this.convertBoldMarkers(testimonial_text || "Great service!"),
+                    client_name: this.convertBoldMarkers(client_name || "Client Name"),
+                    client_title: this.convertBoldMarkers(client_title || "Client Title"),
+                    button_text: button_text || "View all Testimonials"
+                };
+            }
+
+            parseBenefitsSection(content) {
+                const allLines = content.split('\n');
+                const nonEmptyLines = allLines.filter(line => line.trim());
+                const benefits = [];
+                
+                if (nonEmptyLines.length < 3) {
+                    return {
+                        main_heading: "Key Benefits",
+                        description: "Why choose us",
+                        benefits: []
+                    };
+                }
+                
+                const main_heading = nonEmptyLines[0];
+                const description = nonEmptyLines[1];
+                
+                // Process benefits starting from line 2
+                let currentBenefit = null;
+                let currentDescription = [];
+                
+                for (let i = 2; i < nonEmptyLines.length; i++) {
+                    const line = nonEmptyLines[i].trim();
+                    
+                    // Detect if this line is a benefit title based on patterns:
+                    // - Short lines (under 80 chars) that are likely titles
+                    // - Lines that don't end with periods (descriptions usually do)
+                    // - Consider context: if it's a title-like format, it's probably a title
+                    const isShort = line.length < 80;
+                    const endsWithPeriod = line.endsWith('.');
+                    const hasMultipleWords = line.split(' ').length >= 2;
+                    const isCapitalized = /^[A-Z0-9]/.test(line);
+                    const containsActionVerbs = /\b(accelerate|maximize|build|prioritize|integrate|seamlessly|round-the-clock|implement|ensure|provide|deliver|create|develop|design|maintain|monitor|process|handle|manage)\b/i.test(line);
+                    
+                    // A line is likely a benefit title if it's short, doesn't end with period, and doesn't contain action verbs
+                    const isBenefitTitle = isShort && !endsWithPeriod && !containsActionVerbs && isCapitalized && hasMultipleWords;
+                    
+                    // Also check if it's the first line after main description
+                    const isFirstBenefit = i === 2;
+                    
+                    if (isBenefitTitle || isFirstBenefit) {
+                        // Save previous benefit if exists
+                        if (currentBenefit) {
+                            benefits.push({
+                                title: currentBenefit,
+                                description: currentDescription.join(' ').trim(),
+                                image_slug: this.generateImageSlug(currentBenefit)
+                            });
+                        }
+                        
+                        // Start new benefit
+                        currentBenefit = line;
+                        currentDescription = [];
+                    } else {
+                        // This line is part of the description
+                        if (line.trim()) {
+                            currentDescription.push(line);
+                        }
+                    }
+                }
+                
+                // Don't forget the last benefit
+                if (currentBenefit) {
+                    benefits.push({
+                        title: currentBenefit,
+                        description: currentDescription.join(' ').trim(),
+                        image_slug: this.generateImageSlug(currentBenefit)
+                    });
+                }
+                
+                return {
+                    main_heading: this.convertBoldMarkers(main_heading || "Key Benefits"),
+                    description: this.convertBoldMarkers(description || "Why choose us"),
+                    benefits: benefits
+                };
+            }
+
+            generateImageSlug(title) {
+                // Convert title to lowercase slug for image filename
+                return title.toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+                    .replace(/\s+/g, '-') // Replace spaces with hyphens
+                    .replace(/-+/g, '-') // Replace multiple hyphens with single
+                    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+            }
+
+            parseBenefitsTwoSection(content) {
+                const lines = content.split('\n').filter(line => line.trim());
+                
+                let main_heading = '';
+                let description = '';
+                let benefits = [];
+                let currentIndex = 0;
+                
+                // First line is heading
+                if (lines.length > 0) {
+                    main_heading = lines[0].trim();
+                    currentIndex = 1;
+                }
+                
+                // Second line is description
+                if (lines.length > 1) {
+                    description = lines[1].trim();
+                    currentIndex = 2;
+                }
+                
+                // Parse benefits - they follow title/description pairs
+                let i = currentIndex;
+                while (i < lines.length) {
+                    if (i + 1 < lines.length) {
+                        const title = lines[i];
+                        const benefit_desc = lines[i + 1];
+                        benefits.push({'title': title, 'description': benefit_desc});
+                        i += 2;
+                    } else {
+                        // Last item without description
+                        benefits.push({'title': lines[i], 'description': ''});
+                        i += 1;
+                    }
+                }
+                
+                return {
+                    main_heading: main_heading || "Why Choose Space-O Technologies",
+                    description: description || "Partner with us for expert web development consulting.",
+                    benefits: benefits
+                };
+            }
+
+            parseContentFormSection(content) {
+                const lines = content.split('\n').filter(line => line.trim());
+                
+                let main_heading = '';
+                let description = '';
+                let bullet_points = [];
+                let bullet_intro = '';
+                let currentIndex = 0;
+                
+                // First line is heading
+                if (lines.length > 0) {
+                    main_heading = lines[0].trim();
+                    currentIndex = 1;
+                }
+                
+                // Look for description and bullet points
+                let foundBulletIntro = false;
+                
+                for (let i = currentIndex; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    
+                    if (line.startsWith('●')) {
+                        // This is a bullet point
+                        const bulletText = line.replace('●', '').trim();
+                        const parts = bulletText.split(':', 2);
+                        if (parts.length === 2) {
+                            bullet_points.push(`<strong>${parts[0]}:</strong>${parts[1]}`);
+                        } else {
+                            bullet_points.push(bulletText);
+                        }
+                    } else if (line.endsWith(':') && (line.includes('Challenge') || line.includes('Address') || line.includes('Help'))) {
+                        // This is the bullet intro line
+                        bullet_intro = line;
+                        foundBulletIntro = true;
+                    } else if (!foundBulletIntro && line.length > 20) {
+                        // This is likely part of the description
+                        description += (description ? ' ' : '') + line;
+                    }
+                }
+                
+                return {
+                    main_heading: main_heading || "Contact Us",
+                    description: description || "Get in touch",
+                    bullet_points: bullet_points,
+                    bullet_intro: bullet_intro
+                };
+            }
+
+            detectSections(content) {
+                const sectionPattern = /\[([A-Z_\s]+)\]/g;
+                const matches = [...content.matchAll(sectionPattern)];
+                const detected = matches.map(match => match[1].trim());
+                
+                // Filter out END markers and only keep supported sections
+                return [...new Set(detected)]
+                    .filter(section => !section.endsWith(' END'))
+                    .filter(section => 
+                        this.supportedSections.some(supported => 
+                            section.includes(supported) || supported.includes(section)
+                        )
+                    );
+            }
+
+            async processContent(content) {
+                try {
+                    const detectedSections = this.detectSections(content);
+                    
+                    if (detectedSections.length === 0) {
+                        return {
+                            success: false,
+                            error: 'No valid sections found in document',
+                            detectedSections: []
+                        };
+                    }
+
+                    const sections = await this.parseRealDocument(content);
+                    const generatedHtml = [];
+
+                    for (let [sectionType, sectionContent] of Object.entries(sections)) {
+                        if (!this.supportedSections.some(s => sectionType.includes(s))) continue;
+                        
+                        const html = this.generateSection(sectionType, sectionContent);
+                        generatedHtml.push(html);
+                    }
+
+                    return {
+                        success: true,
+                        html: generatedHtml.join('\n'),
+                        detectedSections: detectedSections,
+                        sectionsGenerated: Object.keys(sections)
+                    };
+                } catch (error) {
+                    return {
+                        success: false,
+                        error: error.message,
+                        detectedSections: []
+                    };
+                }
+            }
+
+            generateSection(sectionType, content) {
+                if (sectionType.includes('HERO')) {
+                    return this.generateHeroSection(content);
+                } else if (sectionType.includes('FAQ')) {
+                    return this.generateFaqSection(content);
+                } else if (sectionType.includes('CTA_TWO')) {
+                    return this.generateCtaTwoSection(content);
+                } else if (sectionType.includes('CTA')) {
+                    return this.generateCtaSection(content);
+                } else if (sectionType.includes('PROCESS')) {
+                    return this.generateProcessSection(content);
+                } else if (sectionType.includes('TECHNOLOGY')) {
+                    return this.generateTechnologySection(content);
+                } else if (sectionType.includes('INDUSTRIES')) {
+                    return this.generateIndustriesSection(content);
+                } else if (sectionType.includes('SERVICES_GRID')) {
+                    return this.generateServicesGridSection(content);
+                } else if (sectionType.includes('SERVICES_ACCORDION')) {
+                    return this.generateServicesAccordionSection(content);
+                } else if (sectionType.includes('PORTFOLIO')) {
+                    return this.generatePortfolioSection(content);
+                } else if (sectionType.includes('TESTIMONIAL')) {
+                    return this.generateTestimonialSection(content);
+                } else if (sectionType.includes('BENEFITS_TWO')) {
+                    return this.generateBenefitsTwoSection(content);
+                } else if (sectionType.includes('BENEFITS')) {
+                    return this.generateBenefitsSection(content);
+                } else if (sectionType.includes('CONTENT_FORM')) {
+                    return this.generateContentFormSection(content);
+                }
+                return `<div><!-- ${sectionType} section not implemented yet --></div>`;
+            }
+
+            generateHeroSection(content) {
+                let bulletPoints = '';
+                if (content.bullet_points) {
+                    for (let bullet of content.bullet_points) {
+                        bulletPoints += `    <li>${bullet}</li>\n`;
+                    }
+                }
+
+                const template = `<section class="pt70 pb40 hero-section">
+<div class="container-xl">
+<div class="row align-items-center">
+<div class="col-lg-7 col-md-12 banner-text">
+<nav aria-label="breadcrumbs" class="rank-math-breadcrumb mb-3 mt-3"><p><a href="/" class="local" style="text-decoration: unset;">Home</a><span class="separator"> &gt; </span><a href="/services/" class="local" style="text-decoration: unset;">Services</a><span class="separator"> &gt; </span><span class="last">{breadcrumb_title}</span></p></nav>
+<h1 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h1>
+<p class="fonts-18 mb-3">{description}</p>
+{bullet_intro_html}
+<ul class="bullet mb-5 fonts-18">
+{bullet_points}
+</ul>
+
+<div class="rating-section d-flex"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
+<a href="https://clutch.co/profile/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/clutch-rating.svg" alt="Clutch" width="99" height="56" /></a>
+<a href="https://www.goodfirms.co/company/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/goodfirm-rating.svg" alt="GoodFirms" width="135" height="56" /></a></div>
+</div>
+<div class="col-lg-5 col-md-12 text-form-section">
+<div class="homen_form">
+<p class="fonts-24 font-weight-bold mt-0 mb-2 text-center line-height-1">{form_heading}</p>
+<form id="other-form" class="footer_form append-form blur-form" action="" method="post" name="popup-form" novalidate="">
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-user"></i><input id="name" class="form-control" name="name" required="" size="40" type="text" value="" placeholder="Name*" data-name="Please enter your name" /><small class="error"></small></p>
+
+<div class="clearfix"></div>
+</div>
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-envelope"></i><input id="email" class="form-control" name="email" required="" size="40" type="email" value="" placeholder="Email*" data-name="Please enter your email" /><small class="error"></small></p>
+
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-phone"></i><input id="number" class="form-control" name="number" required="" size="15" type="tel" value="" placeholder="Phone*" data-name="Please enter your number" /><small class="error"></small><span id="error-msg" class="d-none"></span></p>
+
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 mb-0 text-left"><textarea id="Comment" class="form-control" cols="40" name="comment" required="" rows="3" placeholder="Write your message.*" data-name="Please enter your description"></textarea><small class="error"></small></div>
+</div>
+<div class="row">
+<div class="form-group col-md-12">
+<div class="footer_txt_block mt-2">
+<input id="form_type" name="form_type" type="hidden" value="footer_form" />
+[spaceo_get_permalink][spaceo_get_referal]
+<div id="loadingmessage" class="loader"><img src="/wp-content/uploads/2021/04/ajax-loader.gif" alt="Ajax loader" width="30" height="30" /></div>
+<input id="submit" class="btn btn-pop mb0" name="submit" type="submit" value="{form_button_text}" data-medium="BF_1" />
+
+</div>
+</div>
+</div>
+</form></div>
+</div>
+</div>
+</div>
+</section>`;
+
+                const bulletIntroHtml = content.bullet_intro ? `<p class="fonts-18 mb-2 font-weight-bold">${content.bullet_intro}</p>` : '';
+                
+                return template
+                    .replace('{breadcrumb_title}', content.main_heading || 'Service')
+                    .replace('{main_heading}', content.main_heading || 'Service Title')
+                    .replace('{description}', content.description || 'Service description')
+                    .replace('{bullet_intro_html}', bulletIntroHtml)
+                    .replace('{bullet_points}', bulletPoints)
+                    .replace('{form_heading}', content.form_heading || 'Dream It, We Build It')
+                    .replace('{form_button_text}', content.form_button_text || 'Book Your Free Consultation');
+            }
+
+            generateFaqSection(content) {
+                let faqItems = '';
+                if (content.faqs) {
+                    content.faqs.forEach((faq, index) => {
+                        const collapseId = ['one', 'two', 'three', 'four', 'five', 'six', 'seven'][index] || 'item' + index;
+                        const isActive = index === 0 ? 'active' : ''; // First item is active
+                        const showCollapse = index === 0 ? 'style="display: block;"' : 'style="display: none;"';
+                        const collapseClass = index === 0 ? 'collapse open' : 'collapse';
+                        
+                        faqItems += `<div class="card py-4">
+<div class="card-header ${isActive}">
+<h3 class="card-link" data-toggle="collapse" href="#${collapseId}">${faq.question}</h3>
+<div id="${collapseId}" class="${collapseClass}" data-parent="#accordion" ${showCollapse}>
+<div class="card card-body">
+${faq.answer}
+</div>
+</div>
+</div>
+</div>
+`;
+                    });
+                }
+
+                const template = `<div class="faq pt80 pb50" style="background: linear-gradient(var(--bg-color-9), #fff);">
+  <div class="container-xl">
+    <h2 class="fonts-40 font-weight-bold text-center">{main_heading}</h2>
+    <div id="accordion" class="text-left px-4">
+${faqItems}
+    </div>
+  </div>
+</div>`;
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'FAQs About Web Development Consulting');
+            }
+
+            generateCtaSection(content) {
+                const template = `<section class="pt80 pb80 new-cta-section">
+<div class="container-xl">
+<div class="cta-inner">
+<div class="row align-items-center">
+<div class="col-md-12 text-center">
+<p class="fonts-40 font-weight-bold cta-title mxw-1000">{main_heading}</p>
+<p class="fonts-20 mxw-900">{description}</p>
+</div>
+<div class="col-md-12 text-center mt-4"><button class="btn btn-pop open-qouteform" type="button" data-medium="B_2">{button_text}</button></div>
+</div>
+</div>
+</div>
+</section>`;
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Ready to Get Started?')
+                    .replace('{description}', content.description || 'Let us help you achieve your goals')
+                    .replace('{button_text}', content.button_text || 'Get Started');
+            }
+
+            generateProcessSection(content) {
+                const template = `<section class="pt70 pb40 process-section">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-12 text-center">
+<h2 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h2>
+<p class="fonts-18 mb-5">{description}</p>
+</div>
+</div>
+<div class="row">
+{process_steps}
+</div>
+</div>
+</section>`;
+
+                let processSteps = '';
+                if (content.steps) {
+                    content.steps.forEach((step, index) => {
+                        processSteps += `<div class="col-lg-4 col-md-6 mb-4">
+<div class="process-step text-center">
+<div class="step-number fonts-24 font-weight-bold mb-3">${index + 1}</div>
+<h3 class="fonts-20 font-weight-bold mb-2">${step.title}</h3>
+<p class="fonts-16">${step.description}</p>
+</div>
+</div>
+`;
+                    });
+                }
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Our Process')
+                    .replace('{description}', content.description || 'How we work with you')
+                    .replace('{process_steps}', processSteps);
+            }
+
+            generateTechnologySection(content) {
+                const template = `<section class="pt70 pb40 technology-section bg-light">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-12 text-center">
+<h2 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h2>
+<p class="fonts-18 mb-5">{description}</p>
+</div>
+</div>
+<div class="row">
+<div class="col-lg-12">
+<div class="tech-stack">
+{tech_items}
+</div>
+</div>
+</div>
+</div>
+</section>`;
+
+                let techItems = '';
+                if (content.technologies) {
+                    content.technologies.forEach(tech => {
+                        techItems += `<span class="tech-item badge badge-primary mr-2 mb-2 fonts-16">${tech}</span>
+`;
+                    });
+                }
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Technology Stack')
+                    .replace('{description}', content.description || 'Technologies we use')
+                    .replace('{tech_items}', techItems);
+            }
+
+            generateIndustriesSection(content) {
+                const template = `<section class="pt70 pb40 industries-section">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-12 text-center">
+<h2 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h2>
+<p class="fonts-18 mb-5">{description}</p>
+</div>
+</div>
+</div>
+</section>`;
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Industries We Serve')
+                    .replace('{description}', content.description || 'We serve various industries');
+            }
+
+            generateServicesGridSection(content) {
+                const serviceImages = [
+                    '/wp-content/uploads/2023/09/Architecture-and-Design-Consulting.svg',
+                    '/wp-content/uploads/2025/07/ux-performance-optimization.svg',
+                    '/wp-content/uploads/2024/02/Legacy-App-Modernization.svg',
+                    '/wp-content/uploads/2025/07/code-audits-quality-assurance.svg',
+                    '/wp-content/uploads/2023/09/MVP-Development.svg',
+                    '/wp-content/uploads/2024/03/Third-party-Integrations.svg'
+                ];
+
+                let servicesGrid = '';
+                if (content.services) {
+                    content.services.forEach((service, index) => {
+                        const imageSrc = serviceImages[index] || serviceImages[0];
+                        
+                        // Generate bullet points if they exist
+                        let bulletHtml = '';
+                        if (service.bullets && service.bullets.length > 0) {
+                            bulletHtml = '<ul class="bullet fonts-14 mb-3">';
+                            service.bullets.forEach(bullet => {
+                                bulletHtml += `<li>${bullet}</li>`;
+                            });
+                            bulletHtml += '</ul>';
+                        }
+                        
+                        servicesGrid += `
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<img src="${imageSrc}" alt="${service.title}" width="74" height="74" />
+<h3 class="fonts-18 font-weight-semibold">${service.title}</h3>
+<p>${service.description}</p>
+${bulletHtml}
+</div>
+</div>
+`;
+                    });
+                }
+
+                const template = `<section class="pt80 pb50 services-section bg-color">
+<div class="container-xl">
+<h2 class="fonts-40 text-center font-weight-bold mb-3 mxw-1000">{main_heading}</h2>
+<p class="fonts-18 text-center mxw-1000 mb-4">{description}</p>
+<div class="row">
+${servicesGrid}
+</div>
+</div>
+</section>`;
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Our Services')
+                    .replace('{description}', content.description || 'Services we provide');
+            }
+
+            generateServicesAccordionSection(content) {
+                if (!content.services || content.services.length === 0) {
+                    return '<div>No services found</div>';
+                }
+
+                const services = content.services;
+                const totalServices = services.length;
+
+                // If 3 or fewer services, use single section
+                if (totalServices <= 3) {
+                    return this.generateSingleAccordionSection(services);
+                }
+
+                // If more than 3, split into multiple sections with swapped columns
+                return this.generateMultipleAccordionSections(services);
+            }
+
+            generateSingleAccordionSection(services) {
+                const accordionImages = [
+                    '/wp-content/uploads/2025/07/security-compliance-advisory.svg',
+                    '/wp-content/uploads/2025/07/cloud-infrastructure-planning.svg',
+                    '/wp-content/uploads/2025/07/cloud-infrastructure-planning.svg'
+                ];
+
+                const collapseIds = ['one', 'two', 'three'];
+                let accordionItems = '';
+
+                services.forEach((service, index) => {
+                    const imageSrc = accordionImages[index] || accordionImages[0];
+                    const collapseId = collapseIds[index] || `item_${index}`;
+                    const isFirst = index === 0;
+                    const cardHeaderClass = isFirst ? 'card-header active' : 'card-header';
+                    const collapseClass = isFirst ? 'collapse show' : 'collapse';
+                    const displayStyle = isFirst ? 'style="display:block;"' : '';
+                    
+                    // Generate bullet points if they exist
+                    let bulletHtml = '';
+                    if (service.bullets && service.bullets.length > 0) {
+                        bulletHtml = '<ul class="bullet fonts-14 mb-3">';
+                        service.bullets.forEach(bullet => {
+                            bulletHtml += `<li>${bullet}</li>`;
+                        });
+                        bulletHtml += '</ul>';
+                    }
+                    
+                    accordionItems += `<div class="card">
+<div class="${cardHeaderClass}" ${displayStyle}>
+<h3 class="card-link" data-toggle="collapse" href="#${collapseId}"><img src="${imageSrc}" width="34" height="34" alt="${service.title}" class="left-icons" loading="lazy" decoding="async">${service.title}</h3>
+<div id="${collapseId}" class="${collapseClass}" data-parent="#accordion">
+<div class="card card-body">
+<p>${service.description}</p>
+${bulletHtml}
+</div>
+</div>
+</div>
+</div>
+`;
+                });
+
+                return `<section class="techno-stack pb80 bg-color services-tab-new">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-6">
+<div class="left-img">
+<img src="/wp-content/uploads/2025/07/security-compliance-advisory.jpg" alt="Security Compliance Advisory" width="630" height="500" loading="lazy" decoding="async">
+</div>
+</div>
+<div class="col-lg-6">
+<div id="accordion" class="text-left">
+${accordionItems}
+</div>
+</div>
+</div>
+</div>
+</section>`;
+            }
+
+            generateMultipleAccordionSections(services) {
+                // Split services into groups of 3
+                const serviceGroups = [];
+                for (let i = 0; i < services.length; i += 3) {
+                    serviceGroups.push(services.slice(i, i + 3));
+                }
+
+                let sectionsHtml = '';
+                
+                serviceGroups.forEach((group, groupIndex) => {
+                    const accordionImages = [
+                        '/wp-content/uploads/2025/07/security-compliance-advisory.svg',
+                        '/wp-content/uploads/2025/07/cloud-infrastructure-planning.svg',
+                        '/wp-content/uploads/2025/07/cloud-infrastructure-planning.svg'
+                    ];
+
+                    const collapseIds = ['one', 'two', 'three'];
+                    let accordionItems = '';
+
+                    group.forEach((service, index) => {
+                        const imageSrc = accordionImages[index] || accordionImages[0];
+                        const collapseId = collapseIds[index];
+                        const isFirst = index === 0;
+                        const cardHeaderClass = isFirst ? 'card-header active' : 'card-header';
+                        const collapseClass = isFirst ? 'collapse show' : 'collapse';
+                        const displayStyle = isFirst ? 'style="display:block;"' : '';
+                        
+                        // Generate bullet points if they exist
+                        let bulletHtml = '';
+                        if (service.bullets && service.bullets.length > 0) {
+                            bulletHtml = '<ul class="bullet fonts-14 mb-3">';
+                            service.bullets.forEach(bullet => {
+                                bulletHtml += `<li>${bullet}</li>`;
+                            });
+                            bulletHtml += '</ul>';
+                        }
+                        
+                        accordionItems += `<div class="card">
+<div class="${cardHeaderClass}" ${displayStyle}>
+<h3 class="card-link" data-toggle="collapse" href="#${collapseId}"><img src="${imageSrc}" width="34" height="34" alt="${service.title}" class="left-icons" loading="lazy" decoding="async">${service.title}</h3>
+<div id="${collapseId}" class="${collapseClass}" data-parent="#accordion">
+<div class="card card-body">
+<p>${service.description}</p>
+${bulletHtml}
+</div>
+</div>
+</div>
+</div>
+`;
+                    });
+
+                    // Swap columns for alternating sections (odd sections have swapped layout)
+                    const isSwapped = groupIndex % 2 === 1;
+                    
+                    if (isSwapped) {
+                        // Swapped: Accordion left, Image right
+                        sectionsHtml += `<section class="techno-stack pb80 bg-color services-tab-new">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-6">
+<div id="accordion" class="text-left">
+${accordionItems}
+</div>
+</div>
+<div class="col-lg-6">
+<div class="left-img">
+<img src="/wp-content/uploads/2025/07/security-compliance-advisory.jpg" alt="Security Compliance Advisory" width="630" height="500" loading="lazy" decoding="async">
+</div>
+</div>
+</div>
+</div>
+</section>
+
+`;
+                    } else {
+                        // Normal: Image left, Accordion right
+                        sectionsHtml += `<section class="techno-stack pb80 bg-color services-tab-new">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-6">
+<div class="left-img">
+<img src="/wp-content/uploads/2025/07/security-compliance-advisory.jpg" alt="Security Compliance Advisory" width="630" height="500" loading="lazy" decoding="async">
+</div>
+</div>
+<div class="col-lg-6">
+<div id="accordion" class="text-left">
+${accordionItems}
+</div>
+</div>
+</div>
+</div>
+</section>
+
+`;
+                    }
+                });
+
+                return sectionsHtml;
+            }
+
+            generatePortfolioSection(content) {
+                let portfolioItems = '';
+                if (content.projects && content.projects.length > 0) {
+                    content.projects.forEach((project, index) => {
+                        const orderClass = index % 2 === 0 ? 'order-1' : 'order-2';
+                        const isEven = index % 2 === 0;
+                        
+                        if (isEven) {
+                            // Even index: Text left, Image right
+                            portfolioItems += `<div class="slider_projects ${orderClass}">
+<div class="row vcenter-parent">
+<div class="col-lg-6 col-12">
+<div class="left_text">
+<div class="slider-app-name">
+<div class="top-heading">
+<h3 class="fonts-26 mb-2 font-weight-bold"><a href="${project.link || '#'}">${project.title}</a></h3>
+</div>
+</div>
+<p class="mb-3">${project.description}</p>
+<div class="keep-reading ml-2"><a class="btn-link-arrow btn-link-arrow-right" href="${project.link || '#'}"><span class="btn__label-wrapper">${project.buttonText || 'See Project Details'}</span></a></div>
+</div>
+</div>
+<div class="col-lg-6 col-12">
+<img loading="lazy" decoding="async" class="project-img" src="${project.image}" alt="${project.title}" width="600" height="459">
+</div>
+</div>
+</div>
+`;
+                        } else {
+                            // Odd index: Text left, Image right (same as even for consistency)
+                            portfolioItems += `<div class="slider_projects ${orderClass}">
+<div class="row vcenter-parent">
+<div class="col-lg-6 col-12">
+<div class="left_text">
+<div class="slider-app-name">
+<div class="top-heading">
+<h3 class="fonts-26 mb-2 font-weight-bold"><a href="${project.link || '#'}">${project.title}</a></h3>
+</div>
+</div>
+<p class="mb-3">${project.description}</p>
+<div class="keep-reading ml-2"><a class="btn-link-arrow btn-link-arrow-right" href="${project.link || '#'}"><span class="btn__label-wrapper">${project.buttonText || 'See Project Details'}</span></a></div>
+</div>
+</div>
+<div class="col-lg-6 col-12">
+<img loading="lazy" decoding="async" class="project-img" src="${project.image}" alt="${project.title}" width="600" height="459">
+</div>
+</div>
+</div>
+`;
+                        }
+                    });
+                }
+                
+                return `<div class="our-work pt70 pb70 bg-color">
+<div class="container-xl">
+<div class="text-center">
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">${content.main_heading || 'Proven Results: Real Projects That Drive Business Growth'}</h2>
+<p class="fonts-18 text-center mb-3 mxw-900">${content.description || 'See how we\'ve transformed complex business challenges into measurable success stories.'}</p>
+</div>
+${portfolioItems}
+</div>
+</div>`;
+            }
+
+            generateTestimonialSection(content) {
+                const template = `<div class="blog-testimonial pb80 pt80 bg-color">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center mb-5">{main_heading}</h2>
+<div class="row align-items-center customer-feedback">
+<div class="col-lg-7 blog-testimonial-left">
+<p class="description mb-0">{testimonial_text}</p>
+<div class="users-feed-ibox d-flex flex-row">
+<div class="userfedd-detbox justify-content-between">
+<div class="d-flex align-items-center mb-2">
+<p class="user-name">{client_name}</p>
+<p><img loading="lazy" decoding="async" src="/wp-content/uploads/2023/06/Rating.svg" alt="review-star" width="82" height="13">
+</p></div>
+<p>{client_title}</p>
+</div>
+</div>
+<div class="read_more">
+<a class="btn-link-arrow btn-link-arrow-right" href="/company/client-testimonials/"><span class="btn__label-wrapper">{button_text}</span></a>
+</div>
+</div>
+<div class="col-lg-5 right-img text-right"><img loading="lazy" decoding="async" src="/wp-content/uploads/2024/01/{client_image}" alt="{client_name}" width="434" height="402"></div>
+</div>
+</div>
+</div>`;
+
+                // Generate client image filename from name
+                const clientImageName = (content.client_name || 'Client-Name').replace(/\s+/g, '-') + '.png';
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Client Testimonials')
+                    .replace('{testimonial_text}', content.testimonial_text || 'Great service!')
+                    .replace(/{client_name}/g, content.client_name || 'Client Name')
+                    .replace('{client_title}', content.client_title || 'Client Title')
+                    .replace('{button_text}', content.button_text || 'View all Testimonials')
+                    .replace('{client_image}', clientImageName);
+            }
+
+            generateBenefitsSection(content) {
+                const template = `<section class="pt80 pb50 services-section">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center mb-3 mxw-1000">{main_heading}</h2>
+<p class="fonts-18 text-center mxw-1000 mb-4">{description}</p>
+<div class="row">
+{benefits_items}
+</div>
+</div>
+</section>`;
+
+                let benefitsItems = '';
+                if (content.benefits) {
+                    content.benefits.forEach(benefit => {
+                        benefitsItems += `<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+            <img loading="lazy" decoding="async" src="/wp-content/uploads/2025/07/${benefit.image_slug}.svg" alt="${benefit.title}" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">${benefit.title}</h3>
+<p>            ${benefit.description}
+        </p></div>
+</div>
+`;
+                    });
+                }
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Key Benefits')
+                    .replace('{description}', content.description || 'Why choose us')
+                    .replace('{benefits_items}', benefitsItems);
+            }
+
+            generateBenefitsTwoSection(content) {
+                const template = `<section class="pt80 pb50 services-section practices-we-follow">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center mb-3">{main_heading}</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">{description}</p>
+<div class="row">
+{benefits_items}
+</div>
+</div>
+</section>`;
+
+                let benefitsItems = '';
+                if (content.benefits) {
+                    content.benefits.slice(0, 6).forEach(benefit => {
+                        benefitsItems += `    <div class="col-lg-4 col-md-6">
+        <div class="mad_service_box">
+            <h3 class="fonts-18 font-weight-semibold">${benefit.title}</h3>
+            ${benefit.description}
+        </div>
+    </div>
+`;
+                    });
+                }
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Why Choose Space-O Technologies')
+                    .replace('{description}', content.description || 'Partner with us for expert web development consulting.')
+                    .replace('{benefits_items}', benefitsItems);
+            }
+
+            parseCtaTwoSection(content) {
+                const lines = content.split('\n').filter(line => line.trim());
+                
+                let title = '';
+                let description = '';
+                let stats = [];
+                let buttons = '';
+                
+                // First line is title
+                if (lines.length > 0) {
+                    title = lines[0].trim();
+                }
+                
+                // Second line is description
+                if (lines.length > 1) {
+                    description = lines[1].trim();
+                }
+                
+                // Parse stats and buttons (number + description pairs)
+                let i = 2;
+                while (i < lines.length) {
+                    const line = lines[i].trim();
+                    if (line && /\d/.test(line) && line.length < 10) {  // This is a stat number
+                        const statNumber = line;
+                        let statDescription = '';
+                        if (i + 1 < lines.length && !/\d/.test(lines[i + 1]) && !lines[i + 1].includes('Request')) {
+                            statDescription = lines[i + 1].trim();
+                            i += 2;
+                        } else {
+                            i += 1;
+                        }
+                        stats.push(`${statNumber} ${statDescription}`);
+                    } else if (line.includes('Request')) {
+                        buttons = line;
+                        i += 1;
+                    } else {
+                        i += 1;
+                    }
+                }
+                
+                return {
+                    title: title || 'Ready to Build a Web Solution That Drives Results?',
+                    description: description || 'Whether you\'re a startup or an enterprise, we offer fully customized web development services.',
+                    stats: stats,
+                    buttons: buttons || 'Request a Free Proposal View Portfolio'
+                };
+            }
+
+            generateContentFormSection(content) {
+                let bulletHtml = '';
+                if (content.bullet_points && content.bullet_points.length > 0) {
+                    bulletHtml = `<strong>${content.bullet_intro || 'Key Points:'}</strong>\n<ul class="bullet fonts-14 mb-3">\n`;
+                    for (let bullet of content.bullet_points) {
+                        bulletHtml += `<li>${bullet}</li>\n`;
+                    }
+                    bulletHtml += '</ul>';
+                }
+
+                const template = `<section class="pt80 pb80 text-form-section bg-color">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-7 col-md-12 col-sm-12">
+<h2 class="fonts-40 font-weight-bold text-left mb-4">{main_heading}</h2>
+<p>{description}</p>
+{bullet_html}
+</div>
+<div class="col-lg-5 col-md-12 col-sm-12 text-center">
+<div class="homen_form">
+<p class="fonts-24 font-weight-bold mt-0 mb-3 text-center line-height-1 pb-0">Talk to Our Experts Now</p>
+<form id="other-form2" class="footer_form append-form blur-form" action="" method="post" name="popup-form" novalidate="">
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-user"></i><input id="name" class="form-control" name="name" required="" size="40" type="text" value="" placeholder="Name*" data-name="Please enter your name" /><small class="error"></small></p>
+<div class="clearfix"></div>
+</div>
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-envelope"></i><input id="email" class="form-control" name="email" required="" size="40" type="email" value="" placeholder="Email*" data-name="Please enter your email" /><small class="error"></small></p>
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-phone"></i><input id="number" class="form-control" name="number" required="" size="15" type="tel" value="" placeholder="Phone*" data-name="Please enter your number" /><small class="error"></small><span id="error-msg" class="d-none"></span></p>
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 mb-0 text-left"><textarea id="Comment" class="form-control" cols="40" name="comment" required="" rows="3" placeholder="Write your message.*" data-name="Please enter your description"></textarea><small class="error"></small></div>
+</div>
+<div class="row">
+<div class="form-group col-md-12">
+<div class="footer_txt_block mt-2">
+<input id="form_type" name="form_type" type="hidden" value="footer_form" />
+[spaceo_get_permalink][spaceo_get_referal]
+<div id="loadingmessage" class="loader"><img src="/wp-content/uploads/2021/04/ajax-loader.gif" alt="Ajax loader" width="30" height="30" /></div>
+<input id="submit" class="btn btn-pop mb0" name="submit" type="submit" value="Book Your Consultation Now" data-medium="S_2" />
+</div>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Contact Us')
+                    .replace('{description}', content.description || 'Get in touch')
+                    .replace('{bullet_html}', bulletHtml);
+            }
+
+            generateCtaTwoSection(content) {
+                let statsHtml = '';
+                const statImages = [
+                    'https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Frame-1.svg',
+                    '/wp-content/uploads/2025/07/frameworks-tools-mastered.svg',
+                    '/wp-content/uploads/2025/07/seo-mobile-optimized.svg',
+                    '/wp-content/uploads/2025/07/years-of-dev-expertise.svg'
+                ];
+                
+                if (content.stats && content.stats.length > 0) {
+                    content.stats.slice(0, 4).forEach((stat, index) => {
+                        const imgSrc = statImages[index] || statImages[0];
+                        const parts = stat.split(' ');
+                        const number = parts[0];
+                        const text = parts.slice(1).join(' ');
+                        
+                        statsHtml += `    <div class="new-button-group-inner">
+        <img src="${imgSrc}">
+        <strong>${number}</strong> ${text}
+    </div>
+`;
+                    });
+                }
+
+                const template = `<section class="pt50 pb80 new-cta-section">
+<div class="container-xl">
+<div class="cta-inner">
+<div class="row align-items-center">
+<div class="col-md-12 text-center">
+<p class="fonts-40 font-weight-bold cta-title">{title}</p>
+<p class="fonts-20 mxw-900">{description}</p>
+</div>
+<div class="new-button-group">
+{stats_html}</div>
+<div class="col-md-12 text-center mt-4 d-flex justify-content-center two-btn-group"><button class="btn btn-pop open-qouteform" type="button" data-medium="B_2">Request a Free Proposal</button> <a class="btn btn-pop open-qouteform white-btn" href="/project/">View Portfolio</a></div>
+</div>
+</div>
+</div>
+</section>`;
+
+                return template
+                    .replace('{title}', content.title || 'Ready to Build a Web Solution That Drives Results?')
+                    .replace('{description}', content.description || 'Whether you\'re a startup or an enterprise, we offer fully customized web development services.')
+                    .replace('{stats_html}', statsHtml);
+            }
+        }
+
+        // Enhanced IDE Interface
+        class EnhancedIDEInterface {
+            constructor() {
+                this.processor = new RealDocumentProcessor();
+                this.currentFile = null;
+                this.generatedCode = '';
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.showWelcomeMessage();
+            }
+
+            initializeElements() {
+                this.fileUpload = document.getElementById('fileUpload');
+                this.fileInput = document.getElementById('fileInput');
+                this.fileInfo = document.getElementById('fileInfo');
+                this.fileName = document.getElementById('fileName');
+                this.fileSize = document.getElementById('fileSize');
+                this.fileType = document.getElementById('fileType');
+                this.fileStatus = document.getElementById('fileStatus');
+                this.inputContent = document.getElementById('inputContent');
+                this.outputCode = document.getElementById('outputCode');
+                this.processBtn = document.getElementById('processBtn');
+                this.clearBtn = document.getElementById('clearBtn');
+                this.copyBtn = document.getElementById('copyBtn');
+                this.downloadBtn = document.getElementById('downloadBtn');
+                this.statusText = document.getElementById('statusText');
+                this.detectedSections = document.getElementById('detectedSections');
+                this.sectionTags = document.getElementById('sectionTags');
+                this.sectionCount = document.getElementById('sectionCount');
+                this.statsPanel = document.getElementById('statsPanel');
+                this.lineCount = document.getElementById('lineCount');
+                this.wordCount = document.getElementById('wordCount');
+                this.processIcon = document.getElementById('processIcon');
+                this.aiConfigBtn = document.getElementById('aiConfigBtn');
+                this.aiConfig = document.getElementById('aiConfig');
+                this.apiKeyInput = document.getElementById('apiKeyInput');
+                this.useAICheckbox = document.getElementById('useAICheckbox');
+            }
+
+            bindEvents() {
+                // File upload events
+                this.fileUpload.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+                
+                // Drag and drop events
+                this.fileUpload.addEventListener('dragover', (e) => this.handleDragOver(e));
+                this.fileUpload.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+                this.fileUpload.addEventListener('drop', (e) => this.handleFileDrop(e));
+
+                // Input content change
+                this.inputContent.addEventListener('input', () => this.handleContentChange());
+                this.inputContent.addEventListener('paste', (e) => this.handlePaste(e));
+
+                // Button events
+                this.processBtn.addEventListener('click', () => this.processContent());
+                this.clearBtn.addEventListener('click', () => this.clearAll());
+                this.copyBtn.addEventListener('click', () => this.copyCode());
+                this.downloadBtn.addEventListener('click', () => this.downloadCode());
+                this.aiConfigBtn.addEventListener('click', () => this.toggleAIConfig());
+                
+                // AI configuration events
+                this.useAICheckbox.addEventListener('change', (e) => {
+                    this.processor.useAI = e.target.checked;
+                    localStorage.setItem('useAI', e.target.checked);
+                });
+                
+                this.apiKeyInput.addEventListener('input', (e) => {
+                    localStorage.setItem('groqApiKey', e.target.value);
+                });
+                
+                // Load saved settings
+                this.loadAISettings();
+            }
+            
+            loadAISettings() {
+                const savedApiKey = localStorage.getItem('groqApiKey');
+                const savedUseAI = localStorage.getItem('useAI');
+                
+                if (savedApiKey) {
+                    this.apiKeyInput.value = savedApiKey;
+                }
+                
+                if (savedUseAI !== null) {
+                    this.useAICheckbox.checked = savedUseAI === 'true';
+                    this.processor.useAI = savedUseAI === 'true';
+                }
+            }
+            
+            toggleAIConfig() {
+                if (this.aiConfig.style.display === 'none') {
+                    this.aiConfig.style.display = 'block';
+                } else {
+                    this.aiConfig.style.display = 'none';
+                }
+            }
+
+            showWelcomeMessage() {
+                this.showToast('🎉 Enhanced IDE ready! Now supports real Word documents!', 'success');
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                this.fileUpload.classList.add('dragover');
+            }
+
+            handleDragLeave(e) {
+                e.preventDefault();
+                this.fileUpload.classList.remove('dragover');
+            }
+
+            handleFileDrop(e) {
+                e.preventDefault();
+                this.fileUpload.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.handleFile(files[0]);
+                }
+            }
+
+            handleFileSelect(e) {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    this.handleFile(files[0]);
+                }
+            }
+
+            handleFile(file) {
+                this.currentFile = file;
+                
+                // Show file info
+                this.fileName.textContent = file.name;
+                this.fileSize.textContent = this.formatFileSize(file.size);
+                this.fileType.textContent = file.type || 'Unknown';
+                this.fileStatus.textContent = 'Processing...';
+                this.fileInfo.style.display = 'block';
+
+                // Read file content
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    let content = e.target.result;
+                    
+                    // Handle Word document content (continuous text)
+                    if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+                        content = this.processWordContent(content);
+                        this.fileStatus.textContent = 'Word document processed ✅';
+                        this.showToast('📄 Word document processed successfully!', 'success');
+                    } else {
+                        this.fileStatus.textContent = 'Text file loaded ✅';
+                        this.showToast('📝 Text file loaded successfully!', 'success');
+                    }
+                    
+                    this.inputContent.value = content;
+                    this.handleContentChange();
+                };
+                reader.onerror = () => {
+                    this.fileStatus.textContent = 'Error reading file ❌';
+                    this.showToast('❌ Error reading file', 'error');
+                };
+                reader.readAsText(file);
+            }
+
+            processWordContent(content) {
+                // Clean document content from metadata, encryption data, and formatting artifacts
+                let cleanContent = content
+                    // Remove meta data patterns
+                    .replace(/Normal text|Heading[1-6]/g, '')
+                    .replace(/URL:\s*http[^\s]+/g, '')
+                    .replace(/Meta Title:[^\n]+/g, '')
+                    .replace(/Meta Description:[^\n]+/g, '')
+                    // Remove document formatting artifacts
+                    .replace(/^[^[]*(?=\[)/s, '') // Remove everything before first section marker
+                    .replace(/\s+/g, ' ') // Normalize whitespace
+                    // Add proper line breaks for sections
+                    .replace(/\[([A-Z_\s]+)\]/g, '\n\n[$1]\n')
+                    // Add line breaks after sentences for readability
+                    .replace(/([.!?])\s*([A-Z][a-z])/g, '$1\n$2')
+                    // Clean up extra whitespace
+                    .replace(/\n{3,}/g, '\n\n')
+                    .trim();
+                
+                // Ensure content starts with a section marker
+                if (!cleanContent.startsWith('[')) {
+                    const firstSectionMatch = cleanContent.match(/\[([A-Z_\s]+)\]/);
+                    if (firstSectionMatch) {
+                        const sectionIndex = cleanContent.indexOf(firstSectionMatch[0]);
+                        cleanContent = cleanContent.substring(sectionIndex);
+                    }
+                }
+                
+                return cleanContent;
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            handlePaste(e) {
+                // Let the paste happen normally, then process the content
+                setTimeout(() => {
+                    this.handleContentChange();
+                }, 10);
+            }
+
+            preserveBoldText(content) {
+                // Convert common bold text patterns to temporary markers
+                // This will be converted to <strong> tags during processing
+                return content
+                    // Handle bold text patterns like **text** or __text__
+                    .replace(/\*\*(.*?)\*\*/g, '[[BOLD]]$1[[/BOLD]]')
+                    .replace(/__(.*?)__/g, '[[BOLD]]$1[[/BOLD]]')
+                    // Handle copied bold text that might have special characters
+                    .replace(/\u{E000}(.*?)\u{E000}/gu, '[[BOLD]]$1[[/BOLD]]') // Private use area chars
+                    .replace(/\u{200B}(.*?)\u{200B}/gu, '[[BOLD]]$1[[/BOLD]]'); // Zero-width spaces
+            }
+
+            convertBoldMarkers(text) {
+                // Return text as-is, no bold conversion
+                return text;
+            }
+
+            handleContentChange() {
+                const content = this.inputContent.value.trim();
+                const hasContent = content.length > 0;
+                console.log('Content change detected:', {content: content.substring(0, 50), hasContent, buttonDisabled: !hasContent});
+                this.processBtn.disabled = !hasContent;
+                
+                if (hasContent) {
+                    // Update stats
+                    const lines = content.split('\n').length;
+                    const words = content.split(/\s+/).length;
+                    this.lineCount.textContent = lines;
+                    this.wordCount.textContent = words;
+                    this.statsPanel.style.display = 'block';
+                    
+                    // Auto-detect sections
+                    const detectedSections = this.processor.detectSections(content);
+                    this.updateDetectedSections(detectedSections);
+                    
+                    if (detectedSections.length > 0) {
+                        this.statusText.innerHTML = `✅ Content ready - ${detectedSections.length} sections detected`;
+                    } else {
+                        this.statusText.innerHTML = '⚠️ No valid sections detected - check format';
+                    }
+                } else {
+                    this.detectedSections.style.display = 'none';
+                    this.statsPanel.style.display = 'none';
+                    this.statusText.textContent = 'Upload a Word document or paste content to get started';
+                }
+            }
+
+            updateDetectedSections(sections) {
+                if (sections.length === 0) {
+                    this.detectedSections.style.display = 'none';
+                    return;
+                }
+
+                this.detectedSections.style.display = 'block';
+                this.sectionCount.textContent = sections.length;
+                this.sectionTags.innerHTML = '';
+                
+                // Show all supported sections
+                const allSections = ['HERO', 'SERVICES_GRID', 'SERVICES_ACCORDION', 'FAQ', 'CTA_SIMPLE', 'CTA_TWO', 'PROCESS', 'TECHNOLOGY', 'INDUSTRIES', 'PORTFOLIO', 'TESTIMONIAL', 'BENEFITS', 'BENEFITS_TWO', 'CONTENT_FORM'];
+                
+                allSections.forEach(section => {
+                    const tag = document.createElement('span');
+                    tag.className = 'section-tag';
+                    
+                    const isFound = sections.some(s => s.includes(section) || section.includes(s));
+                    if (!isFound) {
+                        tag.className += ' not-found';
+                    }
+                    
+                    const check = document.createElement('span');
+                    check.className = 'check';
+                    check.textContent = isFound ? '✓' : '○';
+                    
+                    tag.appendChild(check);
+                    tag.appendChild(document.createTextNode(section));
+                    this.sectionTags.appendChild(tag);
+                });
+            }
+
+            async processContent() {
+                const content = this.inputContent.value.trim();
+
+                if (!content) {
+                    this.showToast('Please provide content to process', 'error');
+                    return;
+                }
+
+                this.statusText.innerHTML = '<span class="loading"></span> Processing content with AI...';
+                this.processBtn.disabled = true;
+                this.processIcon.textContent = '⏳';
+
+                try {
+                    // Process with enhanced AI engine
+                    const result = await this.processor.processContent(content);
+                    
+                    if (result.success) {
+                        this.generatedCode = result.html;
+                        this.outputCode.value = result.html;
+                        this.copyBtn.disabled = false;
+                        this.downloadBtn.disabled = false;
+                        
+                        this.statusText.innerHTML = `<span class="success">✅</span> Generated ${result.sectionsGenerated.length} sections successfully`;
+                        this.showToast(`🎉 Successfully generated ${result.sectionsGenerated.length} HTML sections!`, 'success');
+                    } else {
+                        this.statusText.innerHTML = `<span class="error">❌</span> Processing failed`;
+                        this.showToast(`❌ Error: ${result.error}`, 'error');
+                    }
+                } catch (error) {
+                    this.statusText.innerHTML = `<span class="error">❌</span> Processing failed`;
+                    this.showToast(`❌ Error: ${error.message}`, 'error');
+                } finally {
+                    this.processBtn.disabled = false;
+                    this.processIcon.textContent = '⚡';
+                }
+            }
+
+
+            clearAll() {
+                this.inputContent.value = '';
+                this.outputCode.value = '';
+                this.fileInfo.style.display = 'none';
+                this.detectedSections.style.display = 'none';
+                this.statsPanel.style.display = 'none';
+                this.currentFile = null;
+                this.generatedCode = '';
+                this.fileInput.value = '';
+                
+                this.processBtn.disabled = true;
+                this.copyBtn.disabled = true;
+                this.downloadBtn.disabled = true;
+                
+                this.statusText.textContent = 'Upload a Word document or paste content to get started';
+                this.showToast('🗑️ All content cleared', 'success');
+            }
+
+            copyCode() {
+                if (!this.generatedCode) return;
+                
+                navigator.clipboard.writeText(this.generatedCode).then(() => {
+                    this.showToast('📋 Code copied to clipboard!', 'success');
+                }).catch(() => {
+                    this.outputCode.select();
+                    document.execCommand('copy');
+                    this.showToast('📋 Code copied to clipboard!', 'success');
+                });
+            }
+
+            downloadCode() {
+                if (!this.generatedCode) return;
+                
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                const filename = `generated-sections-${timestamp}.html`;
+                
+                const blob = new Blob([this.generatedCode], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showToast(`💾 HTML file downloaded: ${filename}`, 'success');
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 4000);
+            }
+        }
+
+        // Initialize Enhanced IDE
+        document.addEventListener('DOMContentLoaded', () => {
+            new EnhancedIDEInterface();
+        });
+    </script>
+</body>
+</html>

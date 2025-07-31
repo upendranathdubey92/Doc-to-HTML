@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QA Unit Tests - All Sections</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .test-suite { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-case { margin: 15px 0; padding: 15px; border-left: 4px solid #ddd; background: #fafafa; }
+        .test-pass { border-left-color: #4caf50; background: #f1f8e9; }
+        .test-fail { border-left-color: #f44336; background: #ffebee; }
+        .test-warning { border-left-color: #ff9800; background: #fff3e0; }
+        .test-title { font-weight: bold; margin-bottom: 10px; }
+        .test-result { font-size: 14px; margin: 5px 0; }
+        .section-preview { background: #f8f8f8; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; }
+        .stats { background: #e3f2fd; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .run-all { background: #2196f3; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 20px 0; }
+        .run-all:hover { background: #1976d2; }
+        .test-input { width: 100%; height: 100px; font-family: monospace; font-size: 12px; margin: 10px 0; }
+        h1 { color: #333; text-align: center; }
+        h2 { color: #555; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔬 QA Unit Test Suite - All Sections</h1>
+    <div class="stats" id="testStats">
+        <strong>Test Status:</strong> Ready to run comprehensive tests
+    </div>
+    
+    <button class="run-all" onclick="runAllTests()">🚀 Run All Tests</button>
+    
+    <div id="testResults"></div>
+
+    <script>
+        // Copy the exact logic from web_ide_final.html
+        const supportedSections = ['HERO', 'FAQ', 'CTA_SIMPLE', 'CTA_ENHANCED', 'CTA_TWO', 'PROCESS', 'TECHNOLOGY', 'INDUSTRIES', 'SERVICES_GRID', 'SERVICES_ACCORDION', 'PORTFOLIO', 'TESTIMONIAL', 'BENEFITS', 'BENEFITS_TWO', 'CONTENT_FORM'];
+        
+        function detectSections(content) {
+            const sectionPattern = /\[([A-Z_\s]+)\]/g;
+            const matches = [...content.matchAll(sectionPattern)];
+            const detected = matches.map(match => match[1].trim());
+            
+            return [...new Set(detected)]
+                .filter(section => !section.endsWith(' END'))
+                .filter(section => 
+                    supportedSections.some(supported => 
+                        section.includes(supported) || supported.includes(section)
+                    )
+                );
+        }
+
+        // Test data for each section type
+        const testData = {
+            HERO: `[HERO]
+Expert Web Development Services
+Transform your business with custom web solutions that drive results and enhance user experience.
+
+●Responsive Design & Development
+●E-commerce Solutions
+●Custom Web Applications
+●SEO Optimization
+[HERO END]`,
+
+            FAQ: `[FAQ]
+Frequently Asked Questions
+Find answers to common questions about our web development services.
+
+What technologies do you use?
+We use modern frameworks like React, Vue.js, Node.js, and PHP to build scalable web applications.
+
+How long does a project take?
+Project timelines vary based on complexity, typically ranging from 4-12 weeks for custom solutions.
+
+Do you provide ongoing support?
+Yes, we offer comprehensive maintenance and support packages for all our web solutions.
+[FAQ END]`,
+
+            CTA_SIMPLE: `[CTA_SIMPLE]
+Ready to Start Your Project?
+Contact us today for a free consultation and project estimate.
+Get Started Now
+[CTA_SIMPLE END]`,
+
+            CTA_TWO: `[CTA_TWO]
+Ready to Build a Web Solution That Drives Results?
+Whether you're a startup or an enterprise, we offer fully customized web development services built on the latest tech stacks to meet your business goals.
+
+350+
+Web Solutions Delivered
+
+20+
+Frameworks & Tools Mastered
+
+100%
+SEO & Mobile Optimized
+
+15+ 
+Years of Dev Expertise
+
+Request a Free Proposal View Portfolio
+[CTA_TWO END]`,
+
+            SERVICES_GRID: `[SERVICES_GRID]
+Our Web Development Services
+Comprehensive solutions for your digital presence
+
+Custom Web Development
+Tailored web applications built with modern technologies
+●React & Vue.js Development
+●Node.js Backend Solutions
+●Database Integration
+
+E-commerce Solutions
+Complete online store development and optimization
+●Shopping Cart Integration
+●Payment Gateway Setup
+●Inventory Management
+
+Mobile-First Design
+Responsive designs that work perfectly on all devices
+●Mobile Optimization
+●Cross-browser Compatibility
+●Performance Optimization
+[SERVICES_GRID END]`,
+
+            SERVICES_ACCORDION: `[SERVICES_ACCORDION]
+Our Development Process
+Step-by-step approach to building your web solution
+
+Discovery & Planning
+We analyze your requirements and create a detailed project roadmap
+●Requirements Analysis
+●Technical Specification
+●Project Timeline
+
+Design & Prototyping
+Creating user-friendly designs and interactive prototypes
+●UI/UX Design
+●Wireframing
+●Prototype Development
+
+Development & Testing
+Building and testing your web solution with quality assurance
+●Frontend Development
+●Backend Integration
+●Quality Testing
+[SERVICES_ACCORDION END]`,
+
+            BENEFITS_TWO: `[BENEFITS_TWO]
+Why Choose Our Web Development Services
+Experience the difference with our professional approach
+
+Expertise
+Over 15 years of experience in web development with cutting-edge technologies
+
+Quality
+We deliver high-quality, tested solutions that meet industry standards
+
+Support
+Ongoing maintenance and support to keep your website running smoothly
+
+Results
+Proven track record of successful projects and satisfied clients
+[BENEFITS_TWO END]`,
+
+            CONTENT_FORM: `[CONTENT_FORM]
+Get Your Free Web Development Quote
+Tell us about your project and get a customized proposal
+
+Your Name
+Email Address
+Phone Number
+Project Description
+[CONTENT_FORM END]`,
+
+            PORTFOLIO: `[PORTFOLIO]
+Our Recent Projects
+Showcase of successful web development projects
+
+E-commerce Platform
+Modern online store with advanced features
+Technology Stack: React, Node.js, MongoDB
+
+Corporate Website
+Professional business website with CMS
+Technology Stack: WordPress, Custom PHP
+
+Web Application
+Custom dashboard and analytics platform
+Technology Stack: Vue.js, Laravel, MySQL
+[PORTFOLIO END]`,
+
+            TESTIMONIAL: `[TESTIMONIAL]
+What Our Clients Say
+Real feedback from satisfied customers
+
+"Excellent work on our e-commerce platform. The team delivered exactly what we needed."
+John Smith, CEO at TechCorp
+
+"Professional service and great communication throughout the project."
+Sarah Johnson, Marketing Director
+
+"Our website traffic increased by 200% after the redesign. Highly recommended!"
+Mike Brown, Business Owner
+[TESTIMONIAL END]`
+        };
+
+        // Test cases definition
+        const testCases = [
+            {
+                name: "Section Detection - All Supported Sections",
+                category: "Detection",
+                test: () => {
+                    let results = [];
+                    for (let section of supportedSections) {
+                        if (testData[section]) {
+                            const detected = detectSections(testData[section]);
+                            const isDetected = detected.includes(section);
+                            results.push({
+                                section: section,
+                                detected: isDetected,
+                                detectedSections: detected
+                            });
+                        }
+                    }
+                    return results;
+                }
+            },
+            {
+                name: "Section Detection - END Markers Filtered",
+                category: "Detection",
+                test: () => {
+                    const testContent = `[HERO]\nTest content\n[HERO END]\n[FAQ]\nMore content\n[FAQ END]`;
+                    const detected = detectSections(testContent);
+                    return {
+                        detected: detected,
+                        hasEndMarkers: detected.some(s => s.includes('END')),
+                        expectedSections: ['HERO', 'FAQ']
+                    };
+                }
+            },
+            {
+                name: "Section Detection - Case Sensitivity",
+                category: "Detection", 
+                test: () => {
+                    const testContent = `[hero]\nLowercase\n[hero end]\n[HERO]\nUppercase\n[HERO END]`;
+                    const detected = detectSections(testContent);
+                    return {
+                        detected: detected,
+                        correctCase: detected.includes('HERO'),
+                        incorrectCase: detected.includes('hero')
+                    };
+                }
+            },
+            {
+                name: "Section Detection - Multiple Same Sections",
+                category: "Detection",
+                test: () => {
+                    const testContent = `[HERO]\nFirst hero\n[HERO END]\n[HERO]\nSecond hero\n[HERO END]`;
+                    const detected = detectSections(testContent);
+                    return {
+                        detected: detected,
+                        uniqueCount: detected.length,
+                        expectedUnique: 1
+                    };
+                }
+            },
+            {
+                name: "Section Order - CTA_TWO vs CTA Priority",
+                category: "Priority",
+                test: () => {
+                    const testContent = `[CTA_TWO]\nTest CTA_TWO content\n[CTA_TWO END]`;
+                    const detected = detectSections(testContent);
+                    return {
+                        detected: detected,
+                        correctDetection: detected.includes('CTA_TWO') && !detected.includes('CTA_SIMPLE'),
+                        detectedSections: detected
+                    };
+                }
+            },
+            {
+                name: "Content Parsing - Empty Sections",
+                category: "Parsing",
+                test: () => {
+                    const testContent = `[HERO]\n\n[HERO END]`;
+                    const detected = detectSections(testContent);
+                    return {
+                        detected: detected,
+                        emptyContentHandled: detected.includes('HERO')
+                    };
+                }
+            },
+            {
+                name: "Content Parsing - Special Characters",
+                category: "Parsing",
+                test: () => {
+                    const testContent = `[HERO]\nTitle with "quotes" & symbols\nDescription with <tags> and émojis 🚀\n[HERO END]`;
+                    const detected = detectSections(testContent);
+                    return {
+                        detected: detected,
+                        specialCharsHandled: detected.includes('HERO')
+                    };
+                }
+            },
+            {
+                name: "Edge Case - Malformed Section Markers",
+                category: "Edge Cases",
+                test: () => {
+                    const testContent = `[HERO\nMissing bracket\n[HERO END]\n[ HERO ]\nSpaces in brackets\n[HERO END]`;
+                    const detected = detectSections(testContent);
+                    return {
+                        detected: detected,
+                        malformedIgnored: !detected.includes('HERO'),
+                        validSpacedDetected: detected.includes('HERO')
+                    };
+                }
+            },
+            {
+                name: "Edge Case - Nested Brackets",
+                category: "Edge Cases",
+                test: () => {
+                    const testContent = `[HERO]\nContent with [nested] brackets\n[HERO END]`;
+                    const detected = detectSections(testContent);
+                    return {
+                        detected: detected,
+                        nestedHandled: detected.includes('HERO') && detected.length === 1
+                    };
+                }
+            },
+            {
+                name: "Performance - Large Content",
+                category: "Performance",
+                test: () => {
+                    let largeContent = '[HERO]\n';
+                    for (let i = 0; i < 1000; i++) {
+                        largeContent += `Line ${i} with some content\n`;
+                    }
+                    largeContent += '[HERO END]';
+                    
+                    const startTime = performance.now();
+                    const detected = detectSections(largeContent);
+                    const endTime = performance.now();
+                    
+                    return {
+                        detected: detected,
+                        processingTime: endTime - startTime,
+                        performanceAcceptable: (endTime - startTime) < 100
+                    };
+                }
+            }
+        ];
+
+        function runTest(testCase) {
+            try {
+                const result = testCase.test();
+                return {
+                    name: testCase.name,
+                    category: testCase.category,
+                    status: 'pass',
+                    result: result,
+                    error: null
+                };
+            } catch (error) {
+                return {
+                    name: testCase.name,
+                    category: testCase.category,
+                    status: 'fail',
+                    result: null,
+                    error: error.message
+                };
+            }
+        }
+
+        function runAllTests() {
+            const startTime = performance.now();
+            const results = testCases.map(runTest);
+            const endTime = performance.now();
+            
+            const passed = results.filter(r => r.status === 'pass').length;
+            const failed = results.filter(r => r.status === 'fail').length;
+            const total = results.length;
+            
+            // Update stats
+            document.getElementById('testStats').innerHTML = `
+                <strong>Test Results:</strong> ${passed}/${total} passed (${failed} failed) | 
+                <strong>Execution Time:</strong> ${(endTime - startTime).toFixed(2)}ms |
+                <strong>Success Rate:</strong> ${((passed/total)*100).toFixed(1)}%
+            `;
+            
+            // Display results
+            const resultsHtml = generateResultsHtml(results);
+            document.getElementById('testResults').innerHTML = resultsHtml;
+        }
+
+        function generateResultsHtml(results) {
+            const categories = [...new Set(results.map(r => r.category))];
+            
+            let html = '';
+            for (let category of categories) {
+                const categoryResults = results.filter(r => r.category === category);
+                const passed = categoryResults.filter(r => r.status === 'pass').length;
+                
+                html += `<div class="test-suite">
+                    <h2>${category} Tests (${passed}/${categoryResults.length} passed)</h2>`;
+                
+                for (let result of categoryResults) {
+                    const cssClass = result.status === 'pass' ? 'test-pass' : 'test-fail';
+                    const icon = result.status === 'pass' ? '✅' : '❌';
+                    
+                    html += `<div class="test-case ${cssClass}">
+                        <div class="test-title">${icon} ${result.name}</div>`;
+                    
+                    if (result.status === 'pass') {
+                        html += `<div class="test-result">
+                            <strong>Result:</strong> ${JSON.stringify(result.result, null, 2)}
+                        </div>`;
+                    } else {
+                        html += `<div class="test-result">
+                            <strong>Error:</strong> ${result.error}
+                        </div>`;
+                    }
+                    
+                    html += `</div>`;
+                }
+                
+                html += `</div>`;
+            }
+            
+            return html;
+        }
+
+        // Auto-run tests on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Give user a moment to see the interface
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>

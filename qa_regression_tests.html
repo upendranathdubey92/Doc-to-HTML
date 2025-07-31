@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QA Regression Tests - Verify No Breaking Changes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .test-suite { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-case { margin: 15px 0; padding: 15px; border-left: 4px solid #ddd; background: #fafafa; }
+        .test-pass { border-left-color: #4caf50; background: #f1f8e9; }
+        .test-fail { border-left-color: #f44336; background: #ffebee; }
+        .test-critical { border-left-color: #e91e63; background: #fce4ec; }
+        .test-title { font-weight: bold; margin-bottom: 10px; }
+        .test-result { font-size: 14px; margin: 5px 0; }
+        .stats { background: #e3f2fd; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .run-all { background: #2196f3; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 20px 0; }
+        .run-all:hover { background: #1976d2; }
+        h1 { color: #333; text-align: center; }
+        h2 { color: #555; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        .critical { background: #e91e63; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .warning { background: #ff9800; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .baseline { background: #f8f8f8; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>🔍 QA Regression Tests - No Breaking Changes</h1>
+    <div class="stats" id="testStats">
+        <strong>Test Status:</strong> Ready to verify no regressions in existing functionality
+    </div>
+    
+    <button class="run-all" onclick="runAllRegressionTests()">🔍 Run Regression Tests</button>
+    
+    <div id="testResults"></div>
+
+    <script>
+        // Baseline functionality - these should work exactly as before
+        const supportedSections = ['HERO', 'FAQ', 'CTA_SIMPLE', 'CTA_ENHANCED', 'CTA_TWO', 'PROCESS', 'TECHNOLOGY', 'INDUSTRIES', 'SERVICES_GRID', 'SERVICES_ACCORDION', 'PORTFOLIO', 'TESTIMONIAL', 'BENEFITS', 'BENEFITS_TWO', 'CONTENT_FORM'];
+        
+        function detectSections(content) {
+            const sectionPattern = /\[([A-Z_\s]+)\]/g;
+            const matches = [...content.matchAll(sectionPattern)];
+            const detected = matches.map(match => match[1].trim());
+            
+            return [...new Set(detected)]
+                .filter(section => !section.endsWith(' END'))
+                .filter(section => 
+                    supportedSections.some(supported => 
+                        section.includes(supported) || supported.includes(section)
+                    )
+                );
+        }
+
+        // Known working test cases that should NEVER break
+        const baselineTests = {
+            basicHero: {
+                input: `[HERO]
+Expert Web Development Services
+Transform your business with custom web solutions.
+●Responsive Design
+●E-commerce Solutions
+[HERO END]`,
+                expectedDetection: ['HERO'],
+                description: "Basic HERO section that has always worked"
+            },
+
+            basicFaq: {
+                input: `[FAQ]
+Frequently Asked Questions
+Common questions about our services
+
+What do you offer?
+We offer web development services.
+
+How much does it cost?
+Pricing varies based on requirements.
+[FAQ END]`,
+                expectedDetection: ['FAQ'],
+                description: "Basic FAQ section that has always worked"
+            },
+
+            basicCtaSimple: {
+                input: `[CTA_SIMPLE]
+Ready to Get Started?
+Contact us today for your free consultation.
+Get Started Now
+[CTA_SIMPLE END]`,
+                expectedDetection: ['CTA_SIMPLE'],
+                description: "Basic CTA_SIMPLE section that has always worked"
+            },
+
+            multipleSections: {
+                input: `[HERO]
+Web Development Services
+Professional solutions for your business.
+[HERO END]
+
+[FAQ]
+Questions & Answers
+Find answers here.
+
+What is included?
+Full web development package.
+[FAQ END]
+
+[CTA_SIMPLE]
+Get Started Today
+Contact us now.
+Start Now
+[CTA_SIMPLE END]`,
+                expectedDetection: ['HERO', 'FAQ', 'CTA_SIMPLE'],
+                description: "Multiple sections that have always worked together"
+            },
+
+            // Recently added sections that should work
+            benefitsTwo: {
+                input: `[BENEFITS_TWO]
+Why Choose Our Services
+Professional web development with proven results
+
+Expertise
+Over 15 years of experience in web development
+
+Quality
+High-quality, tested solutions that meet standards
+
+Support
+Ongoing maintenance and support services
+[BENEFITS_TWO END]`,
+                expectedDetection: ['BENEFITS_TWO'],
+                description: "BENEFITS_TWO section (recently changed from BENEFITS2)"
+            },
+
+            contentForm: {
+                input: `[CONTENT_FORM]
+Get Your Free Quote
+Tell us about your project requirements
+
+Your Name
+Email Address
+Phone Number
+Project Description
+[CONTENT_FORM END]`,
+                expectedDetection: ['CONTENT_FORM'],
+                description: "CONTENT_FORM section (recently added)"
+            },
+
+            ctaTwo: {
+                input: `[CTA_TWO]
+Ready to Build a Web Solution?
+Custom web development services for all business sizes.
+
+350+
+Web Solutions Delivered
+
+20+
+Frameworks Mastered
+
+100%
+SEO Optimized
+
+Request Proposal View Portfolio
+[CTA_TWO END]`,
+                expectedDetection: ['CTA_TWO'],
+                description: "CTA_TWO section (recently added)"
+            }
+        };
+
+        // Regression test cases
+        const regressionTests = [
+            {
+                name: "Baseline HERO Detection",
+                type: "critical",
+                category: "Core Functionality",
+                test: () => {
+                    const result = detectSections(baselineTests.basicHero.input);
+                    return {
+                        detected: result,
+                        expected: baselineTests.basicHero.expectedDetection,
+                        matches: JSON.stringify(result.sort()) === JSON.stringify(baselineTests.basicHero.expectedDetection.sort()),
+                        passed: JSON.stringify(result.sort()) === JSON.stringify(baselineTests.basicHero.expectedDetection.sort())
+                    };
+                }
+            },
+            {
+                name: "Baseline FAQ Detection", 
+                type: "critical",
+                category: "Core Functionality",
+                test: () => {
+                    const result = detectSections(baselineTests.basicFaq.input);
+                    return {
+                        detected: result,
+                        expected: baselineTests.basicFaq.expectedDetection,
+                        matches: JSON.stringify(result.sort()) === JSON.stringify(baselineTests.basicFaq.expectedDetection.sort()),
+                        passed: JSON.stringify(result.sort()) === JSON.stringify(baselineTests.basicFaq.expectedDetection.sort())
+                    };
+                }
+            },
+            {
+                name: "Baseline CTA_SIMPLE Detection",
+                type: "critical", 
+                category: "Core Functionality",
+                test: () => {
+                    const result = detectSections(baselineTests.basicCtaSimple.input);
+                    return {
+                        detected: result,
+                        expected: baselineTests.basicCtaSimple.expectedDetection,
+                        matches: JSON.stringify(result.sort()) === JSON.stringify(baselineTests.basicCtaSimple.expectedDetection.sort()),
+                        passed: JSON.stringify(result.sort()) === JSON.stringify(baselineTests.basicCtaSimple.expectedDetection.sort())
+                    };
+                }
+            },
+            {
+                name: "Multiple Sections Detection (Legacy)",
+                type: "critical",
+                category: "Core Functionality", 
+                test: () => {
+                    const result = detectSections(baselineTests.multipleSections.input);
+                    return {
+                        detected: result,
+                        expected: baselineTests.multipleSections.expectedDetection,
+                        hasAllExpected: baselineTests.multipleSections.expectedDetection.every(exp => result.includes(exp)),
+                        correctCount: result.length === baselineTests.multipleSections.expectedDetection.length,
+                        passed: baselineTests.multipleSections.expectedDetection.every(exp => result.includes(exp)) && result.length === baselineTests.multipleSections.expectedDetection.length
+                    };
+                }
+            },
+            {
+                name: "BENEFITS_TWO Replaces BENEFITS2",
+                type: "critical",
+                category: "Recent Changes",
+                test: () => {
+                    const oldInput = `[BENEFITS2]\nOld format\n[BENEFITS2 END]`;
+                    const newInput = baselineTests.benefitsTwo.input;
+                    
+                    const oldResult = detectSections(oldInput);
+                    const newResult = detectSections(newInput);
+                    
+                    return {
+                        oldDetected: oldResult,
+                        newDetected: newResult,
+                        oldIgnored: !oldResult.includes('BENEFITS2') && !oldResult.includes('BENEFITS_TWO'),
+                        newDetected: newResult.includes('BENEFITS_TWO'),
+                        transitionWorking: !oldResult.includes('BENEFITS2') && newResult.includes('BENEFITS_TWO'),
+                        passed: !oldResult.includes('BENEFITS2') && newResult.includes('BENEFITS_TWO')
+                    };
+                }
+            },
+            {
+                name: "CONTENT_FORM New Section Working",
+                type: "warning",
+                category: "Recent Changes",
+                test: () => {
+                    const result = detectSections(baselineTests.contentForm.input);
+                    return {
+                        detected: result,
+                        expected: baselineTests.contentForm.expectedDetection, 
+                        correctlyDetected: result.includes('CONTENT_FORM'),
+                        inSupportedList: supportedSections.includes('CONTENT_FORM'),
+                        passed: result.includes('CONTENT_FORM') && supportedSections.includes('CONTENT_FORM')
+                    };
+                }
+            },
+            {
+                name: "CTA_TWO Priority Over CTA",
+                type: "critical",
+                category: "Recent Changes", 
+                test: () => {
+                    const result = detectSections(baselineTests.ctaTwo.input);
+                    return {
+                        detected: result,
+                        detectedCtaTwo: result.includes('CTA_TWO'),
+                        didNotDetectCtaSimple: !result.includes('CTA_SIMPLE'),
+                        correctPriority: result.includes('CTA_TWO') && !result.includes('CTA_SIMPLE'),
+                        passed: result.includes('CTA_TWO') && !result.includes('CTA_SIMPLE')
+                    };
+                }
+            },
+            {
+                name: "All Supported Sections List Intact",
+                type: "critical",
+                category: "Configuration",
+                test: () => {
+                    const expectedSections = ['HERO', 'FAQ', 'CTA_SIMPLE', 'CTA_ENHANCED', 'CTA_TWO', 'PROCESS', 'TECHNOLOGY', 'INDUSTRIES', 'SERVICES_GRID', 'SERVICES_ACCORDION', 'PORTFOLIO', 'TESTIMONIAL', 'BENEFITS', 'BENEFITS_TWO', 'CONTENT_FORM'];
+                    
+                    return {
+                        currentSections: supportedSections,
+                        expectedSections: expectedSections,
+                        allPresent: expectedSections.every(section => supportedSections.includes(section)),
+                        noUnexpected: supportedSections.every(section => expectedSections.includes(section)),
+                        correctCount: supportedSections.length === expectedSections.length,
+                        passed: expectedSections.every(section => supportedSections.includes(section)) && 
+                               supportedSections.every(section => expectedSections.includes(section)) &&
+                               supportedSections.length === expectedSections.length
+                    };
+                }
+            },
+            {
+                name: "END Marker Filtering Still Works",
+                type: "critical",
+                category: "Core Logic",
+                test: () => {
+                    const input = `[HERO]\nContent\n[HERO END]\n[FAQ]\nMore content\n[FAQ END]`;
+                    const result = detectSections(input);
+                    
+                    return {
+                        detected: result,
+                        hasValidSections: result.includes('HERO') && result.includes('FAQ'),
+                        noEndMarkers: !result.some(section => section.includes('END')),
+                        correctCount: result.length === 2,
+                        passed: result.includes('HERO') && result.includes('FAQ') && !result.some(section => section.includes('END')) && result.length === 2
+                    };
+                }
+            },
+            {
+                name: "Performance Baseline Maintained",
+                type: "warning",
+                category: "Performance",
+                test: () => {
+                    const testInput = baselineTests.multipleSections.input;
+                    const iterations = 100;
+                    
+                    const startTime = performance.now();
+                    for (let i = 0; i < iterations; i++) {
+                        detectSections(testInput);
+                    }
+                    const endTime = performance.now();
+                    
+                    const averageTime = (endTime - startTime) / iterations;
+                    const performanceGood = averageTime < 1; // Should be under 1ms per detection
+                    
+                    return {
+                        iterations: iterations,
+                        totalTime: (endTime - startTime).toFixed(2) + 'ms',
+                        averageTime: averageTime.toFixed(3) + 'ms',
+                        performanceGood: performanceGood,
+                        passed: performanceGood
+                    };
+                }
+            },
+            {
+                name: "Section Detection Pattern Still Accurate",
+                type: "critical",
+                category: "Core Logic",
+                test: () => {
+                    const testCases = [
+                        { input: '[HERO]', expected: true },
+                        { input: '[HERO END]', expected: false },
+                        { input: '[hero]', expected: false },
+                        { input: '[NOTASECTION]', expected: false },
+                        { input: '[FAQ]', expected: true },
+                        { input: '[CTA_TWO]', expected: true }
+                    ];
+                    
+                    let results = {};
+                    let allPassed = true;
+                    
+                    for (let testCase of testCases) {
+                        const detected = detectSections(testCase.input);
+                        const hasDetection = detected.length > 0;
+                        const passed = hasDetection === testCase.expected;
+                        if (!passed) allPassed = false;
+                        
+                        results[testCase.input] = {
+                            detected: detected,
+                            expected: testCase.expected,
+                            actual: hasDetection,
+                            passed: passed
+                        };
+                    }
+                    
+                    return {
+                        testResults: results,
+                        allTestsPassed: allPassed,
+                        passed: allPassed
+                    };
+                }
+            }
+        ];
+
+        function runRegressionTest(testCase) {
+            try {
+                const result = testCase.test();
+                return {
+                    name: testCase.name,
+                    type: testCase.type,
+                    category: testCase.category,
+                    status: result.passed ? 'pass' : 'fail',
+                    result: result,
+                    error: null
+                };
+            } catch (error) {
+                return {
+                    name: testCase.name,
+                    type: testCase.type,
+                    category: testCase.category,
+                    status: 'fail',
+                    result: null,
+                    error: error.message
+                };
+            }
+        }
+
+        function runAllRegressionTests() {
+            const startTime = performance.now();
+            const results = regressionTests.map(runRegressionTest);
+            const endTime = performance.now();
+            
+            const passed = results.filter(r => r.status === 'pass').length;
+            const failed = results.filter(r => r.status === 'fail').length;
+            const total = results.length;
+            
+            const criticalFailed = results.filter(r => r.status === 'fail' && r.type === 'critical').length;
+            const warningFailed = results.filter(r => r.status === 'fail' && r.type === 'warning').length;
+            
+            // Update stats
+            document.getElementById('testStats').innerHTML = `
+                <strong>Regression Tests:</strong> ${passed}/${total} passed (${failed} failed) | 
+                <strong>Critical Failed:</strong> ${criticalFailed} |
+                <strong>Warning Failed:</strong> ${warningFailed} |
+                <strong>Execution Time:</strong> ${(endTime - startTime).toFixed(2)}ms |
+                <strong>System Status:</strong> ${criticalFailed === 0 ? '✅ STABLE' : '❌ REGRESSIONS DETECTED'}
+            `;
+            
+            // Display results
+            const resultsHtml = generateRegressionResultsHtml(results);
+            document.getElementById('testResults').innerHTML = resultsHtml;
+        }
+
+        function generateRegressionResultsHtml(results) {
+            const categories = [...new Set(results.map(r => r.category))];
+            
+            let html = '';
+            for (let category of categories) {
+                const categoryResults = results.filter(r => r.category === category);
+                const passed = categoryResults.filter(r => r.status === 'pass').length;
+                const criticalFailed = categoryResults.filter(r => r.status === 'fail' && r.type === 'critical').length;
+                
+                html += `<div class="test-suite">
+                    <h2>🔍 ${category} Tests (${passed}/${categoryResults.length} passed)`;
+                
+                if (criticalFailed > 0) {
+                    html += ` <span class="critical">CRITICAL FAILURES: ${criticalFailed}</span>`;
+                }
+                
+                html += `</h2>`;
+                
+                for (let result of categoryResults) {
+                    let cssClass = result.status === 'pass' ? 'test-pass' : 'test-fail';
+                    if (result.status === 'fail' && result.type === 'critical') {
+                        cssClass = 'test-critical';
+                    }
+                    
+                    const icon = result.status === 'pass' ? '✅' : (result.type === 'critical' ? '🚨' : '⚠️');
+                    const typeLabel = result.type === 'critical' ? 'CRITICAL' : 'WARNING';
+                    
+                    html += `<div class="test-case ${cssClass}">
+                        <div class="test-title">
+                            ${icon} ${result.name} 
+                            <span class="${result.type}">${typeLabel}</span>
+                        </div>`;
+                    
+                    if (result.status === 'pass') {
+                        html += `<div class="test-result">
+                            ✅ <strong>PASSED:</strong> No regression detected - functionality working as expected
+                        </div>
+                        <div class="baseline">
+                            <strong>Test Results:</strong><br><pre>${JSON.stringify(result.result, null, 2)}</pre>
+                        </div>`;
+                    } else {
+                        html += `<div class="test-result">
+                            ${result.type === 'critical' ? '🚨' : '⚠️'} <strong>${result.type.toUpperCase()} REGRESSION:</strong> This functionality is not working as expected!
+                        </div>`;
+                        
+                        if (result.error) {
+                            html += `<div class="test-result">
+                                <strong>Error:</strong> ${result.error}
+                            </div>`;
+                        }
+                        
+                        if (result.result) {
+                            html += `<div class="baseline">
+                                <strong>Failure Details:</strong><br><pre>${JSON.stringify(result.result, null, 2)}</pre>
+                            </div>`;
+                        }
+                    }
+                    
+                    html += `</div>`;
+                }
+                
+                html += `</div>`;
+            }
+            
+            return html;
+        }
+
+        // Auto-run tests on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(runAllRegressionTests, 1000);
+        });
+    </script>
+</body>
+</html>

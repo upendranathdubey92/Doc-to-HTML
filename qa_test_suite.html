@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QA Test Suite - Section Parsing</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .test-pass { background-color: #d4edda; border-color: #c3e6cb; }
+        .test-fail { background-color: #f8d7da; border-color: #f5c6cb; }
+        .test-title { font-weight: bold; margin-bottom: 10px; }
+        .test-input { background: #f8f9fa; padding: 10px; margin: 10px 0; white-space: pre-wrap; }
+        .test-output { background: #e9ecef; padding: 10px; margin: 10px 0; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>QA Test Suite - Section Parsing Validation</h1>
+    <div id="testResults"></div>
+
+    <script>
+        // Copy the parsing functions from main file for testing
+        class TestDocumentProcessor {
+            convertBoldMarkers(text) {
+                return text;
+            }
+
+            generateImageSlug(title) {
+                return title.toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .trim('-');
+            }
+
+            parseHeroSection(content) {
+                const lines = content.split('\n');
+                const nonEmptyLines = lines.filter(line => line.trim());
+                
+                if (nonEmptyLines.length < 2) {
+                    return {
+                        title: "Default Title",
+                        description: "Default Description",
+                        bullet_intro: "",
+                        bullet_points: []
+                    };
+                }
+                
+                let title = nonEmptyLines[0].trim();
+                let description = nonEmptyLines[1].trim();
+                let bullet_intro = "";
+                let bullet_points = [];
+                
+                let bulletStartIndex = -1;
+                
+                for (let i = 2; i < nonEmptyLines.length; i++) {
+                    const line = nonEmptyLines[i].trim();
+                    
+                    if (line.match(/^[●\\-\\*•‑]\\s*/)) {
+                        bulletStartIndex = i;
+                        break;
+                    }
+                    
+                    if (bulletStartIndex === -1) {
+                        if (bullet_intro) {
+                            bullet_intro += " " + line;
+                        } else {
+                            bullet_intro = line;
+                        }
+                    }
+                }
+                
+                if (bulletStartIndex !== -1) {
+                    for (let i = bulletStartIndex; i < nonEmptyLines.length; i++) {
+                        const line = nonEmptyLines[i].trim();
+                        if (line.match(/^[●\\-\\*•‑]\\s*/)) {
+                            const bulletText = line.replace(/^[●\\-\\*•‑]\\s*/, '').trim();
+                            if (bulletText) {
+                                bullet_points.push(bulletText);
+                            }
+                        }
+                    }
+                }
+                
+                return {
+                    title: this.convertBoldMarkers(title),
+                    description: this.convertBoldMarkers(description),
+                    bullet_intro: this.convertBoldMarkers(bullet_intro),
+                    bullet_points: bullet_points.map(bp => this.convertBoldMarkers(bp))
+                };
+            }
+
+            parseBenefitsSection(content) {
+                const allLines = content.split('\n');
+                const nonEmptyLines = allLines.filter(line => line.trim());
+                const benefits = [];
+                
+                if (nonEmptyLines.length < 3) {
+                    return {
+                        main_heading: "Key Benefits",
+                        description: "Why choose us",
+                        benefits: []
+                    };
+                }
+                
+                const main_heading = nonEmptyLines[0];
+                const description = nonEmptyLines[1];
+                
+                let currentBenefit = null;
+                let currentDescription = [];
+                
+                for (let i = 2; i < nonEmptyLines.length; i++) {
+                    const line = nonEmptyLines[i].trim();
+                    
+                    const isShort = line.length < 80;
+                    const endsWithPeriod = line.endsWith('.');
+                    const containsDescriptiveWords = /\b(with|using|through|allows|enables|provides|ensures|helps|includes|supports|offers|delivers|creates|builds|makes|gives|brings|improves|enhances|reduces|increases|optimize|manage|handle|process|implement|develop|design|maintain|monitor|track|analyze|integrate|customize|scale|secure|protect|deploy|configure|setup|install|update|upgrade|migrate|backup|restore|test|validate|verify|check|review|audit|assess|evaluate|measure|report|document|train|support|troubleshoot|debug|fix|resolve|solve|prevent|avoid|minimize|maximize|streamline|automate|simplify|standardize|centralize|organize|coordinate|collaborate|communicate|facilitate|accelerate|expedite|prioritize|focus|target|align|synchronize|balance|optimize|refine|polish|perfect|complete|finalize)\b/i.test(line);
+                    
+                    const isBenefitTitle = isShort && !endsWithPeriod && !containsDescriptiveWords;
+                    const isFirstBenefit = i === 2;
+                    
+                    if (isBenefitTitle || isFirstBenefit) {
+                        if (currentBenefit) {
+                            benefits.push({
+                                title: currentBenefit,
+                                description: currentDescription.join(' ').trim(),
+                                image_slug: this.generateImageSlug(currentBenefit)
+                            });
+                        }
+                        
+                        currentBenefit = line;
+                        currentDescription = [];
+                    } else {
+                        if (line.trim()) {
+                            currentDescription.push(line);
+                        }
+                    }
+                }
+                
+                if (currentBenefit) {
+                    benefits.push({
+                        title: currentBenefit,
+                        description: currentDescription.join(' ').trim(),
+                        image_slug: this.generateImageSlug(currentBenefit)
+                    });
+                }
+                
+                return {
+                    main_heading: this.convertBoldMarkers(main_heading || "Key Benefits"),
+                    description: this.convertBoldMarkers(description || "Why choose us"),
+                    benefits: benefits
+                };
+            }
+
+            parsePortfolioSection(content) {
+                const allLines = content.split('\n');
+                const nonEmptyLines = allLines.filter(line => line.trim());
+                
+                if (nonEmptyLines.length < 3) return { main_heading: "", description: "", projects: [] };
+                
+                const main_heading = nonEmptyLines[0];
+                const description = nonEmptyLines[1];
+                const projects = [];
+                
+                let currentProject = null;
+                let currentDescription = [];
+                let buttonText = "";
+                
+                for (let i = 2; i < nonEmptyLines.length; i++) {
+                    const line = nonEmptyLines[i].trim();
+                    
+                    const isShortTitle = line.length < 100 && line.length > 10;
+                    const hasCapitalStart = /^[A-Z]/.test(line);
+                    const isNotButtonText = !line.toLowerCase().includes('project') || !line.toLowerCase().includes('detail');
+                    const containsCommonWords = /\b(project|platform|system|application|website|portal|dashboard|tool|service|solution)\b/i.test(line);
+                    
+                    const isProjectTitle = isShortTitle && hasCapitalStart && isNotButtonText && containsCommonWords;
+                    const isFirstProject = i === 2;
+                    
+                    if (isProjectTitle || isFirstProject) {
+                        if (currentProject) {
+                            let desc = currentDescription.join(' ').trim();
+                            
+                            const buttonMatch = desc.match(/\b([^.]*(?:project|detail)[^.]*)\s*\.?\s*$/i);
+                            if (buttonMatch) {
+                                buttonText = buttonMatch[1].trim();
+                                desc = desc.replace(buttonMatch[0], '').trim();
+                            }
+                            
+                            projects.push({
+                                title: currentProject,
+                                description: desc,
+                                button_text: buttonText || "See Project Details",
+                                image_slug: this.generateImageSlug(currentProject)
+                            });
+                        }
+                        
+                        currentProject = line;
+                        currentDescription = [];
+                        buttonText = "";
+                    } else {
+                        currentDescription.push(line);
+                    }
+                }
+                
+                if (currentProject) {
+                    let desc = currentDescription.join(' ').trim();
+                    
+                    const buttonMatch = desc.match(/\b([^.]*(?:project|detail)[^.]*)\s*\.?\s*$/i);
+                    if (buttonMatch) {
+                        buttonText = buttonMatch[1].trim();
+                        desc = desc.replace(buttonMatch[0], '').trim();
+                    }
+                    
+                    projects.push({
+                        title: currentProject,
+                        description: desc,
+                        button_text: buttonText || "See Project Details",
+                        image_slug: this.generateImageSlug(currentProject)
+                    });
+                }
+                
+                return {
+                    main_heading: this.convertBoldMarkers(main_heading),
+                    description: this.convertBoldMarkers(description),
+                    projects: projects
+                };
+            }
+        }
+
+        // Test cases
+        const testCases = [
+            {
+                name: "HERO Section - Basic Structure",
+                section: "HERO",
+                input: `Web Development Services    
+Join 100+ brands who trust Space-O Technologies to power their digital presence.
+How We Help You-
+●Custom web development using modern technologies
+●Mobile-first, responsive design
+●Performance-optimized code`,
+                expected: {
+                    title: "Web Development Services",
+                    description: "Join 100+ brands who trust Space-O Technologies to power their digital presence.",
+                    bullet_intro: "How We Help You-",
+                    bullet_points: ["Custom web development using modern technologies", "Mobile-first, responsive design", "Performance-optimized code"]
+                }
+            },
+            {
+                name: "BENEFITS Section - 6 Benefits",
+                section: "BENEFITS",
+                input: `Key Benefits of Our Service
+Why choose our comprehensive solution
+Rapid Development Cycles
+Accelerate your time-to-market with our agile development approach.
+Cost-Effective Solutions
+Maximize your ROI with our efficient development processes.
+Enterprise-Grade Security
+We prioritize security in every line of code we write.
+Scalable Architecture
+Build for growth with our scalable system design.
+24/7 Technical Support
+Round-the-clock support for your critical business needs.
+Custom Integration
+Seamlessly integrate with your existing business systems.`,
+                expected: {
+                    main_heading: "Key Benefits of Our Service",
+                    description: "Why choose our comprehensive solution",
+                    benefits: [
+                        { title: "Rapid Development Cycles", description: "Accelerate your time-to-market with our agile development approach." },
+                        { title: "Cost-Effective Solutions", description: "Maximize your ROI with our efficient development processes." },
+                        { title: "Enterprise-Grade Security", description: "We prioritize security in every line of code we write." },
+                        { title: "Scalable Architecture", description: "Build for growth with our scalable system design." },
+                        { title: "24/7 Technical Support", description: "Round-the-clock support for your critical business needs." },
+                        { title: "Custom Integration", description: "Seamlessly integrate with your existing business systems." }
+                    ]
+                }
+            },
+            {
+                name: "PORTFOLIO Section - Multiple Projects",
+                section: "PORTFOLIO",
+                input: `Projects Where PHP Consulting Delivered Results
+Each project addresses specific technical challenges resolved through focused PHP consulting.
+An eCommerce Marketplace for Waste Management Equipment
+Space-O Technologies engineered Parts Express, a scalable marketplace developed using Laravel and PHP 8.1. See Project Details
+Field Service Management System for Logistics Operations
+We designed and implemented CrewVision, a web-based logistics platform built on Laravel and PHP. View Project Details
+CCTV Data Platform to Support Public Safety Initiatives
+Space-O Technologies developed a secure web platform for law enforcement agencies. Check Project Details`,
+                expected: {
+                    main_heading: "Projects Where PHP Consulting Delivered Results",
+                    description: "Each project addresses specific technical challenges resolved through focused PHP consulting.",
+                    projects: [
+                        { title: "An eCommerce Marketplace for Waste Management Equipment", button_text: "See Project Details" },
+                        { title: "Field Service Management System for Logistics Operations", button_text: "View Project Details" },
+                        { title: "CCTV Data Platform to Support Public Safety Initiatives", button_text: "Check Project Details" }
+                    ]
+                }
+            }
+        ];
+
+        // Run tests
+        function runTests() {
+            const processor = new TestDocumentProcessor();
+            const resultsDiv = document.getElementById('testResults');
+            let passCount = 0;
+            let totalCount = testCases.length;
+
+            testCases.forEach((testCase, index) => {
+                const testDiv = document.createElement('div');
+                testDiv.className = 'test-case';
+                
+                let result;
+                let passed = true;
+                let errors = [];
+
+                try {
+                    switch(testCase.section) {
+                        case 'HERO':
+                            result = processor.parseHeroSection(testCase.input);
+                            break;
+                        case 'BENEFITS':
+                            result = processor.parseBenefitsSection(testCase.input);
+                            break;
+                        case 'PORTFOLIO':
+                            result = processor.parsePortfolioSection(testCase.input);
+                            break;
+                        default:
+                            throw new Error('Unknown section type');
+                    }
+
+                    // Validate results
+                    if (testCase.section === 'HERO') {
+                        if (result.title !== testCase.expected.title) {
+                            errors.push(`Title mismatch: expected "${testCase.expected.title}", got "${result.title}"`);
+                            passed = false;
+                        }
+                        if (result.bullet_points.length !== testCase.expected.bullet_points.length) {
+                            errors.push(`Bullet points count mismatch: expected ${testCase.expected.bullet_points.length}, got ${result.bullet_points.length}`);
+                            passed = false;
+                        }
+                    }
+
+                    if (testCase.section === 'BENEFITS') {
+                        if (result.benefits.length !== testCase.expected.benefits.length) {
+                            errors.push(`Benefits count mismatch: expected ${testCase.expected.benefits.length}, got ${result.benefits.length}`);
+                            passed = false;
+                        }
+                        result.benefits.forEach((benefit, i) => {
+                            if (testCase.expected.benefits[i] && benefit.description.startsWith('R')) {
+                                errors.push(`Text corruption detected in benefit ${i}: "${benefit.description}"`);
+                                passed = false;
+                            }
+                        });
+                    }
+
+                    if (testCase.section === 'PORTFOLIO') {
+                        if (result.projects.length !== testCase.expected.projects.length) {
+                            errors.push(`Projects count mismatch: expected ${testCase.expected.projects.length}, got ${result.projects.length}`);
+                            passed = false;
+                        }
+                    }
+
+                } catch (error) {
+                    passed = false;
+                    errors.push(`Exception: ${error.message}`);
+                }
+
+                if (passed) {
+                    passCount++;
+                    testDiv.classList.add('test-pass');
+                } else {
+                    testDiv.classList.add('test-fail');
+                }
+
+                testDiv.innerHTML = `
+                    <div class="test-title">${testCase.name} - ${passed ? 'PASS' : 'FAIL'}</div>
+                    <div class="test-input"><strong>Input:</strong><br>${testCase.input}</div>
+                    <div class="test-output"><strong>Result:</strong><br>${JSON.stringify(result, null, 2)}</div>
+                    ${errors.length > 0 ? `<div class="error">Errors:<br>${errors.join('<br>')}</div>` : ''}
+                `;
+
+                resultsDiv.appendChild(testDiv);
+            });
+
+            // Summary
+            const summaryDiv = document.createElement('div');
+            summaryDiv.innerHTML = `<h2>Test Summary: ${passCount}/${totalCount} tests passed</h2>`;
+            resultsDiv.insertBefore(summaryDiv, resultsDiv.firstChild);
+        }
+
+        // Run tests when page loads
+        window.onload = runTests;
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+[HERO]
+Heading: Test Service Title
+Description: This is a test description for debugging.
+Bullet 1: First benefit point
+Bullet 2: Second benefit point
+Form Heading: Contact Us
+Form Button: Get Started
+
+[FAQ]
+Heading: Test FAQ Section
+Question 1: What is this test?
+Answer 1: This is a simple test to check if the tool works.
+Question 2: Does it work?
+Answer 2: It should generate HTML sections.

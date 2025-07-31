@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Section Detection</title>
+</head>
+<body>
+    <h1>Section Detection Test</h1>
+    <textarea id="testContent" rows="20" cols="100">
+[CONTENT_FORM]
+Web Development Services Backed By Industry Experts
+Web development services involve designing, building, and maintaining digital platforms—from informational websites to complex web applications.
+How Web Development Services Address Key Challenges:
+
+●Custom Builds for Unique Needs: Avoid limitations of generic platforms.
+●Mobile-Responsive Design: Ensure a seamless experience across all devices.
+[CONTENT_FORM END]
+
+[BENEFITS2]
+Key Benefits of Web Development Consulting Services
+Partnering with a web development consulting company offers more than just technical guidance.
+Eliminate Performance Issues
+Transform slow-loading websites that drive customers away into fast, responsive platforms.
+Boost Conversion Rates
+Convert more visitors into paying customers through strategic user experience optimization.
+[BENEFITS2 END]
+    </textarea>
+    <br><br>
+    <button onclick="testDetection()">Test Detection</button>
+    <div id="results"></div>
+
+    <script>
+        // Copy the detection logic from web IDE
+        const supportedSections = ['HERO', 'FAQ', 'CTA_SIMPLE', 'CTA_ENHANCED', 'PROCESS', 'TECHNOLOGY', 'INDUSTRIES', 'SERVICES_GRID', 'SERVICES_ACCORDION', 'PORTFOLIO', 'TESTIMONIAL', 'BENEFITS', 'BENEFITS2', 'CONTENT_FORM'];
+        
+        function detectSections(content) {
+            const sectionPattern = /\[([A-Z_\s]+)\]/g;
+            const matches = [...content.matchAll(sectionPattern)];
+            const detected = matches.map(match => match[1].trim());
+            
+            return [...new Set(detected)].filter(section => 
+                supportedSections.some(supported => 
+                    section.includes(supported) || supported.includes(section)
+                )
+            );
+        }
+        
+        function testDetection() {
+            const content = document.getElementById('testContent').value;
+            const detected = detectSections(content);
+            
+            document.getElementById('results').innerHTML = `
+                <h3>Detection Results:</h3>
+                <p><strong>Detected sections:</strong> ${detected.join(', ')}</p>
+                <p><strong>Count:</strong> ${detected.length}</p>
+                <p><strong>All matches found:</strong></p>
+                <ul>
+                    ${detected.map(section => `<li>${section} - ${supportedSections.includes(section) ? '✅ Supported' : '❌ Not supported'}</li>`).join('')}
+                </ul>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Web IDE Detection</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        textarea { width: 100%; height: 400px; }
+        .results { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        .error { background: #ffebee; color: #c62828; }
+    </style>
+</head>
+<body>
+    <h1>Test Web IDE Detection - BENEFITS2</h1>
+    
+    <textarea id="testContent">[BENEFITS2]
+Why Space-O Technologies is Your Strategic Partner for Web Development Consulting Services
+From crashing servers to abandoned carts, we help CTOs navigate the technical challenges that stall growth. Our web consulting services bring clarity to complex architecture decisions, reduce technical debt, and build a solid foundation for what's next.
+Strategic Technology Roadmapping
+Our consulting services include long-term technology planning aligned with business growth objectives. We create detailed roadmaps for web platform evolution, feature prioritization, and resource allocation optimization.
+Data-Driven Architecture Decisions
+No guesswork here at Space-O Technologies. We analyze your traffic patterns, growth projections, and integration needs to recommend technologies that align with your roadmap, not just the trending frameworks everyone's talking about.
+Cost-Effective Consulting Models
+We offer flexible engagement options including project-based, retainer, and hybrid consulting models. Space-O Technologies consistently delivers web development consulting at 30-40% lower costs than traditional enterprise consulting firms.
+Certified Technology Partnerships
+Space-O Technologies maintains official partnerships with AWS, Google Cloud, and Microsoft Azure. Our certified consultants leverage these relationships to provide enterprise-grade web development solutions with preferential support.
+24/7 Critical Support Coverage
+Our web development consultants provide round-the-clock emergency support for critical system issues. We maintain a dedicated team of on-call consultants to promptly address performance degradation, security incidents, and infrastructure failures.
+Industry-Specific Solutions
+From e-commerce conversion optimization to SaaS performance scaling, we understand sector-specific challenges. Your healthcare compliance needs or fintech security requirements aren't foreign concepts to us—they're our expertise.
+[BENEFITS2 END]</textarea>
+    
+    <br><br>
+    <button onclick="testDetection()">Test Detection</button>
+    
+    <div id="results" class="results"></div>
+
+    <script>
+        const supportedSections = ['HERO', 'FAQ', 'CTA_SIMPLE', 'CTA_ENHANCED', 'PROCESS', 'TECHNOLOGY', 'INDUSTRIES', 'SERVICES_GRID', 'SERVICES_ACCORDION', 'PORTFOLIO', 'TESTIMONIAL', 'BENEFITS', 'BENEFITS2', 'CONTENT_FORM'];
+        
+        // NEW FIXED DETECTION LOGIC
+        function detectSections(content) {
+            const sectionPattern = /\[([A-Z_\s]+)\]/g;
+            const matches = [...content.matchAll(sectionPattern)];
+            const detected = matches.map(match => match[1].trim());
+            
+            // Filter out END markers and only keep supported sections
+            return [...new Set(detected)]
+                .filter(section => !section.endsWith(' END'))
+                .filter(section => 
+                    supportedSections.some(supported => 
+                        section.includes(supported) || supported.includes(section)
+                    )
+                );
+        }
+        
+        function testDetection() {
+            const content = document.getElementById('testContent').value;
+            const resultsDiv = document.getElementById('results');
+            
+            console.log('Testing content length:', content.length);
+            console.log('First 100 chars:', content.substring(0, 100));
+            
+            const detectedSections = detectSections(content);
+            
+            let html = `
+                <h3>Detection Results:</h3>
+                <p><strong>Content length:</strong> ${content.length} characters</p>
+                <p><strong>Detected sections:</strong> ${JSON.stringify(detectedSections)}</p>
+                <p><strong>Section count:</strong> ${detectedSections.length}</p>
+            `;
+            
+            if (detectedSections.length > 0) {
+                html += '<div class="success">✅ Success: BENEFITS2 section detected!</div>';
+                html += '<p>The web IDE should now work correctly with this content.</p>';
+            } else {
+                html += '<div class="error">❌ Error: No valid sections found</div>';
+                html += '<p>Detection is still failing. Need to investigate further.</p>';
+            }
+            
+            // Test raw pattern matching
+            const sectionPattern = /\[([A-Z_\s]+)\]/g;
+            const matches = [...content.matchAll(sectionPattern)];
+            const allMatches = matches.map(match => match[1].trim());
+            
+            html += `
+                <h4>Debug Info:</h4>
+                <p><strong>All pattern matches:</strong> ${JSON.stringify(allMatches)}</p>
+                <p><strong>After END filter:</strong> ${JSON.stringify(allMatches.filter(section => !section.endsWith(' END')))}</p>
+                <p><strong>BENEFITS2 in supported:</strong> ${supportedSections.includes('BENEFITS2')}</p>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

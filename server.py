@@ -5,10 +5,11 @@ import socket
 import os
 
 def start_server():
-    PORT = 8080
+    PORT = 8081
     
-    # Change to the correct directory
-    os.chdir('/home/sotsys-252/Desktop/page-content-update')
+    # Use current directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(current_dir)
     
     # Get local IP address
     hostname = socket.gethostname()
@@ -34,30 +35,30 @@ def start_server():
     try:
         # Bind to all interfaces (0.0.0.0)
         with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
-            print(f"🚀 Page Content Update IDE Server Started!")
-            print(f"📁 Serving from: {os.getcwd()}")
-            print(f"📡 Local access: http://localhost:{PORT}")
-            print(f"🌐 Network access: http://{local_ip}:{PORT}")
+            print(f"Page Content Update IDE Server Started!")
+            print(f"Serving from: {os.getcwd()}")
+            print(f"Local access: http://localhost:{PORT}")
+            print(f"Network access: http://{local_ip}:{PORT}")
             print(f"")
-            print(f"🎯 DIRECT LINKS:")
+            print(f"DIRECT LINKS:")
             print(f"   Main Page: http://localhost:{PORT}/index.html")
             print(f"   Web IDE: http://localhost:{PORT}/web_ide_final.html")
             print(f"   Sample Doc: http://localhost:{PORT}/Content_File_Web_Development_Consulting_FINAL.txt")
             print(f"")
-            print(f"⚡ Press Ctrl+C to stop")
+            print(f"Press Ctrl+C to stop")
             print("=" * 70)
             
             httpd.serve_forever()
             
     except KeyboardInterrupt:
-        print("\n👋 Server stopped!")
+        print("\nServer stopped!")
     except OSError as e:
         if "Address already in use" in str(e):
-            print(f"❌ Port {PORT} is already in use.")
-            print("Try running: sudo lsof -i :8080")
+            print(f"Port {PORT} is already in use.")
+            print("Try running: netstat -ano | findstr :8080")
             print("Then kill the process or use a different port")
         else:
-            print(f"❌ Error starting server: {e}")
+            print(f"Error starting server: {e}")
 
 if __name__ == "__main__":
     start_server()

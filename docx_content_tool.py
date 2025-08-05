@@ -48,28 +48,30 @@ class DocxContentTool:
 
     def generate_hero_html(self, content):
         """Generate hero section HTML from docx content"""
-        lines = [line.strip() for line in content.split('\n') if line.strip()]
+        # Split by actual line breaks to preserve spacing
+        all_lines = content.split('\n')
+        lines = [line.strip() for line in all_lines if line.strip()]
         
         # Parse content
         heading = lines[0] if lines else "Service Title"
-        
-        # Find where bullets start
-        bullet_start_index = -1
-        for i, line in enumerate(lines[1:], 1):
-            if line.startswith('●'):
-                bullet_start_index = i
-                break
+        current_index = 1
         
         description = ''
         bullet_intro = ''
         bullet_lines = []
         
-        if bullet_start_index == -1:
-            # No bullets found, everything else is description
-            description = ' '.join(lines[1:])
-        else:
+        # Find where explicit bullets start (WPS style with symbols)
+        bullet_start_index = -1
+        for i in range(current_index, len(lines)):
+            line = lines[i]
+            if re.match(r'^[●\-\*•‑]\s*', line) or re.match(r'^\d+[\.\)]\s+', line):
+                bullet_start_index = i
+                break
+        
+        # If explicit bullets found (WPS style)
+        if bullet_start_index != -1:
             # Process lines before bullets
-            description_lines = lines[1:bullet_start_index]
+            description_lines = lines[current_index:bullet_start_index]
             
             if len(description_lines) > 1:
                 # Check if last line before bullets looks like an intro title
@@ -88,10 +90,11 @@ class DocxContentTool:
             else:
                 description = ' '.join(description_lines)
             
-            # Extract bullets
+            # Extract explicit bullets
             for line in lines[bullet_start_index:]:
-                if line.startswith('●'):
-                    clean_bullet = line.replace('●', '').strip()
+                if re.match(r'^[●\-\*•‑]\s*', line) or re.match(r'^\d+[\.\)]\s+', line):
+                    clean_bullet = re.sub(r'^[●\-\*•‑]\s*', '', line).strip()
+                    clean_bullet = re.sub(r'^\d+[\.\)]\s+', '', clean_bullet).strip()
                     # Handle bold formatting in bullet points
                     if ':' in clean_bullet:
                         parts = clean_bullet.split(':', 1)
@@ -101,6 +104,47 @@ class DocxContentTool:
                             bullet_lines.append(clean_bullet)
                     else:
                         bullet_lines.append(clean_bullet)
+        else:
+            # No explicit bullets found - check for Google Docs style lists
+            description_lines = lines[current_index:]
+            
+            # Look for bullet intro line (like "How We Help You-")
+            intro_line_index = -1
+            for i in range(len(description_lines)):
+                line = description_lines[i]
+                # Line that ends with dash/colon or is short and followed by structured content
+                if (len(line) < 50 and 
+                    (line.endswith('-') or line.endswith(':') or line.endswith('?')) and
+                    i < len(description_lines) - 2):  # Must have at least 2 lines after it
+                    intro_line_index = i
+                    break
+            
+            if intro_line_index != -1:
+                # We found an intro line, check if lines after it look like list items
+                lines_after_intro = description_lines[intro_line_index + 1:]
+                
+                # Check if these lines look like list items (Google Docs style)
+                likely_bullets = []
+                for line in lines_after_intro:
+                    trimmed = line.strip()
+                    if (trimmed and 
+                        len(trimmed) > 10 and  # Not too short
+                        len(trimmed) < 200 and  # Not too long
+                        re.match(r'^[A-Z]', trimmed) and  # Starts with capital
+                        (trimmed.endswith('.') or '.' not in trimmed or len(trimmed.split('.')) <= 2)):  # Complete thought
+                        likely_bullets.append(trimmed)
+                
+                # If we have 2+ structured lines after intro, treat them as bullets
+                if len(likely_bullets) >= 2:
+                    description = ' '.join(description_lines[:intro_line_index])
+                    bullet_intro = description_lines[intro_line_index]
+                    bullet_lines = likely_bullets
+                else:
+                    # Not enough structured content, treat all as description
+                    description = ' '.join(description_lines)
+            else:
+                # No intro line found, treat all as description
+                description = ' '.join(description_lines)
         
         # Create bullet points HTML
         bullet_html = ""
@@ -206,7 +250,11 @@ class DocxContentTool:
             if not line.startswith('●') and (not current_service or current_service.get('description')):
                 if current_service:
                     services.append(current_service)
-                current_service = {'title': line, 'description': '', 'points': []}
+                # Remove numbers from beginning of titles (1. B2B Portal → B2B Portal)
+                clean_title = line
+                if re.match(r'^\d+\.\s+', line):
+                    clean_title = re.sub(r'^\d+\.\s+', '', line)
+                current_service = {'title': clean_title, 'description': '', 'points': []}
                 i += 1
                 # Next line should be description
                 if i < len(lines) and not lines[i].startswith('●'):
@@ -479,24 +527,74 @@ class DocxContentTool:
         heading = lines[0] if lines else "Key Benefits of Web Development Consulting Services"
         description = lines[1] if len(lines) > 1 else "Partnering with a web development consulting company offers more than just technical guidance."
         
-        # Parse benefits - they come in pairs (title + description)
+        # Parse benefits - robust detection including numbered format
         benefits = []
-        current_benefit = {}
+        current_benefit = None
         
-        for line in lines[2:]:
-            # Benefit titles (shorter lines that don't start with common description words)
-            if not line.startswith(('Transform', 'Convert', 'Replace', 'Complete', 'Maximize', 'Launch', 'Professional', 'Web development', 'Expert', 'Strategic', 'No guesswork', 'We offer', 'Space-O', 'Our web', 'From e-commerce')):
+        all_lines = content.split('\n')
+        
+        for i, line in enumerate(lines[2:], start=2):
+            # CRITICAL: Check if line starts with a number (1., 2., etc.)
+            numbered_match = re.match(r'^(\d+)\.\s+(.+)', line)
+            is_numbered_title = bool(numbered_match)
+            
+            # Find original line index to check for empty lines
+            original_line_idx = None
+            for j, orig_line in enumerate(all_lines):
+                if orig_line.strip() == line:
+                    original_line_idx = j
+                    break
+            
+            # Check if separated by empty lines
+            is_after_empty = original_line_idx > 0 and all_lines[original_line_idx - 1].strip() == ''
+            
+            # Better title detection - now includes numbered format
+            is_short = len(line) < 80  # Increased to handle numbered titles
+            is_title_case = re.match(r'^[A-Z][a-zA-Z\s&-]*[a-zA-Z]$', line) or re.match(r'^[A-Z][a-zA-Z]*$', line)
+            no_end_punct = not line.endswith(('.', '!', '?'))
+            is_first_benefit = i == 2
+            
+            # Smart title detection based on structure
+            next_line_index = i + 1 if i < len(lines) - 3 else None
+            has_long_text_after = False
+            if next_line_index and next_line_index < len(lines):
+                next_line = lines[next_line_index].strip()
+                has_long_text_after = len(next_line) > 100
+            
+            # A line is a benefit title if:
+            # 1. It starts with a number (1., 2., etc.)
+            # 2. It's the first content after description
+            # 3. It's short AND followed by longer text
+            # 4. It's after empty line(s) and is relatively short
+            is_benefit_title = is_numbered_title or is_first_benefit or (is_short and has_long_text_after) or (is_short and is_after_empty and i > 2)
+            
+            if is_benefit_title:
+                # Save previous benefit
                 if current_benefit:
                     benefits.append(current_benefit)
-                current_benefit = {'title': line, 'description': ''}
+                # Start new benefit
+                # If it's a numbered title, extract just the title part
+                if is_numbered_title and numbered_match:
+                    title = numbered_match.group(2)  # Get title without number
+                else:
+                    title = line
+                current_benefit = {'title': title, 'description': ''}
             else:
-                # Benefit descriptions
+                # Add to description
                 if current_benefit:
                     if current_benefit['description']:
                         current_benefit['description'] += ' ' + line
                     else:
                         current_benefit['description'] = line
+                else:
+                    # Check if this might be a numbered title as first line
+                    first_line_numbered = re.match(r'^(\d+)\.\s+(.+)', line)
+                    if first_line_numbered:
+                        current_benefit = {'title': first_line_numbered.group(2), 'description': ''}
+                    else:
+                        current_benefit = {'title': line, 'description': ''}
         
+        # Add last benefit
         if current_benefit:
             benefits.append(current_benefit)
         
@@ -513,11 +611,12 @@ class DocxContentTool:
         benefits_html = ""
         for i, benefit in enumerate(benefits[:6]):  # Limit to 6 benefits
             icon_slug = benefit_icons[i] if i < len(benefit_icons) else f'benefit-{i+1}'
+            description_html = f'<p class="fonts-14">{benefit.get("description", "")}</p>' if benefit.get('description') else ''
             benefits_html += f"""    <div class="col-lg-4 col-md-6">
         <div class="mad_service_box text-center">
             <img src="/wp-content/uploads/2025/07/{icon_slug}.svg" alt="{benefit['title']}" width="74" height="74" />
             <h3 class="fonts-18 font-weight-semibold">{benefit['title']}</h3>
-            {benefit.get('description', '')}
+            {description_html}
         </div>
     </div>"""
         
@@ -778,50 +877,6 @@ class DocxContentTool:
 </div>
 </section>"""
 
-    def generate_process_html(self, content):
-        """Generate process section HTML from docx content"""
-        lines = [line.strip() for line in content.split('\n') if line.strip()]
-        
-        heading = lines[0] if lines else "Our Proven Process"
-        description = lines[1] if len(lines) > 1 else "Our step-by-step approach ensures project success."
-        
-        # Parse process steps
-        steps = []
-        current_step = {}
-        
-        for line in lines[2:]:
-            # Step titles (lines that contain 'Discovery', 'Architecture', etc.)
-            if any(keyword in line for keyword in ['Discovery', 'Architecture', 'Environment', 'Development', 'Acceptance', 'Deployment']):
-                if current_step:
-                    steps.append(current_step)
-                current_step = {'title': line, 'description': ''}
-            else:
-                # Step descriptions
-                if current_step and line:
-                    current_step['description'] = line
-        
-        if current_step:
-            steps.append(current_step)
-        
-        steps_html = ""
-        for i, step in enumerate(steps[:6]):  # Limit to 6 steps
-            steps_html += f"""         <div class="col-lg-4 col-md-6">
-            <div class="instalikeapp">
-               <p class="number">0{i+1}</p>
-               <h3 class="font-weight-semibold fonts-20 mt-2 mb-3">{step['title']}</h3>
-               <p>{step.get('description', '')}</p>
-            </div>
-         </div>"""
-        
-        return f"""<section class="pt80 pb50 process-sec bg-color">
-   <div class="container-xl">
-    <h2 class="fonts-40 font-weight-bold text-center mb-3">{heading}</h2>
-    <p class="fonts-18 text-center mxw-1000 mb-4">{description}</p>
-      <div class="row">
-{steps_html}
-      </div>
-   </div>
-</section>"""
 
     def generate_technology_html(self, content):
         """Generate technology stack section HTML from docx content"""
@@ -830,72 +885,234 @@ class DocxContentTool:
         heading = lines[0] if lines else "Technology Stack"
         description = lines[1] if len(lines) > 1 else "Modern technologies we use."
         
-        # Technology categories will be hardcoded based on the expected structure
-        tech_categories = [
-            {
-                'name': 'Frontend Technologies',
-                'techs': [
-                    {'name': 'React', 'icon': 'React.svg'},
-                    {'name': 'Vue.js', 'icon': 'Vue-JS.svg'},
-                    {'name': 'Angular', 'icon': 'Angular.svg'},
-                    {'name': 'Next.js', 'icon': 'Next.js.svg'},
-                    {'name': 'TypeScript', 'icon': 'typescript.svg'},
-                    {'name': 'Tailwind CSS', 'icon': 'Tailwind.svg'}
-                ]
-            },
-            {
-                'name': 'Backend Technologies',
-                'techs': [
-                    {'name': 'Node.js', 'icon': 'Node.js.svg'},
-                    {'name': 'Python', 'icon': 'python.svg'},
-                    {'name': 'Django', 'icon': 'Django.svg'},
-                    {'name': 'PHP', 'icon': 'php.svg'},
-                    {'name': 'Laravel', 'icon': 'Laravel.svg'},
-                    {'name': 'Ruby on Rails', 'icon': 'ROR.svg'},
-                    {'name': '.NET Core', 'icon': 'Microsoft_.NET_.svg'},
-                    {'name': 'Express.js', 'icon': 'expressjs.svg'}
-                ]
-            },
-            {
-                'name': 'Database',
-                'techs': [
-                    {'name': 'PostgreSQL', 'icon': 'Postgresql_elephant.svg'},
-                    {'name': 'MongoDB', 'icon': 'MongoDB.svg'},
-                    {'name': 'MySQL', 'icon': 'MySQL.svg'},
-                    {'name': 'Redis', 'icon': 'Redis.svg'},
-                    {'name': 'Firebase', 'icon': 'Firebase.svg'},
-                    {'name': 'Supabase', 'icon': 'supabase.svg'}
-                ]
-            },
-            {
-                'name': 'Cloud & DevOps',
-                'techs': [
-                    {'name': 'AWS', 'icon': 'AWS.svg'},
-                    {'name': 'Google Cloud', 'icon': 'Google-Cloud-Platform.svg'},
-                    {'name': 'Microsoft Azure', 'icon': 'Microsoft-Azure.svg'},
-                    {'name': 'Docker', 'icon': 'Docker.svg'},
-                    {'name': 'Kubernetes', 'icon': 'Kubernetes.svg'}
-                ]
-            }
-        ]
+        # Parse technology categories from content
+        tech_categories = []
+        current_category = None
+        current_techs = []
+        
+        # Skip heading and description
+        start_idx = 2 if len(lines) > 1 else 0
+        
+        for i in range(start_idx, len(lines)):
+            line = lines[i]
+            
+            # Check if this is a category name (ends with ':')
+            if line.endswith(':'):
+                # Save previous category if exists
+                if current_category and current_techs:
+                    tech_categories.append({
+                        'name': current_category,
+                        'techs': current_techs
+                    })
+                
+                current_category = line.replace(':', '').strip()
+                current_techs = []
+            else:
+                # This is a technology item
+                # Try to parse tech name and icon from the line
+                tech_name = line.strip()
+                
+                # Map tech names to their icons
+                tech_icons = {
+                    'React': 'React.svg',
+                    'React.js': 'React.svg',
+                    'Vue.js': 'Vue-JS.svg',
+                    'Angular': 'Angular.svg',
+                    'Next.js': 'Next.js.svg',
+                    'Nuxt.js': 'Nuxt.js.svg',
+                    'Nuxt': 'Nuxt.js.svg',
+                    'Ember.js': 'Ember.js.svg',
+                    'TypeScript': 'typescript.svg',
+                    'Tailwind CSS': 'Tailwind.svg',
+                    'HTML': 'HTML.svg',
+                    'CSS': 'CSS.svg',
+                    'JavaScript': 'JavaScript.svg',
+                    'Node.js': 'Node.js.svg',
+                    'Python': 'python.svg',
+                    'Django': 'Django.svg',
+                    'PHP': 'php.svg',
+                    'Laravel': 'Laravel.svg',
+                    'Symfony': 'Symfony.svg',
+                    'CodeIgniter': 'CodeIgniter.svg',
+                    'Yii': 'Yii.svg',
+                    'CakePHP': 'CakePHP.svg',
+                    'Zend': 'Zend.svg',
+                    'Zend Framework': 'Zend.svg',
+                    'Ruby on Rails': 'ROR.svg',
+                    '.NET Core': 'Microsoft_.NET_.svg',
+                    'Microsoft .NET': 'Microsoft_.NET_.svg',
+                    'Express': 'expressjs.svg',
+                    'Express.js': 'expressjs.svg',
+                    'PostgreSQL': 'Postgresql_elephant.svg',
+                    'MongoDB': 'MongoDB.svg',
+                    'MySQL': 'MySQL.svg',
+                    'Redis': 'Redis.svg',
+                    'Memcached': 'Memcached.svg',
+                    'SQL': 'SQL.svg',
+                    'NoSQL': 'NoSQL.svg',
+                    'Firebase': 'Firebase.svg',
+                    'Supabase': 'supabase.svg',
+                    'AWS': 'AWS.svg',
+                    'Google Cloud': 'Google-Cloud-Platform.svg',
+                    'Google Cloud Platform': 'Google-Cloud-Platform.svg',
+                    'Microsoft Azure': 'Microsoft-Azure.svg',
+                    'Azure': 'Microsoft-Azure.svg',
+                    'Docker': 'Docker.svg',
+                    'Kubernetes': 'Kubernetes.svg',
+                    'Heroku': 'Heroku.svg',
+                    'Jenkins': 'Jenkins.svg',
+                    'Vercel': 'vercel.svg',
+                    'Git': 'Git.svg',
+                    'Visual Studio Code': 'Visual-Studio-Code.svg',
+                    'GraphQL': 'GraphQL.svg',
+                    'Jest': 'Jest.svg',
+                    'Cypress': 'Cypress.svg',
+                    'Selenium': 'Selenium.svg',
+                    'Mocha': 'Mocha.svg',
+                    'WordPress': 'WordPress.svg',
+                    'Drupal': 'Drupal.svg',
+                    'Magento': 'Magento.svg',
+                    'Joomla': 'Joomla.svg',
+                    'TYPO3': 'TYPO3.svg',
+                    'OpenAI': 'OpenAI.svg',
+                    'ChatGPT': 'ChatGPT.svg',
+                    'Whisper': 'Whisper.svg',
+                    'Synthesia': 'Synthesia.svg',
+                    'Prism': 'Prism.svg',
+                    'Swift': 'Swift.svg',
+                    'Xcode': 'Xcode.svg',
+                    'Webflow': 'webflow.svg',
+                    'Bubble': 'bubble.svg',
+                    'Airtable': 'airtable.svg',
+                    'Zapier': 'Zapier.svg',
+                    'Notion': 'notion.svg',
+                    'Strapi': 'strapi.svg',
+                    'Figma': 'Figma.svg',
+                    'Adobe Creative Suite': 'adobe-creative-suite.svg',
+                    'Sketch': 'Sketch.svg',
+                    'Framer': 'framer.svg',
+                    'InVision': 'InVision.png'
+                }
+                
+                # Get icon file name
+                icon_file = tech_icons.get(tech_name, f"{tech_name.replace(' ', '-').lower()}.svg")
+                
+                if tech_name in tech_icons:
+                    current_techs.append({
+                        'name': tech_name,
+                        'icon': icon_file
+                    })
+        
+        # Add last category
+        if current_category and current_techs:
+            tech_categories.append({
+                'name': current_category,
+                'techs': current_techs
+            })
+        
+        # If no categories were parsed, use default structure
+        if not tech_categories:
+            tech_categories = [
+                {
+                    'name': 'Frontend Technologies',
+                    'techs': [
+                        {'name': 'React', 'icon': 'React.svg'},
+                        {'name': 'Vue.js', 'icon': 'Vue-JS.svg'},
+                        {'name': 'Angular', 'icon': 'Angular.svg'},
+                        {'name': 'Next.js', 'icon': 'Next.js.svg'},
+                        {'name': 'TypeScript', 'icon': 'typescript.svg'},
+                        {'name': 'Tailwind CSS', 'icon': 'Tailwind.svg'}
+                    ]
+                },
+                {
+                    'name': 'Backend Technologies',
+                    'techs': [
+                        {'name': 'Node.js', 'icon': 'Node.js.svg'},
+                        {'name': 'Python', 'icon': 'python.svg'},
+                        {'name': 'Django', 'icon': 'Django.svg'},
+                        {'name': 'PHP', 'icon': 'php.svg'},
+                        {'name': 'Laravel', 'icon': 'Laravel.svg'},
+                        {'name': 'Ruby on Rails', 'icon': 'ROR.svg'},
+                        {'name': '.NET Core', 'icon': 'Microsoft_.NET_.svg'},
+                        {'name': 'Express.js', 'icon': 'expressjs.svg'}
+                    ]
+                },
+                {
+                    'name': 'Database',
+                    'techs': [
+                        {'name': 'PostgreSQL', 'icon': 'Postgresql_elephant.svg'},
+                        {'name': 'MongoDB', 'icon': 'MongoDB.svg'},
+                        {'name': 'MySQL', 'icon': 'MySQL.svg'},
+                        {'name': 'Redis', 'icon': 'Redis.svg'},
+                        {'name': 'Firebase', 'icon': 'Firebase.svg'},
+                        {'name': 'Supabase', 'icon': 'supabase.svg'}
+                    ]
+                },
+                {
+                    'name': 'Cloud & DevOps',
+                    'techs': [
+                        {'name': 'AWS', 'icon': 'AWS.svg'},
+                        {'name': 'Google Cloud', 'icon': 'Google-Cloud-Platform.svg'},
+                        {'name': 'Microsoft Azure', 'icon': 'Microsoft-Azure.svg'},
+                        {'name': 'Docker', 'icon': 'Docker.svg'},
+                        {'name': 'Kubernetes', 'icon': 'Kubernetes.svg'},
+                        {'name': 'Vercel', 'icon': 'vercel.svg'}
+                    ]
+                },
+                {
+                    'name': 'No-Code / Low-Code',
+                    'techs': [
+                        {'name': 'Webflow', 'icon': 'webflow.svg'},
+                        {'name': 'Bubble', 'icon': 'bubble.svg'},
+                        {'name': 'Airtable', 'icon': 'airtable.svg'},
+                        {'name': 'Zapier', 'icon': 'Zapier.svg'},
+                        {'name': 'Notion', 'icon': 'notion.svg'},
+                        {'name': 'Strapi', 'icon': 'strapi.svg'}
+                    ]
+                },
+                {
+                    'name': 'Design & Tools',
+                    'techs': [
+                        {'name': 'Figma', 'icon': 'Figma.svg'},
+                        {'name': 'Adobe Creative Suite', 'icon': 'adobe-creative-suite.svg'},
+                        {'name': 'Sketch', 'icon': 'Sketch.svg'},
+                        {'name': 'Framer', 'icon': 'framer.svg'},
+                        {'name': 'InVision', 'icon': 'InVision.png'}
+                    ]
+                }
+            ]
         
         tech_html = ""
         for category in tech_categories:
             tech_items = ""
             for tech in category['techs']:
-                icon_path = f"/wp-content/uploads/2023/08/{tech['icon']}" if not tech['icon'].startswith('2024') and not tech['icon'].startswith('2025') else f"/wp-content/uploads/{tech['icon'][:7]}/{tech['icon'][8:]}"
-                if tech['name'] == 'Next.js':
-                    icon_path = "/wp-content/uploads/2024/02/Next.js.svg"
+                # Determine the correct upload path based on icon name and known patterns
+                icon_path = f"/wp-content/uploads/2023/08/{tech['icon']}"
+                
+                # Special cases for different upload years
+                if tech['name'] in ['Next.js', 'Tailwind CSS', 'Zapier']:
+                    icon_path = f"/wp-content/uploads/2024/02/{tech['icon']}"
                 elif tech['name'] == 'TypeScript':
                     icon_path = "/wp-content/uploads/2024/03/typescript.svg"
-                elif tech['name'] == 'Tailwind CSS':
-                    icon_path = "/wp-content/uploads/2024/02/Tailwind.svg"
                 elif tech['name'] == 'PHP':
                     icon_path = "/wp-content/uploads/2022/01/php.svg"
-                elif tech['name'] == 'Supabase':
-                    icon_path = "/wp-content/uploads/2025/07/supabase.svg"
-                elif tech['name'] == 'Google Cloud':
+                elif tech['name'] in ['Supabase', 'Vercel', 'Webflow', 'Bubble', 'Airtable', 'Notion', 'Strapi', 'Framer', 'Adobe Creative Suite', 
+                                     'Nuxt.js', 'Nuxt', 'HTML', 'CSS', 'JavaScript', 'Memcached', 'SQL', 'NoSQL', 'Heroku', 'Jenkins',
+                                     'Git', 'Visual Studio Code', 'GraphQL', 'Jest', 'Cypress', 'Selenium', 'Mocha', 'OpenAI', 
+                                     'ChatGPT', 'Whisper', 'Synthesia', 'Prism', 'Swift', 'Xcode']:
+                    icon_path = f"/wp-content/uploads/2025/07/{tech['icon']}"
+                elif tech['name'] in ['Google Cloud', 'Google Cloud Platform']:
                     icon_path = "/wp-content/uploads/2025/06/Google-Cloud-Platform.svg"
+                elif tech['name'] == 'InVision':
+                    icon_path = "/wp-content/uploads/2021/01/InVision.png"
+                elif tech['name'] == 'Sketch':
+                    icon_path = "/wp-content/uploads/2023/09/Sketch.svg"
+                elif tech['name'] in ['Symfony', 'CodeIgniter', 'Yii', 'CakePHP', 'Zend', 'Zend Framework']:
+                    icon_path = f"/wp-content/uploads/2023/08/{tech['icon']}"
+                elif tech['name'] in ['WordPress', 'Drupal', 'Magento', 'Joomla', 'TYPO3']:
+                    icon_path = f"/wp-content/uploads/2023/08/{tech['icon']}"
+                elif tech['name'] == 'Ember.js':
+                    icon_path = f"/wp-content/uploads/2023/08/{tech['icon']}"
                     
                 tech_items += f'          <li><img src="{icon_path}" alt="{tech["name"]}" width="24" height="24"> {tech["name"]}</li>\n'
             
@@ -1107,9 +1324,6 @@ class DocxContentTool:
                 elif section_name == 'CTA_TWO':
                     html_parts.append(f"<!-- {section_name} SECTION -->")
                     html_parts.append(self.generate_cta_two_html(section_content))
-                elif section_name == 'PROCESS':
-                    html_parts.append(f"<!-- {section_name} SECTION -->")
-                    html_parts.append(self.generate_process_html(section_content))
                 elif section_name == 'TECHNOLOGY':
                     html_parts.append(f"<!-- {section_name} SECTION -->")
                     html_parts.append(self.generate_technology_html(section_content))

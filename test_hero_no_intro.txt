@@ -1,7 +1,0 @@
-[HERO]
-Web Development Services
-Join 100+ brands who trust Space-O Technologies. We offer comprehensive web development services for businesses across the globe.
-●Custom web development using modern technologies.
-●Mobile-first, responsive design for all devices.
-●Performance-optimized code for better speed.
-[HERO END]

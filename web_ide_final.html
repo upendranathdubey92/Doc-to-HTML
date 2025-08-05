@@ -20,11 +20,95 @@
 
         .ide-container {
             display: grid;
-            grid-template-columns: 350px 1fr 1fr;
+            grid-template-columns: 300px 1fr 1fr;
             grid-template-rows: 60px 1fr 40px;
             height: 100vh;
             gap: 1px;
             background: #333;
+            min-width: 0; /* Allow grid items to shrink */
+        }
+
+        /* Responsive breakpoints */
+        @media (max-width: 1200px) {
+            .ide-container {
+                grid-template-columns: 280px 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .ide-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px auto auto 40px;
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .sidebar {
+                order: 1;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            
+            .input-panel {
+                order: 2;
+                min-height: 400px;
+            }
+            
+            .output-panel {
+                order: 3;
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ide-container {
+                gap: 0;
+            }
+            
+            .sidebar {
+                padding: 15px;
+                max-height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 15px;
+            }
+            
+            .logo {
+                font-size: 16px;
+            }
+            
+            .sidebar {
+                padding: 10px;
+                max-height: 200px;
+            }
+            
+            .panel-content {
+                padding: 10px;
+            }
+            
+            .url-input-container {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            
+            #documentUrl {
+                min-width: unset !important;
+                width: 100% !important;
+                font-size: 14px !important;
+            }
+            
+            #fetchUrlBtn {
+                width: 100% !important;
+                text-align: center !important;
+            }
+            
+            .text-editor, .code-editor {
+                font-size: 13px;
+                padding: 10px;
+            }
         }
 
         .header {
@@ -61,12 +145,16 @@
             background: #1e1e1e;
             display: flex;
             flex-direction: column;
+            min-width: 0; /* Allow content to shrink */
+            overflow: hidden; /* Prevent horizontal overflow */
         }
 
         .output-panel {
             background: #1e1e1e;
             display: flex;
             flex-direction: column;
+            min-width: 0; /* Allow content to shrink */
+            overflow: hidden; /* Prevent horizontal overflow */
         }
 
         .panel-header {
@@ -84,6 +172,9 @@
             flex: 1;
             padding: 15px;
             overflow-y: auto;
+            overflow-x: hidden; /* Prevent horizontal overflow */
+            min-width: 0; /* Allow content to shrink */
+            word-wrap: break-word; /* Break long words */
         }
 
         .file-upload {
@@ -142,6 +233,10 @@
             resize: none;
             outline: none;
             line-height: 1.5;
+            box-sizing: border-box; /* Include padding in width calculation */
+            min-width: 0; /* Allow content to shrink */
+            word-wrap: break-word; /* Break long words */
+            overflow-wrap: break-word; /* Modern browsers */
         }
 
         .text-editor:focus {
@@ -159,10 +254,12 @@
             color: #d4d4d4;
             resize: none;
             outline: none;
-            white-space: pre;
-            overflow-wrap: normal;
+            white-space: pre-wrap; /* Allow wrapping for responsive design */
+            overflow-wrap: break-word; /* Break long words */
             overflow-x: auto;
             line-height: 1.4;
+            box-sizing: border-box; /* Include padding in width calculation */
+            min-width: 0; /* Allow content to shrink */
         }
 
         .btn {
@@ -431,6 +528,140 @@
             margin-bottom: 10px;
         }
     </style>
+    
+    <!-- Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <style>
+        /* Custom styles for Quill editor */
+        .ql-editor {
+            background: #1e1e1e !important;
+            color: #e8e8e8 !important; /* Improved text visibility - lighter color */
+            border: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            font-size: 15px !important; /* Slightly larger font */
+            line-height: 1.6 !important; /* Better line spacing */
+            min-height: 300px !important;
+            padding: 20px !important; /* More padding for better appearance */
+        }
+
+        /* Better text contrast for different elements */
+        .ql-editor p, .ql-editor div, .ql-editor span {
+            color: #e8e8e8 !important; /* Ensure all text is visible */
+        }
+
+        .ql-editor strong {
+            color: #ffffff !important; /* Bold text more visible */
+            font-weight: 600 !important;
+        }
+
+        .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6 {
+            color: #ffffff !important; /* Headers fully white */
+            font-weight: 600 !important;
+        }
+
+        /* Fix placeholder visibility on dark background */
+        .ql-editor.ql-blank::before {
+            color: #888888 !important; /* Light gray for good visibility */
+            font-style: normal !important;
+            opacity: 1 !important;
+        }
+
+        /* Alternative selector for placeholder */
+        .ql-editor[data-placeholder]::before {
+            color: #888888 !important;
+            font-style: normal !important;
+            opacity: 1 !important;
+        }
+        
+        .ql-toolbar {
+            background: #2d2d30 !important;
+            border: none !important;
+            border-bottom: 1px solid #3e3e42 !important;
+        }
+        
+        .ql-toolbar .ql-stroke {
+            fill: none !important;
+            stroke: #d4d4d4 !important;
+        }
+        
+        .ql-toolbar .ql-fill {
+            fill: #d4d4d4 !important;
+            stroke: none !important;
+        }
+        
+        .ql-toolbar .ql-picker-label {
+            color: #d4d4d4 !important;
+        }
+        
+        .ql-container {
+            border: none !important;
+            background: #1e1e1e !important;
+        }
+        
+        .ql-toolbar button:hover,
+        .ql-toolbar button:focus {
+            background: #3e3e42 !important;
+        }
+        
+        .ql-toolbar button.ql-active {
+            background: #007acc !important;
+        }
+        
+        .ql-picker-options {
+            background: #2d2d30 !important;
+            border: 1px solid #3e3e42 !important;
+        }
+        
+        .ql-picker-item {
+            color: #d4d4d4 !important;
+        }
+        
+        .ql-picker-item:hover {
+            background: #3e3e42 !important;
+        }
+        
+        #editor-container {
+            height: calc(100% - 80px);
+            background: #1e1e1e;
+            min-width: 0; /* Allow content to shrink */
+            overflow: hidden; /* Prevent horizontal overflow */
+        }
+
+        /* Responsive Quill editor */
+        @media (max-width: 768px) {
+            #editor-container {
+                height: calc(100% - 60px);
+            }
+            
+            .ql-toolbar {
+                padding: 6px 8px !important;
+            }
+            
+            .ql-editor {
+                padding: 12px !important;
+                font-size: 14px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .ql-toolbar {
+                padding: 4px 6px !important;
+                flex-wrap: wrap !important;
+            }
+            
+            .ql-editor {
+                padding: 10px !important;
+                font-size: 13px !important;
+            }
+        }
+        
+        /* Hide the original textarea when rich editor is active */
+        .text-editor.rich-editor-hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="ide-container">
@@ -448,11 +679,30 @@
                 ✨ Now supports Real Word Documents!
             </div>
             
+            <!-- URL Input Section -->
+            <div class="url-input-section" style="margin-bottom: 20px;">
+                <div class="url-input-container" style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                    <input 
+                        type="url" 
+                        id="documentUrl" 
+                        placeholder="Paste PUBLIC document URL (Google Docs, Dropbox, GitHub, etc.)" 
+                        style="flex: 1; min-width: 200px; padding: 12px; background: #252526; border: 1px solid #3e3e42; border-radius: 4px; color: #d4d4d4; font-size: 14px; box-sizing: border-box; word-break: break-all;"
+                    />
+                    <button id="fetchUrlBtn" class="btn" style="width: auto; padding: 12px 20px; margin: 0; white-space: nowrap;">Fetch</button>
+                </div>
+                <div style="font-size: 12px; opacity: 0.7; text-align: center;">
+                    📋 <strong>Supported:</strong> Google Docs (public), Dropbox, GitHub raw files<br>
+                    🎯 <strong>Smart Filtering:</strong> Only extracts supported sections (HERO_BANNER_SECTION, FAQ_SECTION, CTA_SIMPLE_SECTION, etc.)<br>
+                    ⚠️ <strong>Google Docs:</strong> Make sure it's shared as "Anyone with the link can view"
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
             <div class="file-upload" id="fileUpload">
                 <div class="upload-icon">📄</div>
                 <div class="upload-text">Drop your document here</div>
-                <div class="upload-subtext">Supports .txt, .doc, .docx files<br>Real Word documents supported!</div>
-                <input type="file" id="fileInput" accept=".txt,.doc,.docx" />
+                <div class="upload-subtext">Supports .txt, .doc, .docx, .rtf files<br>Real Word documents supported!</div>
+                <input type="file" id="fileInput" accept=".txt,.doc,.docx,.rtf" />
             </div>
 
             <div id="fileInfo" class="file-info" style="display: none;">
@@ -508,17 +758,18 @@
             <div class="supported-sections">
                 <h5>📋 Supported Sections</h5>
                 <div class="supported-list">
-                    <span class="supported-item">HERO</span>
-                    <span class="supported-item">SERVICES_GRID</span>
-                    <span class="supported-item">SERVICES_ACCORDION</span>
-                    <span class="supported-item">FAQ</span>
-                    <span class="supported-item">CTA_SIMPLE</span>
-                    <span class="supported-item">PROCESS</span>
-                    <span class="supported-item">TECHNOLOGY</span>
-                    <span class="supported-item">INDUSTRIES</span>
-                    <span class="supported-item">PORTFOLIO</span>
-                    <span class="supported-item">TESTIMONIAL</span>
-                    <span class="supported-item">BENEFITS</span>
+                    <span class="supported-item">HERO_BANNER_SECTION</span>
+                    <span class="supported-item">SERVICES_GRID_SECTION</span>
+                    <span class="supported-item">SERVICES_ACCORDION_SECTION</span>
+                    <span class="supported-item">FAQ_SECTION</span>
+                    <span class="supported-item">CTA_SIMPLE_SECTION</span>
+                    <span class="supported-item">PROCESS_SECTION</span>
+                    <span class="supported-item">FEATURED_IN_SECTION</span>
+                    <span class="supported-item">TECHNOLOGY_STACK_SECTION</span>
+                    <span class="supported-item">INDUSTRIES_WE_SERVE_SECTION</span>
+                    <span class="supported-item">PORTFOLIO_SECTION</span>
+                    <span class="supported-item">TESTIMONIAL_SECTION</span>
+                    <span class="supported-item">BENEFITS_SECTION</span>
                 </div>
             </div>
         </div>
@@ -530,10 +781,15 @@
                 </div>
             </div>
             <div class="panel-content">
+                <!-- Rich Text Editor Container -->
+                <div id="editor-container"></div>
+                
+                <!-- Fallback textarea (hidden when rich editor is active) -->
                 <textarea 
                     class="text-editor" 
                     id="inputContent" 
-                    placeholder="Paste your content here or upload a Word document...&#10;&#10;The tool automatically detects sections from real Word docs!&#10;&#10;Example format:&#10;[HERO]&#10;Heading: Your Service Title&#10;Description: Your service description...&#10;Bullet 1: First benefit&#10;&#10;[FAQ]&#10;Heading: Frequently Asked Questions&#10;Question 1: What is this?&#10;Answer 1: This is..."></textarea>
+                    placeholder="Paste your content here or upload a Word document...&#10;&#10;The tool automatically detects sections from real Word docs!&#10;&#10;Example format:&#10;[HERO]&#10;Heading: Your Service Title&#10;Description: Your service description...&#10;Bullet 1: First benefit&#10;&#10;[FAQ]&#10;Heading: Frequently Asked Questions&#10;Question 1: What is this?&#10;Answer 1: This is..."
+                    style="display: none;"></textarea>
             </div>
         </div>
 
@@ -566,12 +822,25 @@
     </div>
 
     <script>
-        // Enhanced Content Processing Engine with AI Support
+        // Global image error handler for broken images
+        function handleImageError(img) {
+            if (img.src.includes('wp-content/uploads/2023/08/') || img.src.includes('wp-content/uploads/2024/02/')) {
+                img.src = 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg';
+            } else if (img.src.includes('wp-content/uploads/2025/07/')) {
+                img.src = '/wp-content/uploads/2025/07/default-placeholder.svg';
+            } else if (img.src.includes('wp-content/uploads/2024/01/')) {
+                img.src = '/wp-content/uploads/2024/01/default-client.png';
+            } else {
+                img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMiA4VjE2TTE2IDEySDgiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+';
+            }
+        }
+
+        // Enhanced Content Processing Engine with AI Support - DATA URI IMAGES v3.8
         class RealDocumentProcessor {
             constructor() {
                 this.useAI = true; // Enable AI processing
                 this.sectionTemplates = {
-                    'HERO': `<section class="pt70 pb40 hero-section">
+                    'HERO': `<section class="pt70 pb40 hero-section section-hero">
 <div class="container-xl">
 <div class="row align-items-center">
 <div class="col-lg-7 col-md-12 banner-text">
@@ -625,7 +894,7 @@
 </div>
 </section>`,
                     // Add other templates...
-                    'FAQ': `<div class="faq pt80 pb50" style="background: linear-gradient(var(--bg-color-9), #fff);">
+                    'FAQ': `<div class="faq pt80 pb50 section-faq" style="background: linear-gradient(var(--bg-color-9), #fff);">
   <div class="container-xl">
     <h2 class="fonts-40 font-weight-bold text-center">{main_heading}</h2>
     <div id="accordion" class="text-left px-4">
@@ -636,12 +905,16 @@
                     // ... other templates
                 };
 
-                this.supportedSections = ['HERO', 'FAQ', 'CTA_SIMPLE', 'CTA_ENHANCED', 'CTA_TWO', 'PROCESS', 'TECHNOLOGY', 'INDUSTRIES', 'SERVICES_GRID', 'SERVICES_ACCORDION', 'PORTFOLIO', 'TESTIMONIAL', 'BENEFITS', 'BENEFITS_TWO', 'CONTENT_FORM'];
+                this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                
+                // Debug: Verify FEATURED_IN is in supported sections at startup
+                console.log('🚀 Web IDE v3.4 SECTION NAMES UPDATED - All sections now use descriptive names:', this.supportedSections.includes('FEATURED_IN_SECTION') && this.supportedSections.includes('INDUSTRIES_WE_SERVE_SECTION'));
             }
 
             // Smart document parsing for real Word docs
             async parseRealDocument(content) {
                 const sections = {};
+                const sectionCounters = {}; // Track multiple instances of same section type
                 
                 // Find section markers - handle both [SECTION] and [SECTION END] format
                 const lines = content.split('\n');
@@ -657,7 +930,8 @@
                         // Save previous section if exists
                         if (currentSection && currentContent.length > 0) {
                             const contentText = currentContent.join('\n').trim();
-                            sections[currentSection] = await this.parseSection(currentSection, contentText);
+                            const sectionKey = this.generateUniqueSectionKey(currentSection, sectionCounters);
+                            sections[sectionKey] = await this.parseSection(currentSection, contentText);
                         }
                         
                         // Start new section
@@ -667,9 +941,15 @@
                     // Check for section end markers
                     else if (trimmedLine.match(/^\[([A-Z_\s]+) END\]$/)) {
                         // End current section
-                        if (currentSection && currentContent.length > 0) {
-                            const contentText = currentContent.join('\n').trim();
-                            sections[currentSection] = await this.parseSection(currentSection, contentText);
+                        if (currentSection) {
+                            // SPECIAL HANDLING: Always process ALL sections even if empty (for default static HTML)
+                            if (currentSection || currentContent.length > 0) {
+                                const contentText = currentContent.join('\n').trim();
+                                const sectionKey = this.generateUniqueSectionKey(currentSection, sectionCounters);
+                                console.log(`🔍 PROCESSING SECTION: ${currentSection}, Content Length: ${currentContent.length}, Content: "${contentText}"`);
+                                sections[sectionKey] = await this.parseSection(currentSection, contentText);
+                                console.log(`✅ SECTION PROCESSED: ${sectionKey}`);
+                            }
                         }
                         currentSection = null;
                         currentContent = [];
@@ -681,46 +961,74 @@
                 }
                 
                 // Handle last section if no END marker
-                if (currentSection && currentContent.length > 0) {
-                    const contentText = currentContent.join('\n').trim();
-                    sections[currentSection] = await this.parseSection(currentSection, contentText);
+                if (currentSection) {
+                    // SPECIAL HANDLING: Always process ALL sections even if empty (for default static HTML)
+                    if (currentSection || currentContent.length > 0) {
+                        const contentText = currentContent.join('\n').trim();
+                        const sectionKey = this.generateUniqueSectionKey(currentSection, sectionCounters);
+                        console.log(`🔍 PROCESSING FINAL SECTION: ${currentSection}, Content Length: ${currentContent.length}, Content: "${contentText}"`);
+                        sections[sectionKey] = await this.parseSection(currentSection, contentText);
+                        console.log(`✅ FINAL SECTION PROCESSED: ${sectionKey}`);
+                    }
                 }
                 
                 return sections;
             }
 
+            generateUniqueSectionKey(sectionType, sectionCounters) {
+                // Initialize counter for this section type if it doesn't exist
+                if (!sectionCounters[sectionType]) {
+                    sectionCounters[sectionType] = 0;
+                }
+                
+                // Increment counter
+                sectionCounters[sectionType]++;
+                
+                // Return unique key: first instance uses original name, subsequent ones get numbered
+                if (sectionCounters[sectionType] === 1) {
+                    return sectionType;
+                } else {
+                    return `${sectionType}_${sectionCounters[sectionType]}`;
+                }
+            }
+
             async parseSection(sectionName, content) {
-                switch (sectionName) {
-                    case 'HERO':
+                // Extract base section type (remove _2, _3, etc. suffixes for multiple sections)
+                const baseSectionType = sectionName.replace(/_\d+$/, '');
+                
+                switch (baseSectionType) {
+                    case 'HERO_BANNER_SECTION':
                         return await this.parseHeroSection(content);
-                    case 'FAQ':
+                    case 'FAQ_SECTION':
                         return await this.parseFaqSection(content);
-                    case 'CTA_SIMPLE':
+                    case 'CTA_SIMPLE_SECTION':
                     case 'CTA SIMPLE':
                     case 'CTA_ENHANCED':
                         return this.parseCtaSection(content);
-                    case 'PROCESS':
-                        return this.parseProcessSection(content);
-                    case 'TECHNOLOGY':
+                    case 'TECHNOLOGY_STACK_SECTION':
                         return this.parseTechnologySection(content);
-                    case 'INDUSTRIES':
+                    case 'INDUSTRIES_WE_SERVE_SECTION':
                         return this.parseIndustriesSection(content);
-                    case 'SERVICES_GRID':
+                    case 'SERVICES_GRID_SECTION':
                         return await this.parseServicesGridSection(content);
-                    case 'SERVICES_ACCORDION':
+                    case 'SERVICES_ACCORDION_SECTION':
                         return await this.parseServicesAccordionSection(content);
-                    case 'PORTFOLIO':
+                    case 'PORTFOLIO_SECTION':
                         return await this.parsePortfolioSection(content);
-                    case 'TESTIMONIAL':
+                    case 'TESTIMONIAL_SECTION':
                         return this.parseTestimonialSection(content);
-                    case 'BENEFITS':
-                        return this.parseBenefitsSection(content);
+                    case 'BENEFITS_SECTION':
+                        return await this.parseBenefitsSection(content);
                     case 'BENEFITS_TWO':
                         return this.parseBenefitsTwoSection(content);
-                    case 'CONTENT_FORM':
+                    case 'CONTENT_WITH_FORM_SECTION':
                         return this.parseContentFormSection(content);
-                    case 'CTA_TWO':
+                    case 'CTA_WITH_LIST_SECTION':
                         return this.parseCtaTwoSection(content);
+                    case 'PROCESS_SECTION':
+                        return this.parseProcessSection(content);
+                    case 'FEATURED_IN_SECTION':
+                        return this.parseFeaturedInSection(content);
                     default:
                         return { raw_content: content };
                 }
@@ -743,6 +1051,7 @@
                 let description = '';
                 let bullet_intro = '';
                 let bullet_points = [];
+                let additional_content = '';
                 
                 let currentIndex = 0;
                 
@@ -752,7 +1061,7 @@
                     currentIndex = 1;
                 }
                 
-                // Find where bullets start
+                // Find where explicit bullets start (WPS style with symbols)
                 let bulletStartIndex = -1;
                 for (let i = currentIndex; i < nonEmptyLines.length; i++) {
                     const line = nonEmptyLines[i].trim();
@@ -762,35 +1071,8 @@
                     }
                 }
                 
-                // If no bullets found, everything else is description
-                if (bulletStartIndex === -1) {
-                    const descriptionLines = nonEmptyLines.slice(currentIndex);
-                    
-                    // Look for lines after the main description that should be preserved as bullet_intro
-                    let descEndIndex = descriptionLines.length;
-                    
-                    // Check each line to see if it's a separate short statement
-                    for (let i = 1; i < descriptionLines.length; i++) {
-                        const line = descriptionLines[i].trim();
-                        const prevLine = descriptionLines[i - 1].trim();
-                        
-                        // Check if this line appears after a gap in the original content
-                        const lineIndex = allLines.findIndex((l, idx) => l.trim() === line && idx > 0);
-                        const prevLineIndex = allLines.findIndex((l, idx) => l.trim() === prevLine && idx < lineIndex);
-                        
-                        // If there's a gap (empty line) before this line, it might be bullet_intro
-                        if (lineIndex > prevLineIndex + 1) {
-                            // This line is separated by empty line(s)
-                            description = descriptionLines.slice(0, i).join(' ');
-                            bullet_intro = descriptionLines.slice(i).join(' ');
-                            break;
-                        }
-                    }
-                    
-                    if (bullet_intro === '') {
-                        description = descriptionLines.join(' ');
-                    }
-                } else {
+                // If explicit bullets found (WPS style)
+                if (bulletStartIndex !== -1) {
                     // Process description up to bullets
                     const descriptionLines = nonEmptyLines.slice(currentIndex, bulletStartIndex);
                     
@@ -823,21 +1105,68 @@
                         description = '';
                     }
                     
-                    // Extract bullets
+                    // Extract explicit bullets
+                    let bulletEndIndex = nonEmptyLines.length;
                     for (let i = bulletStartIndex; i < nonEmptyLines.length; i++) {
                         const line = nonEmptyLines[i].trim();
                         if (line.match(/^[●\-\*•‑]\s*/) || line.match(/^\d+[\.\)]\s+/)) {
                             const cleanBullet = line.replace(/^[●\-\*•‑]\s*/, '').replace(/^\d+[\.\)]\s+/, '');
                             bullet_points.push(cleanBullet);
+                        } else if (bullet_points.length > 0) {
+                            // Found non-bullet line after bullets started
+                            bulletEndIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    // Capture any additional content after bullets
+                    if (bulletEndIndex < nonEmptyLines.length) {
+                        const additionalLines = nonEmptyLines.slice(bulletEndIndex);
+                        additional_content = this.formatAdditionalContent(additionalLines, allLines);
+                    }
+                } else {
+                    // No explicit bullets found - treat all remaining content as description
+                    // DO NOT try to automatically create bullets from regular text
+                    const descriptionLines = nonEmptyLines.slice(currentIndex);
+                    description = descriptionLines.join(' ');
+                    
+                    // Only look for bullet intro if there's a clear pattern
+                    // Check for a line that ends with dash/colon followed by empty space in original
+                    for (let i = 0; i < descriptionLines.length - 1; i++) {
+                        const line = descriptionLines[i].trim();
+                        if (line.length < 50 && 
+                            (line.endsWith('-') || line.endsWith(':')) &&
+                            this.hasEmptyLineAfterInOriginal(line, allLines)) {
+                            // This looks like a genuine bullet intro with spacing
+                            description = descriptionLines.slice(0, i).join(' ');
+                            bullet_intro = line;
+                            // Rest is additional content, not bullets
+                            if (i + 1 < descriptionLines.length) {
+                                additional_content = this.formatAdditionalContent(
+                                    descriptionLines.slice(i + 1), 
+                                    allLines
+                                );
+                            }
+                            break;
                         }
                     }
                 }
                 
+                // Debug logging to see what's being parsed
+                console.log('HERO PARSING RESULT:', {
+                    main_heading,
+                    description,
+                    bullet_points,
+                    bullet_intro,
+                    additional_content
+                });
+
                 return {
                     main_heading: this.convertBoldMarkers(main_heading || "Service Title"),
                     description: this.convertBoldMarkers(description || "Service description"),
                     bullet_points: bullet_points.map(point => this.convertBoldMarkers(point)),
                     bullet_intro: this.convertBoldMarkers(bullet_intro),
+                    additional_content: additional_content,
                     form_heading: "Dream It, We Build It",
                     form_button_text: "Book Your Free Consultation"
                 };
@@ -881,7 +1210,41 @@
 
                 const data = await response.json();
                 const result = JSON.parse(data.choices[0].message.content);
+                
+                // CRITICAL: Validate HERO section results to prevent fake bullets
+                if (sectionType === 'HERO' && result.bullet_points) {
+                    result.bullet_points = this.validateHeroBullets(content, result.bullet_points);
+                }
+                
                 return result;
+            }
+
+            validateHeroBullets(originalContent, aiBullets) {
+                // Check if the original content actually contains explicit bullet markers
+                const lines = originalContent.split('\n');
+                const hasExplicitBullets = lines.some(line => {
+                    const trimmed = line.trim();
+                    return trimmed.match(/^[●\-\*•‑]\s+/) || trimmed.match(/^\d+[\.\)]\s+/);
+                });
+                
+                // If no explicit bullets in original content, return empty array
+                if (!hasExplicitBullets) {
+                    console.log('VALIDATION: No explicit bullets found in content, returning empty array');
+                    return [];
+                }
+                
+                // If explicit bullets exist, validate each AI bullet against original content
+                const validBullets = aiBullets.filter(bullet => {
+                    // Check if this bullet text actually appears after a bullet marker in original
+                    return lines.some(line => {
+                        const trimmed = line.trim();
+                        const withoutMarker = trimmed.replace(/^[●\-\*•‑]\s+/, '').replace(/^\d+[\.\)]\s+/, '');
+                        return withoutMarker.includes(bullet) && trimmed.match(/^[●\-\*•‑]\s+|^\d+[\.\)]\s+/);
+                    });
+                });
+                
+                console.log('VALIDATION: Original bullets:', aiBullets.length, 'Valid bullets:', validBullets.length);
+                return validBullets;
             }
 
             createPromptForSection(content, sectionType) {
@@ -900,11 +1263,38 @@ Return JSON in this exact format:
   "form_button_text": "Book Your Free Consultation"
 }
 
+CRITICAL RULE: bullet_points should be EMPTY [] unless you see explicit bullet markers like:
+● Custom web development using modern technologies
+● Mobile-first, responsive design
+- First bullet point
+- Second bullet point
+* Another bullet style
+1. Numbered bullet
+2. Second numbered bullet
+
+DO NOT CONVERT THESE TO BULLETS:
+- Regular sentences like "Let's talk."
+- Form labels like "Name*", "Email*", "Phone*"  
+- Call-to-action text like "Let's Discuss Your B2B Portal Idea"
+- Regular paragraphs or descriptions
+- Contact form placeholder text
+
+Examples:
+GOOD (has explicit bullets):
+"How We Help You-
+● Custom web development
+● Mobile-first design"
+→ bullet_points: ["Custom web development", "Mobile-first design"]
+
+BAD (no explicit bullets):
+"Let's talk. Let's Discuss Your B2B Portal Idea"
+→ bullet_points: []
+
 Rules:
 - Extract the main heading (usually first line)
 - Extract description text (everything before bullet points, excluding "The result?")
-- Extract bullet points (lines starting with ●, -, *, or numbers)
-- Remove bullet markers from bullet_points array
+- ONLY extract bullet_points if you see ●, -, *, •, ‑, or numbered lists like "1."
+- If no explicit bullet markers exist, return bullet_points: []
 - Do not include "The result?" in description`;
                 }
                 
@@ -984,7 +1374,7 @@ Rules:
                 }
                 
                 if (sectionType === 'PORTFOLIO') {
-                    return `Parse this PORTFOLIO section content and extract multiple projects as JSON:
+                    return `Parse this PORTFOLIO section content and extract projects as JSON:
 
 Content:
 ${content}
@@ -997,30 +1387,90 @@ Return JSON in this exact format:
     {
       "title": "project title",
       "description": "detailed project description"
-    },
-    {
-      "title": "project title", 
-      "description": "detailed project description"
     }
   ]
 }
 
+CRITICAL RULES:
+- First line = main heading
+- Second line/paragraph = main section description
+- Only create projects if there are DISTINCT project descriptions
+- DO NOT duplicate the main description as a project description
+- If content only has heading + description + generic text, return empty projects array: []
+- Projects need UNIQUE descriptions, not repetitions of the section description
+- If you see repeated text, it's likely not separate projects
+- Look for clear project boundaries: different titles with unique content
+
+EXAMPLE OF WHAT NOT TO DO:
+Section description: "We build great apps"
+Project description: "We build great apps" ← WRONG, this is duplication
+
+EXAMPLE OF WHAT TO DO:
+Section description: "We build great apps"
+Project 1: "E-commerce app with 50K users and payment integration" ← UNIQUE content
+Project 2: "Healthcare platform with HIPAA compliance" ← DIFFERENT project`;
+                }
+                
+                if (sectionType === 'BENEFITS') {
+                    return `Parse this BENEFITS section content and extract services/benefits as JSON:
+
+Content:
+${content}
+
+Return JSON in this exact format:
+{
+  "main_heading": "extracted main heading",
+  "description": "extracted main description",
+  "benefits": [
+    {
+      "title": "service title",
+      "description": "service description"
+    }
+  ]
+}
+
+CRITICAL: Identify benefits by STRUCTURE, not content:
+
+Pattern Recognition:
+- Titles are SHORT (usually < 80 characters)
+- Descriptions are LONG (usually > 100 characters)
+- Empty lines often separate different benefits
+- Numbers (1., 2., etc.) indicate new benefit
+
 Rules:
-- First line is the main heading
-- Second line is the section description
-- Each project has a short title (usually under 100 characters) followed by a longer detailed description
-- Projects are typically separated by blank lines or can be identified by context
-- Extract ALL projects from the content, not just the first one
-- Project titles are usually concise and descriptive (e.g., "An eCommerce Marketplace for Waste Management Equipment")
-- Project descriptions are longer paragraphs explaining the technical implementation and results
-- Look for patterns like: Short Title → Long Description → Short Title → Long Description`;
+- First line = main heading
+- Next paragraph(s) = main description (until pattern changes)
+- Then look for this pattern repeating 4-8 times:
+  * SHORT line/phrase (title)
+  * Followed by LONG paragraph (description)
+  * Often separated by empty lines
+- If line starts with number (1., 2., etc.), it's definitely a new benefit
+- Remove any number prefixes from titles
+
+Structure Example:
+SHORT LINE (< 80 chars) ← This is a title
+LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is description
+
+SHORT LINE (< 80 chars) ← This is next title  
+LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 }
                 
                 return `Parse this ${sectionType} section content and return appropriate JSON structure.`;
             }
 
             convertBoldMarkers(text) {
-                // Return text as-is, no bold conversion
+                if (!text) return text;
+                
+                // Convert **text** to <strong>text</strong>
+                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                
+                // Convert __text__ to <strong>text</strong> (alternative bold syntax)
+                text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+                
+                // Convert single *text* to <strong>text</strong> (if used for bold)
+                // Be careful to not convert * used as bullet points
+                text = text.replace(/(?<![*\s])\*([^*\s][^*]*[^*\s])\*(?![*])/g, '<strong>$1</strong>');
+                
                 return text;
             }
 
@@ -1215,6 +1665,80 @@ Rules:
                 return result;
             }
 
+            formatAdditionalContent(lines, allLines) {
+                let result = '';
+                let currentContent = [];
+                let inList = false;
+                let listItems = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    const trimmedLine = line.trim();
+                    
+                    // Check if this is a heading (short line, possibly after empty line)
+                    const lineIndex = allLines.findIndex(l => l.trim() === trimmedLine);
+                    const isAfterEmptyLine = lineIndex > 0 && allLines[lineIndex - 1].trim() === '';
+                    const isHeading = trimmedLine.length < 100 && isAfterEmptyLine && 
+                                     !trimmedLine.match(/^[●\-\*•‑]\s*/) && 
+                                     !trimmedLine.match(/^\d+[\.\)]\s+/);
+                    
+                    if (isHeading && currentContent.length > 0) {
+                        // Process accumulated content before heading
+                        if (inList && listItems.length > 0) {
+                            result += '<ul class="bullet">\n';
+                            listItems.forEach(item => {
+                                result += `<li>${this.convertBoldMarkers(item)}</li>\n`;
+                            });
+                            result += '</ul>\n';
+                            listItems = [];
+                            inList = false;
+                        } else if (currentContent.length > 0) {
+                            result += '<p>' + currentContent.map(c => this.convertBoldMarkers(c)).join(' ') + '</p>\n';
+                            currentContent = [];
+                        }
+                        
+                        // Add heading
+                        result += `<h3>${this.convertBoldMarkers(trimmedLine)}</h3>\n`;
+                    } else if (trimmedLine.match(/^[●\-\*•‑]\s*/) || trimmedLine.match(/^\d+[\.\)]\s+/)) {
+                        // List item
+                        if (currentContent.length > 0) {
+                            result += '<p>' + currentContent.map(c => this.convertBoldMarkers(c)).join(' ') + '</p>\n';
+                            currentContent = [];
+                        }
+                        
+                        const cleanItem = trimmedLine.replace(/^[●\-\*•‑]\s*/, '').replace(/^\d+[\.\)]\s+/, '');
+                        listItems.push(cleanItem);
+                        inList = true;
+                    } else if (trimmedLine) {
+                        // Regular content
+                        if (inList && listItems.length > 0) {
+                            result += '<ul class="bullet">\n';
+                            listItems.forEach(item => {
+                                result += `<li>${this.convertBoldMarkers(item)}</li>\n`;
+                            });
+                            result += '</ul>\n';
+                            listItems = [];
+                            inList = false;
+                        }
+                        
+                        currentContent.push(trimmedLine);
+                    }
+                }
+                
+                // Process any remaining content
+                if (inList && listItems.length > 0) {
+                    result += '<ul class="bullet">\n';
+                    listItems.forEach(item => {
+                        result += `<li>${this.convertBoldMarkers(item)}</li>\n`;
+                    });
+                    result += '</ul>\n';
+                } else if (currentContent.length > 0) {
+                    result += '<p>' + currentContent.map(c => this.convertBoldMarkers(c)).join(' ') + '</p>\n';
+                }
+                
+                return result.trim();
+            }
+
             parseCtaSection(content) {
                 const lines = content.split('\n').filter(line => line.trim());
                 
@@ -1251,41 +1775,79 @@ Rules:
                 return "Get Started";
             }
 
-            parseProcessSection(content) {
-                const lines = content.split(/[.!]/).filter(line => line.trim().length > 10);
-                const steps = [];
-                
-                // Look for step patterns
-                const stepKeywords = ['Discovery', 'Analysis', 'Planning', 'Design', 'Development', 'Testing', 'Deployment'];
-                
-                stepKeywords.forEach((keyword, index) => {
-                    if (content.includes(keyword)) {
-                        const stepText = lines.find(line => line.includes(keyword)) || `${keyword} step`;
-                        steps.push({
-                            title: keyword,
-                            description: stepText.replace(keyword, '').trim() || `${keyword} process description`
-                        });
-                    }
-                });
-                
-                return {
-                    main_heading: lines[0]?.trim() || "Our Process",
-                    description: lines[1]?.trim() || "How we work with you",
-                    steps: steps.slice(0, 6)
-                };
-            }
 
             parseTechnologySection(content) {
-                const lines = content.split(/[.!]/).filter(line => line.trim().length > 10);
+                const lines = content.split('\n').filter(line => line.trim());
                 
-                // Common tech stack items
-                const commonTech = ['React', 'Node.js', 'Python', 'Laravel', 'MySQL', 'PostgreSQL', 'AWS', 'Docker', 'JavaScript', 'PHP'];
-                const foundTech = commonTech.filter(tech => content.includes(tech));
+                let main_heading = "Technology Stack";
+                let description = "Technologies we use";
+                let categories = [];
+                
+                // Check for custom main heading (first line if descriptive)
+                if (lines.length > 0 && lines[0].length > 10 && !lines[0].includes(':')) {
+                    main_heading = lines[0].trim();
+                    lines.shift(); // Remove heading from lines
+                }
+                
+                // Check for description (second line if descriptive and no colon)
+                if (lines.length > 0 && lines[0].length > 30 && !lines[0].includes(':')) {
+                    description = lines[0].trim();
+                    lines.shift(); // Remove description from lines
+                }
+                
+                // Parse categories that end with ':'
+                let currentCategory = null;
+                let currentTechs = [];
+                
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line) continue;
+                    
+                    // Check if line is a category (ends with ':')
+                    if (line.endsWith(':')) {
+                        // Save previous category if exists
+                        if (currentCategory) {
+                            categories.push({
+                                name: currentCategory,
+                                technologies: [...currentTechs]
+                            });
+                        }
+                        
+                        // Start new category
+                        currentCategory = line.slice(0, -1).trim();
+                        currentTechs = [];
+                    } else {
+                        // Add technology to current category
+                        if (currentCategory) {
+                            currentTechs.push(line);
+                        }
+                    }
+                }
+                
+                // Add final category
+                if (currentCategory && currentTechs.length > 0) {
+                    categories.push({
+                        name: currentCategory,
+                        technologies: currentTechs
+                    });
+                }
+                
+                // If no categories found, return legacy format
+                if (categories.length === 0) {
+                    const commonTech = ['React', 'Node.js', 'Python', 'Laravel', 'MySQL', 'PostgreSQL', 'AWS', 'Docker', 'JavaScript', 'PHP'];
+                    const foundTech = commonTech.filter(tech => content.includes(tech));
+                    
+                    return {
+                        main_heading,
+                        description,
+                        technologies: foundTech.length > 0 ? foundTech : commonTech
+                    };
+                }
                 
                 return {
-                    main_heading: lines[0]?.trim() || "Technology Stack",
-                    description: lines[1]?.trim() || "Technologies we use",
-                    technologies: foundTech.length > 0 ? foundTech : commonTech
+                    main_heading,
+                    description,
+                    categories
                 };
             }
 
@@ -1307,72 +1869,148 @@ Rules:
                     }
                 }
                 
-                // Fallback to rule-based parsing
-                const lines = content.split('\n').filter(line => line.trim());
+                // Improved rule-based parsing for service cards
+                const lines = content.split('\n').map(line => {
+                    let trimmed = line.trim();
+                    // Remove numbers from beginning of ALL lines (not just titles)
+                    if (trimmed.match(/^\d+\.\s+/)) {
+                        trimmed = trimmed.replace(/^\d+\.\s+/, '');
+                    }
+                    return trimmed;
+                }).filter(line => line);
+                
                 const services = [];
                 let main_heading = '';
                 let description = '';
                 
                 let currentService = null;
                 let currentMode = 'heading';
-                let awaitingServiceDescription = false;
+                let serviceContent = [];
+                
+                // Debug logging
+                console.log('SERVICES_GRID parsing - Lines after number removal:', lines);
                 
                 for (let i = 0; i < lines.length; i++) {
-                    const trimmedLine = lines[i].trim();
+                    const trimmedLine = lines[i];
                     
-                    // First line is usually main heading
+                    // First line is main heading
                     if (currentMode === 'heading' && !main_heading) {
                         main_heading = trimmedLine;
                         currentMode = 'description';
                         continue;
                     }
                     
-                    // Second line might be main description
-                    if (currentMode === 'description' && !description && !trimmedLine.startsWith('●')) {
+                    // Second line might be main description if it's descriptive
+                    if (currentMode === 'description' && !description && 
+                        trimmedLine.length > 50 && !this.looksLikeServiceTitle(trimmedLine, lines, i)) {
                         description = trimmedLine;
                         currentMode = 'services';
                         continue;
                     }
                     
-                    // In services mode
+                    // Switch to services mode
+                    if (currentMode === 'description') {
+                        currentMode = 'services';
+                    }
+                    
+                    // In services mode - better card detection
                     if (currentMode === 'services') {
-                        // Handle bullets (●, -, *, •, ‑)
-                        if (trimmedLine.match(/^[●\-\*•‑]\s*/)) {
-                            const bulletText = trimmedLine.replace(/^[●\-\*•‑]\s*/, '').trim();
-                            if (currentService) {
-                                currentService.bullets.push(bulletText);
-                            }
-                            awaitingServiceDescription = false;
-                        }
-                        // Service title - line that's not a bullet and comes after bullets or at start
-                        else if (!awaitingServiceDescription) {
+                        // Check if this is a new service title
+                        if (this.isNewServiceCard(trimmedLine, lines, i)) {
                             // Save previous service
-                            if (currentService) services.push(currentService);
+                            if (currentService) {
+                                currentService.description = serviceContent.join(' ');
+                                services.push(currentService);
+                                serviceContent = [];
+                            }
                             
                             // Start new service
                             currentService = {
                                 title: trimmedLine,
                                 description: '',
-                                bullets: []
+                                bullets: [] // Will only add if explicit bullets exist
                             };
-                            awaitingServiceDescription = true;
                         }
-                        // Service description - line immediately after title
-                        else if (awaitingServiceDescription && currentService) {
-                            currentService.description = trimmedLine;
-                            awaitingServiceDescription = false;
+                        // Handle explicit bullets ONLY if they exist
+                        else if (trimmedLine.match(/^[●\-\*•‑]\s*/) && currentService) {
+                            const bulletText = trimmedLine.replace(/^[●\-\*•‑]\s*/, '').trim();
+                            currentService.bullets.push(bulletText);
+                            
+                            // Finish current content before bullets
+                            if (serviceContent.length > 0) {
+                                currentService.description = serviceContent.join(' ');
+                                serviceContent = [];
+                            }
+                        }
+                        // Regular content - accumulate for description
+                        else if (currentService && trimmedLine.length > 0) {
+                            serviceContent.push(trimmedLine);
                         }
                     }
                 }
                 
                 // Add last service
-                if (currentService) services.push(currentService);
+                if (currentService) {
+                    if (serviceContent.length > 0) {
+                        currentService.description = serviceContent.join(' ');
+                    }
+                    services.push(currentService);
+                }
+                
+                console.log('SERVICES_GRID final result:', { main_heading, description, services });
                 
                 return {
                     main_heading: main_heading || "Our Services",
                     description: description || "Services we provide",
                     services: services
                 };
+            }
+            
+            isNewServiceCard(line, allLines, currentIndex) {
+                // More accurate detection of service card titles
+                const isReasonableLength = line.length > 5 && line.length < 80;
+                const startsWithCapital = /^[A-Z]/.test(line);
+                const notBullet = !line.match(/^[●\-\*•‑]\s*/);
+                const hasKeywords = /\b(development|consulting|portal|service|solution|platform|integration|migration|design|custom|b2b)\b/i.test(line);
+                
+                // Check if this line is separated from previous content
+                const prevLine = currentIndex > 0 ? allLines[currentIndex - 1] : '';
+                const nextLine = currentIndex + 1 < allLines.length ? allLines[currentIndex + 1] : '';
+                
+                // Good indicators this is a title:
+                const hasSubstantialNextContent = nextLine && nextLine.length > 20;
+                const followsShortLine = !prevLine || prevLine.length < 40;
+                
+                return isReasonableLength && startsWithCapital && notBullet && 
+                       (hasKeywords || hasSubstantialNextContent || followsShortLine);
+            }
+            
+            hasEmptyLineAfterInOriginal(targetLine, allLines) {
+                // Find the line in original content and check if followed by empty line
+                for (let i = 0; i < allLines.length - 1; i++) {
+                    if (allLines[i].trim() === targetLine) {
+                        return allLines[i + 1].trim() === '';
+                    }
+                }
+                return false;
+            }
+            
+            looksLikeServiceTitle(line, allLines, currentIndex) {
+                // Check if line looks like a service title
+                const isShort = line.length < 100; // Titles are usually shorter
+                const isCapitalized = /^[A-Z]/.test(line); // Starts with capital
+                const notBullet = !line.match(/^[●\-\*•‑]\s*/); // Not a bullet point
+                const notNumber = !line.match(/^\d+[\.\)]/); // Not a numbered list after cleaning
+                
+                // Additional context: if next line exists and looks like description
+                const nextLine = currentIndex + 1 < allLines.length ? allLines[currentIndex + 1]?.trim() : '';
+                const hasDescriptionAfter = nextLine && nextLine.length > 20 && !nextLine.match(/^[●\-\*•‑]\s*/);
+                
+                // Line appears to be standalone (has empty lines around it or is followed by description)
+                const prevLine = currentIndex > 0 ? allLines[currentIndex - 1]?.trim() : '';
+                const isStandalone = !prevLine || prevLine.length < 50 || hasDescriptionAfter;
+                
+                return isShort && isCapitalized && notBullet && notNumber && isStandalone;
             }
 
             async parseServicesAccordionSection(content) {
@@ -1678,7 +2316,15 @@ Rules:
                 };
             }
 
-            parseBenefitsSection(content) {
+            async parseBenefitsSection(content) {
+                if (this.useAI) {
+                    try {
+                        return await this.parseWithAI(content, 'BENEFITS');
+                    } catch (error) {
+                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
+                    }
+                }
+                
                 const allLines = content.split('\n');
                 const nonEmptyLines = allLines.filter(line => line.trim());
                 const benefits = [];
@@ -1694,55 +2340,81 @@ Rules:
                 const main_heading = nonEmptyLines[0];
                 const description = nonEmptyLines[1];
                 
-                // Process benefits starting from line 2
+                // Robust benefit parsing that handles multiple formats
                 let currentBenefit = null;
                 let currentDescription = [];
                 
                 for (let i = 2; i < nonEmptyLines.length; i++) {
                     const line = nonEmptyLines[i].trim();
+                    const originalLineIndex = allLines.findIndex(l => l.trim() === line);
                     
-                    // Detect if this line is a benefit title based on patterns:
-                    // - Short lines (under 80 chars) that are likely titles
-                    // - Lines that don't end with periods (descriptions usually do)
-                    // - Consider context: if it's a title-like format, it's probably a title
+                    // CRITICAL: Check if line starts with a number (1., 2., etc.)
+                    const numberedMatch = line.match(/^(\d+)\.\s+(.+)/);
+                    const isNumberedTitle = !!numberedMatch;
+                    
+                    // Check if this line is separated by empty lines
+                    const isAfterEmptyLine = originalLineIndex > 0 && allLines[originalLineIndex - 1].trim() === '';
+                    
+                    // Smart title detection based on structure
                     const isShort = line.length < 80;
-                    const endsWithPeriod = line.endsWith('.');
-                    const hasMultipleWords = line.split(' ').length >= 2;
-                    const isCapitalized = /^[A-Z0-9]/.test(line);
-                    const containsActionVerbs = /\b(accelerate|maximize|build|prioritize|integrate|seamlessly|round-the-clock|implement|ensure|provide|deliver|create|develop|design|maintain|monitor|process|handle|manage)\b/i.test(line);
-                    
-                    // A line is likely a benefit title if it's short, doesn't end with period, and doesn't contain action verbs
-                    const isBenefitTitle = isShort && !endsWithPeriod && !containsActionVerbs && isCapitalized && hasMultipleWords;
-                    
-                    // Also check if it's the first line after main description
+                    const nextLineIndex = i + 1;
+                    const hasLongTextAfter = nextLineIndex < nonEmptyLines.length && 
+                                           nonEmptyLines[nextLineIndex].trim().length > 100;
                     const isFirstBenefit = i === 2;
                     
-                    if (isBenefitTitle || isFirstBenefit) {
+                    // A line is a benefit title if:
+                    // 1. It starts with a number (1., 2., etc.)
+                    // 2. It's the first content after description
+                    // 3. It's short AND followed by longer text
+                    // 4. It's after empty line(s) and is relatively short
+                    const isBenefitTitle = isNumberedTitle || 
+                                         isFirstBenefit || 
+                                         (isShort && hasLongTextAfter) ||
+                                         (isShort && isAfterEmptyLine && i > 2);
+                    
+                    console.log(`Benefits Line ${i}: "${line.substring(0, 50)}..." -> Title: ${isBenefitTitle} (numbered: ${isNumberedTitle}, short: ${isShort}, afterEmpty: ${isAfterEmptyLine})`);
+                    
+                    if (isBenefitTitle) {
                         // Save previous benefit if exists
                         if (currentBenefit) {
                             benefits.push({
-                                title: currentBenefit,
-                                description: currentDescription.join(' ').trim(),
+                                title: this.convertBoldMarkers(currentBenefit),
+                                description: this.convertBoldMarkers(currentDescription.join(' ').trim()),
                                 image_slug: this.generateImageSlug(currentBenefit)
                             });
                         }
                         
                         // Start new benefit
-                        currentBenefit = line;
+                        // If it's a numbered title, extract just the title part
+                        if (isNumberedTitle && numberedMatch) {
+                            currentBenefit = numberedMatch[2]; // Get title without number
+                        } else {
+                            currentBenefit = line;
+                        }
                         currentDescription = [];
                     } else {
                         // This line is part of the description
-                        if (line.trim()) {
+                        if (currentBenefit) {
                             currentDescription.push(line);
+                        } else {
+                            // If we don't have a current benefit yet, check if this might be a numbered title
+                            const firstLineNumbered = line.match(/^(\d+)\.\s+(.+)/);
+                            if (firstLineNumbered) {
+                                currentBenefit = firstLineNumbered[2];
+                                currentDescription = [];
+                            } else {
+                                currentBenefit = line;
+                                currentDescription = [];
+                            }
                         }
                     }
                 }
                 
-                // Don't forget the last benefit
+                // Add the last benefit
                 if (currentBenefit) {
                     benefits.push({
-                        title: currentBenefit,
-                        description: currentDescription.join(' ').trim(),
+                        title: this.convertBoldMarkers(currentBenefit),
+                        description: this.convertBoldMarkers(currentDescription.join(' ').trim()),
                         image_slug: this.generateImageSlug(currentBenefit)
                     });
                 }
@@ -1822,55 +2494,105 @@ Rules:
                 
                 // Look for description and bullet points
                 let foundBulletIntro = false;
+                let processingBullets = false;
                 
                 for (let i = currentIndex; i < lines.length; i++) {
                     const line = lines[i].trim();
                     
                     if (line.startsWith('●')) {
                         // This is a bullet point
+                        processingBullets = true;
                         const bulletText = line.replace('●', '').trim();
                         const parts = bulletText.split(':', 2);
                         if (parts.length === 2) {
-                            bullet_points.push(`<strong>${parts[0]}:</strong>${parts[1]}`);
+                            bullet_points.push(`<strong>${parts[0]}:</strong> ${parts[1]}`);
                         } else {
                             bullet_points.push(bulletText);
                         }
-                    } else if (line.endsWith(':') && (line.includes('Challenge') || line.includes('Address') || line.includes('Help'))) {
-                        // This is the bullet intro line
+                    } else if (!processingBullets && line.endsWith(':') && (line.includes('Help') || line.includes('Address') || line.includes('Challenge') || line.includes('How') || line.includes('What'))) {
+                        // This is the bullet intro line (only if we haven't started processing bullets yet)
                         bullet_intro = line;
                         foundBulletIntro = true;
-                    } else if (!foundBulletIntro && line.length > 20) {
-                        // This is likely part of the description
+                    } else if (!foundBulletIntro && !processingBullets && line.length > 10) {
+                        // This is likely part of the description (before bullets)
                         description += (description ? ' ' : '') + line;
+                    } else if (!processingBullets && !foundBulletIntro) {
+                        // Could be description or bullet intro
+                        if (line.endsWith(':')) {
+                            bullet_intro = line;
+                            foundBulletIntro = true;
+                        } else {
+                            description += (description ? ' ' : '') + line;
+                        }
                     }
                 }
                 
                 return {
                     main_heading: main_heading || "Contact Us",
-                    description: description || "Get in touch",
+                    description: description || "Get in touch with our team",
                     bullet_points: bullet_points,
                     bullet_intro: bullet_intro
                 };
             }
 
             detectSections(content) {
+                console.log('🔍 DETECT SECTIONS CALLED');
+                console.log('Content preview:', content.substring(0, 200));
+                console.log('FEATURED_IN in this.supportedSections?', this.supportedSections.includes('FEATURED_IN'));
+                console.log('Current supportedSections:', this.supportedSections);
+                
                 const sectionPattern = /\[([A-Z_\s]+)\]/g;
                 const matches = [...content.matchAll(sectionPattern)];
                 const detected = matches.map(match => match[1].trim());
                 
+                // Debug: Log detection process
+                console.log('Section detection - Content:', content);
+                console.log('Section detection - Matches found:', matches);
+                console.log('Section detection - Detected sections:', detected);
+                console.log('Section detection - Supported sections:', this.supportedSections);
+                console.log('Section detection - FEATURED_IN in supported?', this.supportedSections.includes('FEATURED_IN'));
+                
                 // Filter out END markers and only keep supported sections
-                return [...new Set(detected)]
-                    .filter(section => !section.endsWith(' END'))
-                    .filter(section => 
-                        this.supportedSections.some(supported => 
+                console.log('Before filtering - sections to filter:', [...new Set(detected)]);
+                const withoutEndMarkers = [...new Set(detected)].filter(section => !section.endsWith(' END'));
+                console.log('After removing END markers:', withoutEndMarkers);
+                
+                const filtered = withoutEndMarkers
+                    .filter(section => {
+                        // FORCE FEATURED_IN to always pass through
+                        if (section === 'FEATURED_IN') {
+                            console.log('🔍 FEATURED_IN FORCED THROUGH FILTER!');
+                            return true;
+                        }
+                        
+                        // FORCE PROCESS to always pass through (in case of similar issues)
+                        if (section === 'PROCESS') {
+                            console.log('🔍 PROCESS FORCED THROUGH FILTER!');
+                            return true;
+                        }
+                        
+                        // Direct exact match first
+                        if (this.supportedSections.includes(section)) {
+                            return true;
+                        }
+                        
+                        // Then check partial matches
+                        const isSupported = this.supportedSections.some(supported => 
                             section.includes(supported) || supported.includes(section)
-                        )
-                    );
+                        );
+                        
+                        return isSupported;
+                    });
+                
+                console.log('Section detection - Final filtered:', filtered);
+                return filtered;
             }
 
             async processContent(content) {
+                console.log('🚀 PROCESS CONTENT CALLED');
                 try {
                     const detectedSections = this.detectSections(content);
+                    console.log('🎯 Detected sections from detectSections:', detectedSections);
                     
                     if (detectedSections.length === 0) {
                         return {
@@ -1884,6 +2606,14 @@ Rules:
                     const generatedHtml = [];
 
                     for (let [sectionType, sectionContent] of Object.entries(sections)) {
+                        // FORCE FEATURED_IN and PROCESS to always be processed
+                        if (sectionType.includes('FEATURED_IN') || sectionType.includes('PROCESS')) {
+                            console.log(`🚀 FORCING ${sectionType} PROCESSING`);
+                            const html = this.generateSection(sectionType, sectionContent);
+                            generatedHtml.push(html);
+                            continue;
+                        }
+                        
                         if (!this.supportedSections.some(s => sectionType.includes(s))) continue;
                         
                         const html = this.generateSection(sectionType, sectionContent);
@@ -1906,47 +2636,140 @@ Rules:
             }
 
             generateSection(sectionType, content) {
-                if (sectionType.includes('HERO')) {
+                console.log('🎯 GENERATE SECTION CALLED:', sectionType);
+                console.log('🎯 Section content:', content);
+                
+                // Extract base section type (remove _2, _3, etc. suffixes for multiple sections)
+                const baseSectionType = sectionType.replace(/_\d+$/, '');
+                console.log('🎯 Base section type:', baseSectionType);
+                
+                // FORCE FEATURED_IN to be handled
+                if (baseSectionType.includes('FEATURED_IN_SECTION')) {
+                    console.log('🚀 GENERATING FEATURED_IN SECTION!');
+                    const result = this.generateFeaturedInSection(content);
+                    console.log('🚀 FEATURED_IN HTML generated:', result.substring(0, 100) + '...');
+                    return result;
+                }
+                
+                if (baseSectionType.includes('HERO_BANNER_SECTION')) {
                     return this.generateHeroSection(content);
-                } else if (sectionType.includes('FAQ')) {
+                } else if (baseSectionType.includes('FAQ_SECTION')) {
                     return this.generateFaqSection(content);
-                } else if (sectionType.includes('CTA_TWO')) {
+                } else if (baseSectionType.includes('CTA_WITH_LIST_SECTION')) {
                     return this.generateCtaTwoSection(content);
-                } else if (sectionType.includes('CTA')) {
+                } else if (baseSectionType.includes('CTA_SIMPLE_SECTION')) {
                     return this.generateCtaSection(content);
-                } else if (sectionType.includes('PROCESS')) {
-                    return this.generateProcessSection(content);
-                } else if (sectionType.includes('TECHNOLOGY')) {
+                } else if (baseSectionType.includes('TECHNOLOGY_STACK_SECTION')) {
                     return this.generateTechnologySection(content);
-                } else if (sectionType.includes('INDUSTRIES')) {
+                } else if (baseSectionType.includes('INDUSTRIES_WE_SERVE_SECTION')) {
                     return this.generateIndustriesSection(content);
-                } else if (sectionType.includes('SERVICES_GRID')) {
+                } else if (baseSectionType.includes('SERVICES_GRID_SECTION')) {
                     return this.generateServicesGridSection(content);
-                } else if (sectionType.includes('SERVICES_ACCORDION')) {
+                } else if (baseSectionType.includes('SERVICES_ACCORDION_SECTION')) {
                     return this.generateServicesAccordionSection(content);
-                } else if (sectionType.includes('PORTFOLIO')) {
+                } else if (baseSectionType.includes('PORTFOLIO_SECTION')) {
                     return this.generatePortfolioSection(content);
-                } else if (sectionType.includes('TESTIMONIAL')) {
+                } else if (baseSectionType.includes('TESTIMONIAL_SECTION')) {
                     return this.generateTestimonialSection(content);
-                } else if (sectionType.includes('BENEFITS_TWO')) {
+                } else if (baseSectionType.includes('BENEFITS_TWO')) {
                     return this.generateBenefitsTwoSection(content);
-                } else if (sectionType.includes('BENEFITS')) {
+                } else if (baseSectionType.includes('BENEFITS_SECTION')) {
                     return this.generateBenefitsSection(content);
-                } else if (sectionType.includes('CONTENT_FORM')) {
+                } else if (baseSectionType.includes('CONTENT_WITH_FORM_SECTION')) {
                     return this.generateContentFormSection(content);
+                } else if (baseSectionType.includes('PROCESS_SECTION')) {
+                    return this.generateProcessSection(content);
+                } else if (baseSectionType.includes('FEATURED_IN_SECTION')) {
+                    return this.generateFeaturedInSection(content);
                 }
                 return `<div><!-- ${sectionType} section not implemented yet --></div>`;
             }
 
             generateHeroSection(content) {
+                // Handle empty content with default static HTML
+                if (!content || (!content.main_heading && !content.description)) {
+                    return `<!-- Hero Section Start -->
+<section class="pt70 pb40 hero-section section-hero">
+<div class="container-xl">
+<div class="row align-items-center">
+<div class="col-lg-7 col-md-12 banner-text">
+<nav aria-label="breadcrumbs" class="rank-math-breadcrumb mb-3 mt-3"><p><a href="/" class="local" style="text-decoration: unset;">Home</a><span class="separator"> &gt; </span><a href="/services/" class="local" style="text-decoration: unset;">Services</a><span class="separator"> &gt; </span><span class="last">Web Development Services</span></p></nav>
+<h1 class="fonts-45 mb-3 font-weight-bold">Professional Web Development Services</h1>
+<p class="fonts-18 mb-3">Transform your digital presence with our expert web development solutions tailored to your business needs.</p>
+<p class="fonts-18 mb-2 font-weight-bold">Why Choose Our Services-</p>
+<ul class="bullet mb-5 fonts-18">
+    <li>Custom web development using modern technologies</li>
+    <li>Responsive design for all devices</li>
+    <li>SEO-optimized and performance-focused</li>
+    <li>Dedicated support and maintenance</li>
+</ul>
+
+<div class="rating-section d-flex"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
+<a href="https://clutch.co/profile/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/clutch-rating.svg" alt="Clutch" width="99" height="56" /></a>
+<a href="https://www.goodfirms.co/company/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/goodfirm-rating.svg" alt="GoodFirms" width="135" height="56" /></a></div>
+</div>
+<div class="col-lg-5 col-md-12 text-form-section">
+<div class="homen_form">
+<p class="fonts-24 font-weight-bold mt-0 mb-2 text-center line-height-1">Start Your Project Today</p>
+<form id="other-form" class="footer_form append-form blur-form" action="" method="post" name="popup-form" novalidate="">
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-user"></i><input id="name" class="form-control" name="name" required="" size="40" type="text" value="" placeholder="Name*" data-name="Please enter your name" /><small class="error"></small></p>
+
+<div class="clearfix"></div>
+</div>
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-envelope"></i><input id="email" class="form-control" name="email" required="" size="40" type="email" value="" placeholder="Email*" data-name="Please enter your email" /><small class="error"></small></p>
+
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-phone"></i><input id="number" class="form-control" name="number" required="" size="15" type="tel" value="" placeholder="Phone*" data-name="Please enter your number" /><small class="error"></small><span id="error-msg" class="d-none"></span></p>
+
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 mb-0 text-left"><textarea id="Comment" class="form-control" cols="40" name="comment" required="" rows="3" placeholder="Write your message.*" data-name="Please enter your description"></textarea><small class="error"></small></div>
+</div>
+<div class="row">
+<div class="form-group col-md-12">
+<div class="footer_txt_block mt-2">
+<input id="form_type" name="form_type" type="hidden" value="footer_form" />
+[spaceo_get_permalink][spaceo_get_referal]
+<div id="loadingmessage" class="loader"><img src="/wp-content/uploads/2021/04/ajax-loader.gif" alt="Ajax loader" width="30" height="30" /></div>
+<input id="submit" class="btn btn-pop mb0" name="submit" type="submit" value="Get Free Consultation" data-medium="BF_1" />
+
+</div>
+</div>
+</div>
+</form></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Hero Section End -->`;
+                }
+                
                 let bulletPoints = '';
-                if (content.bullet_points) {
+                let bulletSection = '';
+                
+                // Only create bullet section if bullets actually exist
+                if (content.bullet_points && content.bullet_points.length > 0) {
                     for (let bullet of content.bullet_points) {
                         bulletPoints += `    <li>${bullet}</li>\n`;
                     }
+                    bulletSection = `<ul class="bullet mb-5 fonts-18">
+${bulletPoints}
+</ul>
+
+`;
                 }
 
-                const template = `<section class="pt70 pb40 hero-section">
+                const template = `<!-- Hero Section Start -->
+<section class="pt70 pb40 hero-section section-hero">
 <div class="container-xl">
 <div class="row align-items-center">
 <div class="col-lg-7 col-md-12 banner-text">
@@ -1954,13 +2777,11 @@ Rules:
 <h1 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h1>
 <p class="fonts-18 mb-3">{description}</p>
 {bullet_intro_html}
-<ul class="bullet mb-5 fonts-18">
-{bullet_points}
-</ul>
-
+{bullet_section}
 <div class="rating-section d-flex"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
 <a href="https://clutch.co/profile/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/clutch-rating.svg" alt="Clutch" width="99" height="56" /></a>
 <a href="https://www.goodfirms.co/company/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/goodfirm-rating.svg" alt="GoodFirms" width="135" height="56" /></a></div>
+{additional_content_html}
 </div>
 <div class="col-lg-5 col-md-12 text-form-section">
 <div class="homen_form">
@@ -2003,21 +2824,87 @@ Rules:
 </div>
 </div>
 </div>
-</section>`;
+</section>
+<!-- Hero Section End -->`;
 
                 const bulletIntroHtml = content.bullet_intro ? `<p class="fonts-18 mb-2 font-weight-bold">${content.bullet_intro}</p>` : '';
+                const additionalContentHtml = content.additional_content ? `<div class="mt-4">${content.additional_content}</div>` : '';
                 
                 return template
                     .replace('{breadcrumb_title}', content.main_heading || 'Service')
                     .replace('{main_heading}', content.main_heading || 'Service Title')
                     .replace('{description}', content.description || 'Service description')
                     .replace('{bullet_intro_html}', bulletIntroHtml)
-                    .replace('{bullet_points}', bulletPoints)
+                    .replace('{bullet_section}', bulletSection)
+                    .replace('{additional_content_html}', additionalContentHtml)
                     .replace('{form_heading}', content.form_heading || 'Dream It, We Build It')
                     .replace('{form_button_text}', content.form_button_text || 'Book Your Free Consultation');
             }
 
             generateFaqSection(content) {
+                // Handle empty content with default static HTML
+                if (!content || !content.faqs || content.faqs.length === 0) {
+                    return `<!-- FAQ Section Start -->
+<div class="faq pt80 pb50 section-faq" style="background: linear-gradient(var(--bg-color-9), #fff);">
+  <div class="container-xl">
+    <h2 class="fonts-40 font-weight-bold text-center">Frequently Asked Questions</h2>
+    <div id="accordion" class="text-left px-4">
+<div class="card py-4">
+<div class="card-header active">
+<h3 class="card-link" data-toggle="collapse" href="#one">What technologies do you use for web development?</h3>
+<div id="one" class="collapse open" data-parent="#accordion" style="display: block;">
+<div class="card card-body">
+We use modern technologies like React, Node.js, Python, PHP, and various frameworks to build robust and scalable web applications tailored to your business needs.
+</div>
+</div>
+</div>
+</div>
+<div class="card py-4">
+<div class="card-header ">
+<h3 class="card-link" data-toggle="collapse" href="#two">How long does it take to develop a website?</h3>
+<div id="two" class="collapse" data-parent="#accordion" style="display: none;">
+<div class="card card-body">
+Development timeline varies based on project complexity. A simple website takes 2-4 weeks, while complex applications can take 3-6 months. We provide detailed timelines during project planning.
+</div>
+</div>
+</div>
+</div>
+<div class="card py-4">
+<div class="card-header ">
+<h3 class="card-link" data-toggle="collapse" href="#three">Do you provide ongoing support and maintenance?</h3>
+<div id="three" class="collapse" data-parent="#accordion" style="display: none;">
+<div class="card card-body">
+Yes, we offer comprehensive support and maintenance services including regular updates, security patches, performance optimization, and technical support to keep your website running smoothly.
+</div>
+</div>
+</div>
+</div>
+<div class="card py-4">
+<div class="card-header ">
+<h3 class="card-link" data-toggle="collapse" href="#four">What is your development process?</h3>
+<div id="four" class="collapse" data-parent="#accordion" style="display: none;">
+<div class="card card-body">
+Our process includes requirement analysis, planning & strategy, design & development, testing & QA, deployment, and ongoing support. We follow agile methodology for efficient project delivery.
+</div>
+</div>
+</div>
+</div>
+<div class="card py-4">
+<div class="card-header ">
+<h3 class="card-link" data-toggle="collapse" href="#five">Can you help with website redesign and upgrades?</h3>
+<div id="five" class="collapse" data-parent="#accordion" style="display: none;">
+<div class="card card-body">
+Absolutely! We specialize in website redesigns, performance improvements, technology upgrades, and modernizing existing websites to meet current standards and user expectations.
+</div>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+</div>
+<!-- FAQ Section End -->`;
+                }
+                
                 let faqItems = '';
                 if (content.faqs) {
                     content.faqs.forEach((faq, index) => {
@@ -2040,21 +2927,40 @@ ${faq.answer}
                     });
                 }
 
-                const template = `<div class="faq pt80 pb50" style="background: linear-gradient(var(--bg-color-9), #fff);">
+                const template = `<!-- FAQ Section Start -->
+<div class="faq pt80 pb50 section-faq" style="background: linear-gradient(var(--bg-color-9), #fff);">
   <div class="container-xl">
     <h2 class="fonts-40 font-weight-bold text-center">{main_heading}</h2>
     <div id="accordion" class="text-left px-4">
 ${faqItems}
     </div>
   </div>
-</div>`;
+</div>
+<!-- FAQ Section End -->`;
 
                 return template
                     .replace('{main_heading}', content.main_heading || 'FAQs About Web Development Consulting');
             }
 
             generateCtaSection(content) {
-                const template = `<section class="pt80 pb80 new-cta-section">
+                // Handle empty content with default static HTML
+                if (!content || (!content.main_heading && !content.description)) {
+                    return `<section class="pt80 pb80 new-cta-section section-cta-simple">
+<div class="container-xl">
+<div class="cta-inner">
+<div class="row align-items-center">
+<div class="col-md-12 text-center">
+<p class="fonts-40 font-weight-bold cta-title mxw-1000">Ready to Transform Your Business?</p>
+<p class="fonts-20 mxw-900">Let's discuss your project and explore how we can help you achieve your digital goals with cutting-edge web solutions.</p>
+</div>
+<div class="col-md-12 text-center mt-4"><button class="btn btn-pop open-qouteform" type="button" data-medium="B_2">Start Your Project</button></div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+                
+                const template = `<section class="pt80 pb80 new-cta-section section-cta-simple">
 <div class="container-xl">
 <div class="cta-inner">
 <div class="row align-items-center">
@@ -2074,43 +2980,133 @@ ${faqItems}
                     .replace('{button_text}', content.button_text || 'Get Started');
             }
 
-            generateProcessSection(content) {
-                const template = `<section class="pt70 pb40 process-section">
+
+            generateTechnologySection(content) {
+                // Handle empty content with default static HTML using your exact format
+                if (!content || !content.categories || content.categories.length === 0) {
+                    return `<div class="technology-stack pt80 pb60 bg-color">
 <div class="container-xl">
 <div class="row">
-<div class="col-lg-12 text-center">
-<h2 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h2>
-<p class="fonts-18 mb-5">{description}</p>
+<div class="col-md-12">
+<h2 class="fonts-40 text-center font-weight-bold mb-5">Technology Stack for Web Development</h2>
+</div>
+</div>
+<div class="technology-inner">
+<div class="row">
+<div class="col-md-2">
+<div class="technology-name fonts-20">Frontend Technologies</div>
+</div>
+<div class="col-md-10">
+<ul class="technology-icon-wrapper">
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg" alt="React" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> React</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Vue.svg" alt="Vue.js" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Vue.js</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Angular.svg" alt="Angular" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Angular</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Next-js.svg" alt="Next.js" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Next.js</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/TypeScript.svg" alt="TypeScript" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> TypeScript</li>
+</ul>
 </div>
 </div>
 <div class="row">
-{process_steps}
+<div class="col-md-2">
+<div class="technology-name fonts-20">Backend Technologies</div>
+</div>
+<div class="col-md-10">
+<ul class="technology-icon-wrapper">
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Node-js.svg" alt="Node.js" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Node.js</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Python.svg" alt="Python" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Python</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Django.svg" alt="Django" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Django</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/PHP.svg" alt="PHP" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> PHP</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Laravel.svg" alt="Laravel" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Laravel</li>
+</ul>
 </div>
 </div>
-</section>`;
-
-                let processSteps = '';
-                if (content.steps) {
-                    content.steps.forEach((step, index) => {
-                        processSteps += `<div class="col-lg-4 col-md-6 mb-4">
-<div class="process-step text-center">
-<div class="step-number fonts-24 font-weight-bold mb-3">${index + 1}</div>
-<h3 class="fonts-20 font-weight-bold mb-2">${step.title}</h3>
-<p class="fonts-16">${step.description}</p>
+<div class="row">
+<div class="col-md-2">
+<div class="technology-name fonts-20">Database</div>
+</div>
+<div class="col-md-10">
+<ul class="technology-icon-wrapper">
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/PostgreSQL.svg" alt="PostgreSQL" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> PostgreSQL</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/MongoDB.svg" alt="MongoDB" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> MongoDB</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/MySQL.svg" alt="MySQL" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> MySQL</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Redis.svg" alt="Redis" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> Redis</li>
+</ul>
+</div>
+</div>
+<div class="row">
+<div class="col-md-2">
+<div class="technology-name fonts-20">Cloud & DevOps</div>
+</div>
+<div class="col-md-10">
+<ul class="technology-icon-wrapper">
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/AWS.svg" alt="AWS" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> AWS</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Google-Cloud.svg" alt="Google Cloud" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> Google Cloud</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Docker.svg" alt="Docker" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> Docker</li>
+<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Kubernetes.svg" alt="Kubernetes" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> Kubernetes</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>`;
+                }
+                
+                // If categories are provided, generate dynamic HTML
+                if (content && content.categories && content.categories.length > 0) {
+                    let categoriesHTML = '';
+                    content.categories.forEach(category => {
+                        let techList = '';
+                        if (category.technologies && category.technologies.length > 0) {
+                            category.technologies.forEach(tech => {
+                                // Create a more robust tech slug and provide fallback
+                                const techSlug = tech.toLowerCase()
+                                    .replace(/\./g, '')
+                                    .replace(/\s+/g, '-')
+                                    .replace(/[^a-z0-9-]/g, '');
+                                
+                                // Try different possible paths for tech icons
+                                const possiblePaths = [
+                                    `https://www.spaceotechnologies.com/wp-content/uploads/2023/08/${tech}.svg`,
+                                    `https://www.spaceotechnologies.com/wp-content/uploads/2024/02/${tech}.svg`,
+                                    `https://www.spaceotechnologies.com/wp-content/uploads/2023/08/${techSlug}.svg`,
+                                    `https://www.spaceotechnologies.com/wp-content/uploads/2024/02/${techSlug}.svg`,
+                                    // Fallback placeholder
+                                    `https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg`
+                                ];
+                                
+                                // Use the first path as primary with global error handler
+                                techList += `<li><img src="${possiblePaths[0]}" alt="${tech}" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> ${tech}</li>
+`;
+                            });
+                        }
+                        
+                        categoriesHTML += `<div class="row">
+<div class="col-md-2">
+<div class="technology-name fonts-20">${category.name}</div>
+</div>
+<div class="col-md-10">
+<ul class="technology-icon-wrapper">
+${techList}</ul>
 </div>
 </div>
 `;
                     });
+                    
+                    return `<div class="technology-stack pt80 pb60 bg-color">
+<div class="container-xl">
+<div class="row">
+<div class="col-md-12">
+<h2 class="fonts-40 text-center font-weight-bold mb-5">${content.main_heading || 'Technology Stack'}</h2>
+</div>
+</div>
+<div class="technology-inner">
+${categoriesHTML}</div>
+</div>
+</div>`;
                 }
 
-                return template
-                    .replace('{main_heading}', content.main_heading || 'Our Process')
-                    .replace('{description}', content.description || 'How we work with you')
-                    .replace('{process_steps}', processSteps);
-            }
-
-            generateTechnologySection(content) {
-                const template = `<section class="pt70 pb40 technology-section bg-light">
+                // Legacy fallback for old format
+                const template = `<section class="pt70 pb40 technology-section bg-light section-technology">
 <div class="container-xl">
 <div class="row">
 <div class="col-lg-12 text-center">
@@ -2129,7 +3125,7 @@ ${faqItems}
 </section>`;
 
                 let techItems = '';
-                if (content.technologies) {
+                if (content && content.technologies) {
                     content.technologies.forEach(tech => {
                         techItems += `<span class="tech-item badge badge-primary mr-2 mb-2 fonts-16">${tech}</span>
 `;
@@ -2137,18 +3133,119 @@ ${faqItems}
                 }
 
                 return template
-                    .replace('{main_heading}', content.main_heading || 'Technology Stack')
-                    .replace('{description}', content.description || 'Technologies we use')
+                    .replace('{main_heading}', (content && content.main_heading) || 'Technology Stack')
+                    .replace('{description}', (content && content.description) || 'Technologies we use')
                     .replace('{tech_items}', techItems);
             }
 
             generateIndustriesSection(content) {
-                const template = `<section class="pt70 pb40 industries-section">
+                // ALWAYS return the exact static HTML for blank/empty/image content
+                if (!content.industries || content.industries.length === 0) {
+                    console.log('🚀 RETURNING EXACT STATIC INDUSTRIES HTML (blank content detected)');
+                    return `<section class="pt80 pb60 industries-section">
 <div class="container-xl">
 <div class="row">
-<div class="col-lg-12 text-center">
-<h2 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h2>
-<p class="fonts-18 mb-5">{description}</p>
+<div class="col-lg-4 col-md-12">
+<div class="industries-desc">
+<h2 class="fonts-40 font-weight-bold font-weight-bold mb-2">Industries We Serve</h2>
+<p>Whether you operate in healthcare, finance, eCommerce, or any other domain, we develop and integrate mobile innovations that enhance workflows, address industry regulations, and deliver optimal digital experiences for your customers and stakeholders.</p>
+</div>
+</div>
+<div class="col-lg-8 col-md-12 industries-category">
+<div class="row text-center">
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Photo-Video.svg" alt="Photo Video" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/services/photo-editing-app-development/">Photo &amp; Video</a></p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Social-Networking.svg" alt="Social Networking" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/services/instagram-like-app-development/">Social Networking</a></p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/On-Demand-Delivery.svg" alt="On Demand Delivery" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/services/on-demand-app-development/">On-Demand Delivery</a></p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Entertainment.svg" alt="Entertainment" width="64" height="64">
+<p class="fonts-16">Entertainment</p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Health-Fitness.svg" alt="Health-Fitness" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/solution/healthcare-app-development/">Health &amp; Fitness</a></p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Food-Drink.svg" alt="Manufacturing" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/services/zomato-like-restaurant-app-development/">Food &amp; Drink</a></p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Transportation.svg" alt="Transportation" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/solution/enterprise-fleet-management/">Transportation &amp; Logistics</a></p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Education.svg" alt="Education" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/solution/mobile-apps-for-schools/">Education &amp; Elearning</a></p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/11/Ecommerce-Shopping.svg" alt="Hospitality" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/services/ecommerce-website-development/">Ecommerce &amp; Shopping</a></p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Finance.svg" alt="Finance" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/services/financial-software-development/">Banking &amp; Finance</a></p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Travel.svg" alt="Travel" width="64" height="64">
+<p class="fonts-16">Travel &amp; Tourism</p>
+</div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-6">
+<div class="industries-box">
+<img decoding="async" loading="lazy" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Real-estate.svg" alt="Real-estate" width="64" height="64">
+<p class="fonts-16"><a href="https://www.spaceotechnologies.com/services/real-estate-app-development/">Real Estate</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+
+                // If custom industries are provided, generate dynamic HTML (this would need custom parsing logic)
+                const template = `<section class="pt80 pb60 industries-section">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-4 col-md-12">
+<div class="industries-desc">
+<h2 class="fonts-40 font-weight-bold font-weight-bold mb-2">{main_heading}</h2>
+<p>{description}</p>
+</div>
+</div>
+<div class="col-lg-8 col-md-12 industries-category">
+<div class="row text-center">
+{industry_items}
+</div>
 </div>
 </div>
 </div>
@@ -2156,7 +3253,8 @@ ${faqItems}
 
                 return template
                     .replace('{main_heading}', content.main_heading || 'Industries We Serve')
-                    .replace('{description}', content.description || 'We serve various industries');
+                    .replace('{description}', content.description || 'We serve various industries')
+                    .replace('{industry_items}', '<!-- Custom industries would go here -->');
             }
 
             generateServicesGridSection(content) {
@@ -2197,7 +3295,7 @@ ${bulletHtml}
                     });
                 }
 
-                const template = `<section class="pt80 pb50 services-section bg-color">
+                const template = `<section class="pt80 pb50 services-section bg-color section-services-grid">
 <div class="container-xl">
 <h2 class="fonts-40 text-center font-weight-bold mb-3 mxw-1000">{main_heading}</h2>
 <p class="fonts-18 text-center mxw-1000 mb-4">{description}</p>
@@ -2271,7 +3369,7 @@ ${bulletHtml}
 `;
                 });
 
-                return `<section class="techno-stack pb80 bg-color services-tab-new">
+                return `<section class="techno-stack pb80 bg-color services-tab-new section-services-accordion">
 <div class="container-xl">
 <div class="row">
 <div class="col-lg-6">
@@ -2345,7 +3443,7 @@ ${bulletHtml}
                     
                     if (isSwapped) {
                         // Swapped: Accordion left, Image right
-                        sectionsHtml += `<section class="techno-stack pb80 bg-color services-tab-new">
+                        sectionsHtml += `<section class="techno-stack pb80 bg-color services-tab-new section-services-accordion">
 <div class="container-xl">
 <div class="row">
 <div class="col-lg-6">
@@ -2365,7 +3463,7 @@ ${accordionItems}
 `;
                     } else {
                         // Normal: Image left, Accordion right
-                        sectionsHtml += `<section class="techno-stack pb80 bg-color services-tab-new">
+                        sectionsHtml += `<section class="techno-stack pb80 bg-color services-tab-new section-services-accordion">
 <div class="container-xl">
 <div class="row">
 <div class="col-lg-6">
@@ -2412,7 +3510,7 @@ ${accordionItems}
 </div>
 </div>
 <div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="${project.image}" alt="${project.title}" width="600" height="459">
+<img loading="lazy" decoding="async" class="project-img" src="${project.image || '/wp-content/uploads/2025/07/default-project.jpg'}" alt="${project.title}" width="600" height="459" onerror="handleImageError(this)">
 </div>
 </div>
 </div>
@@ -2433,7 +3531,7 @@ ${accordionItems}
 </div>
 </div>
 <div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="${project.image}" alt="${project.title}" width="600" height="459">
+<img loading="lazy" decoding="async" class="project-img" src="${project.image || '/wp-content/uploads/2025/07/default-project.jpg'}" alt="${project.title}" width="600" height="459" onerror="handleImageError(this)">
 </div>
 </div>
 </div>
@@ -2442,7 +3540,7 @@ ${accordionItems}
                     });
                 }
                 
-                return `<div class="our-work pt70 pb70 bg-color">
+                return `<div class="our-work pt70 pb70 bg-color section-portfolio">
 <div class="container-xl">
 <div class="text-center">
 <h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">${content.main_heading || 'Proven Results: Real Projects That Drive Business Growth'}</h2>
@@ -2454,7 +3552,7 @@ ${portfolioItems}
             }
 
             generateTestimonialSection(content) {
-                const template = `<div class="blog-testimonial pb80 pt80 bg-color">
+                const template = `<div class="blog-testimonial pb80 pt80 bg-color section-testimonial">
 <div class="container-xl">
 <h2 class="fonts-40 font-weight-bold text-center mb-5">{main_heading}</h2>
 <div class="row align-items-center customer-feedback">
@@ -2473,7 +3571,7 @@ ${portfolioItems}
 <a class="btn-link-arrow btn-link-arrow-right" href="/company/client-testimonials/"><span class="btn__label-wrapper">{button_text}</span></a>
 </div>
 </div>
-<div class="col-lg-5 right-img text-right"><img loading="lazy" decoding="async" src="/wp-content/uploads/2024/01/{client_image}" alt="{client_name}" width="434" height="402"></div>
+<div class="col-lg-5 right-img text-right"><img loading="lazy" decoding="async" src="/wp-content/uploads/2024/01/{client_image}" alt="{client_name}" width="434" height="402" onerror="handleImageError(this)"></div>
 </div>
 </div>
 </div>`;
@@ -2491,7 +3589,61 @@ ${portfolioItems}
             }
 
             generateBenefitsSection(content) {
-                const template = `<section class="pt80 pb50 services-section">
+                // Handle empty content with default static HTML using data URI images
+                if (!content || !content.benefits || content.benefits.length === 0) {
+                    return `<section class="pt80 pb50 services-section section-benefits">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center mb-3 mxw-1000">Why Choose Our Services</h2>
+<p class="fonts-18 text-center mxw-1000 mb-4">We deliver exceptional solutions with proven expertise and dedication to your success.</p>
+<div class="row">
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiMwMDc4ZmYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Expertise" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">Expert Team</h3>
+<p>Skilled professionals with years of experience in modern technologies and best practices.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiMxMGI5ODEiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTkgMTJMMTEgMTRMMTUgMTBNMjEgMTJDMjEgMTYuOTcwNiAxNi45NzA2IDIxIDEyIDIxQzcuMDI5NDQgMjEgMyAxNi45NzA2IDMgMTJDMyA3LjAyOTQ0IDcuMDI5NDQgMyAxMiAzQzE2Ljk3MDYgMyAyMSA3LjAyOTQ0IDIxIDEyWiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cjwvc3ZnPg==" alt="Quality" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">Quality Assurance</h3>
+<p>Rigorous testing and quality control processes to ensure reliable and bug-free solutions.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiNmNTk0MmYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTUuMDkgOC4yNkwyMiA5TDE2IDEzTDE3LjE4IDIwTDEyIDE2TDYuODIgMjBMOCAxM0wyIDlMOC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Support" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">24/7 Support</h3>
+<p>Round-the-clock support and maintenance to keep your solutions running smoothly.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiM4YjVjZjYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTMgN0gxMFYxNEgzVjdaTTE0IDdIMjFWMTBIMTRWN1pNMTQgMTRIMjFWMTdIMTRWMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Scalability" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">Scalable Solutions</h3>
+<p>Build for growth with scalable architecture that adapts to your business needs.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiNlZjQ0NDQiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMjUgOC4yNUwyMCA5TDEzLjc1IDEzLjc1TDE0IDIxTDEyIDE5TDEwIDIxTDEwLjI1IDEzLjc1TDQgOUwxMC43NSA4LjI1TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Innovation" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">Innovation</h3>
+<p>Stay ahead with cutting-edge technologies and innovative approaches to solve challenges.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiM2MzY2ZjEiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJWNE0xMiAyMFYyMk00LjIyIDQuMjJMNS42NCA1LjY0TTE4LjM2IDE4LjM2TDE5Ljc4IDE5Ljc4TTIgMTJINE0yMCAxMkgyMk00LjIyIDE5Ljc4TDUuNjQgMTguMzZNMTguMzYgNS42NEwxOS43OCA0LjIyIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4KPC9zdmc+" alt="Delivery" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">On-time Delivery</h3>
+<p>Committed to delivering projects on schedule without compromising on quality.</p>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+                
+                const template = `<section class="pt80 pb50 services-section section-benefits">
 <div class="container-xl">
 <h2 class="fonts-40 font-weight-bold text-center mb-3 mxw-1000">{main_heading}</h2>
 <p class="fonts-18 text-center mxw-1000 mb-4">{description}</p>
@@ -2503,13 +3655,26 @@ ${portfolioItems}
 
                 let benefitsItems = '';
                 if (content.benefits) {
-                    content.benefits.forEach(benefit => {
+                    content.benefits.forEach((benefit, index) => {
+                        // Use static data URI images that will never break
+                        const staticDataImages = [
+                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiMwMDc4ZmYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+`, // Expertise - Blue star
+                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiMxMGI5ODEiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTkgMTJMMTEgMTRMMTUgMTBNMjEgMTJDMjEgMTYuOTcwNiAxNi45NzA2IDIxIDEyIDIxQzcuMDI5NDQgMjEgMyAxNi45NzA2IDMgMTJDMyA3LjAyOTQ0IDcuMDI5NDQgMyAxMiAzQzE2Ljk3MDYgMyAyMSA3LjAyOTQ0IDIxIDEyWiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cjwvc3ZnPg==`, // Quality - Green checkmark
+                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiNmNTk0MmYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTUuMDkgOC4yNkwyMiA5TDE2IDEzTDE3LjE4IDIwTDEyIDE2TDYuODIgMjBMOCAxM0wyIDlMOC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+`, // Support - Orange star
+                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiM4YjVjZjYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTMgN0gxMFYxNEgzVjdaTTE0IDdIMjFWMTBIMTRWN1pNMTQgMTRIMjFWMTdIMTRWMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+`, // Scalability - Purple blocks
+                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiNlZjQ0NDQiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMjUgOC4yNUwyMCA5TDEzLjc1IDEzLjc1TDE0IDIxTDEyIDE5TDEwIDIxTDEwLjI1IDEzLjc1TDQgOUwxMC43NSA4LjI1TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+`, // Innovation - Red star
+                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiM2MzY2ZjEiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJWNE0xMiAyMFYyMk00LjIyIDQuMjJMNS42NCA1LjY0TTE4LjM2IDE4LjM2TDE5Ljc4IDE5Ljc4TTIgMTJINE0yMCAxMkgyMk00LjIyIDE5Ljc4TDUuNjQgMTguMzZNMTguMzYgNS42NEwxOS43OCA0LjIyIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4KPC9zdmc+` // Delivery - Indigo clock
+                        ];
+                        
+                        const imageUrl = staticDataImages[index % staticDataImages.length];
+                        const altText = benefit.title || `Benefit ${index + 1}`;
+                        
                         benefitsItems += `<div class="col-lg-4 col-md-6">
 <div class="mad_service_box text-center">
-            <img loading="lazy" decoding="async" src="/wp-content/uploads/2025/07/${benefit.image_slug}.svg" alt="${benefit.title}" width="74" height="74">
+<img loading="lazy" decoding="async" src="${imageUrl}" alt="${altText}" width="74" height="74">
 <h3 class="fonts-18 font-weight-semibold">${benefit.title}</h3>
-<p>            ${benefit.description}
-        </p></div>
+<p>${benefit.description}</p>
+</div>
 </div>
 `;
                     });
@@ -2522,7 +3687,7 @@ ${portfolioItems}
             }
 
             generateBenefitsTwoSection(content) {
-                const template = `<section class="pt80 pb50 services-section practices-we-follow">
+                const template = `<section class="pt80 pb50 services-section practices-we-follow section-benefits-two">
 <div class="container-xl">
 <h2 class="fonts-40 font-weight-bold text-center mb-3">{main_heading}</h2>
 <p class="fonts-18 text-center mxw-900 mb-4">{description}</p>
@@ -2599,6 +3764,132 @@ ${portfolioItems}
                 };
             }
 
+            parseProcessSection(content) {
+                const lines = content.split('\n').filter(line => line.trim());
+                
+                let main_heading = '';
+                let processes = [];
+                let currentProcess = null;
+                let isCollectingDescription = false;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    
+                    if (i === 0) {
+                        // First line is the main heading
+                        main_heading = line;
+                        continue;
+                    }
+                    
+                    // Check if this line looks like a process step title
+                    const isNumberedStep = /^\d+\.\s/.test(line); // "1. Step Title"
+                    const isShortTitle = line.length < 80 && 
+                                        !line.endsWith('.') && 
+                                        line.length > 5 &&
+                                        !line.includes('We ') && 
+                                        !line.includes('Our ') &&
+                                        !line.includes('This ') &&
+                                        !line.includes('It ');
+                    
+                    const isStepTitle = isNumberedStep || isShortTitle;
+                    
+                    if (isStepTitle) {
+                        // Save previous process if exists
+                        if (currentProcess && currentProcess.title && currentProcess.description) {
+                            processes.push(currentProcess);
+                        }
+                        
+                        // Start new process step
+                        let cleanTitle = line.replace(/^\d+\.\s*/, ''); // Remove numbering like "1. "
+                        currentProcess = {
+                            title: cleanTitle,
+                            description: ''
+                        };
+                        isCollectingDescription = true;
+                    } else if (currentProcess && isCollectingDescription && line.length > 10) {
+                        // This is description content
+                        if (currentProcess.description) {
+                            currentProcess.description += ' ' + line;
+                        } else {
+                            currentProcess.description = line;
+                        }
+                    }
+                }
+                
+                // Add the last process
+                if (currentProcess && currentProcess.title && currentProcess.description) {
+                    processes.push(currentProcess);
+                }
+                
+                return {
+                    main_heading: main_heading || 'Our Development Process',
+                    processes: processes
+                };
+            }
+
+            parseFeaturedInSection(content) {
+                console.log('🔍 PARSE FEATURED_IN CALLED');
+                console.log('🔍 Raw content:', content);
+                
+                const lines = content.split('\n').filter(line => line.trim());
+                console.log('🔍 Filtered lines:', lines);
+                console.log('🔍 Lines count:', lines.length);
+                
+                let main_heading = '';
+                let brands = [];
+                
+                // Handle empty content or content with only section markers
+                if (lines.length === 0 || (lines.length === 1 && lines[0].includes('[FEATURED_IN'))) {
+                    return {
+                        main_heading: 'Our Solutions Recognized & Featured In',
+                        brands: [] // Empty brands array will trigger default brands in generate function
+                    };
+                }
+                
+                // Handle case with only heading and no brands (common when images are present)
+                if (lines.length <= 2) {
+                    const potentialHeading = lines.find(line => !line.includes('[FEATURED_IN') && line.length > 10);
+                    return {
+                        main_heading: potentialHeading || 'Our Solutions Recognized & Featured In',
+                        brands: [] // Empty brands array will trigger default brands in generate function
+                    };
+                }
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    
+                    // Skip lines that contain section markers
+                    if (line.includes('[FEATURED_IN') || line.includes('[FEATURED_IN END]')) {
+                        continue;
+                    }
+                    
+                    if (i === 0 || (main_heading === '' && line.length > 10)) {
+                        // First meaningful line is the main heading
+                        main_heading = line;
+                        continue;
+                    }
+                    
+                    // Each subsequent line is a brand name (ignore very short lines and image references)
+                    if (line.length > 2 && !line.includes('.jpg') && !line.includes('.png') && !line.includes('.svg') && !line.includes('image')) {
+                        brands.push(line);
+                    }
+                }
+                
+                // If no valid brands found (empty content, only images, etc.), return empty array to trigger defaults
+                if (brands.length === 0) {
+                    console.log('🔍 NO VALID BRANDS FOUND - will trigger default static HTML');
+                    return {
+                        main_heading: main_heading || 'Our Solutions Recognized & Featured In',
+                        brands: [] // Empty brands array will trigger default static HTML in generate function
+                    };
+                }
+                
+                return {
+                    main_heading: main_heading || 'Our Solutions Recognized & Featured In',
+                    brands: brands
+                };
+            }
+
             generateContentFormSection(content) {
                 let bulletHtml = '';
                 if (content.bullet_points && content.bullet_points.length > 0) {
@@ -2609,7 +3900,7 @@ ${portfolioItems}
                     bulletHtml += '</ul>';
                 }
 
-                const template = `<section class="pt80 pb80 text-form-section bg-color">
+                const template = `<section class="pt80 pb80 text-form-section bg-color section-content-form">
 <div class="container-xl">
 <div class="row">
 <div class="col-lg-7 col-md-12 col-sm-12">
@@ -2687,7 +3978,7 @@ ${portfolioItems}
                     });
                 }
 
-                const template = `<section class="pt50 pb80 new-cta-section">
+                const template = `<section class="pt50 pb80 new-cta-section section-cta-two">
 <div class="container-xl">
 <div class="cta-inner">
 <div class="row align-items-center">
@@ -2708,6 +3999,165 @@ ${portfolioItems}
                     .replace('{description}', content.description || 'Whether you\'re a startup or an enterprise, we offer fully customized web development services.')
                     .replace('{stats_html}', statsHtml);
             }
+
+            generateProcessSection(content) {
+                // If no processes provided or empty content, return default process HTML
+                if (!content.processes || content.processes.length === 0) {
+                    console.log('🚀 RETURNING DEFAULT PROCESS HTML (blank content detected)');
+                    return `<section class="pt80 pb50 process-sec bg-color">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center">Our Development Process</h2>
+<div class="row">
+<div class="col-lg-4 col-md-6">
+<div class="instalikeapp">
+<p class="number">01</p>
+<h3 class="font-weight-semibold fonts-20 mb-2">Requirement Analysis</h3>
+<p>We learn about your requirements and what you need. Our team proposes solutions to meet your business needs.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="instalikeapp">
+<p class="number">02</p>
+<h3 class="font-weight-semibold fonts-20 mb-2">Planning & Strategy</h3>
+<p>We create detailed plans and strategies for your project. Our team makes roadmap based on your requirements.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="instalikeapp">
+<p class="number">03</p>
+<h3 class="font-weight-semibold fonts-20 mb-2">Design & Development</h3>
+<p>Our designers and developers work together to create your solution with modern technologies and best practices.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="instalikeapp">
+<p class="number">04</p>
+<h3 class="font-weight-semibold fonts-20 mb-2">Testing & QA</h3>
+<p>Our QA team thoroughly tests your solution. We make sure it is 100% bug-free before delivery.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="instalikeapp">
+<p class="number">05</p>
+<h3 class="font-weight-semibold fonts-20 mb-2">Deployment</h3>
+<p>We deploy your solution and provide complete support during the launch process.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="instalikeapp">
+<p class="number">06</p>
+<h3 class="font-weight-semibold fonts-20 mb-2">Support & Maintenance</h3>
+<p>We provide ongoing support and maintenance to ensure your solution runs smoothly.</p>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+                
+                let processItems = '';
+                if (content.processes && content.processes.length > 0) {
+                    content.processes.forEach((process, index) => {
+                        const stepNumber = String(index + 1).padStart(2, '0');
+                        processItems += `<div class="col-lg-4 col-md-6">
+<div class="instalikeapp">
+<p class="number">${stepNumber}</p>
+<h3 class="font-weight-semibold fonts-20 mb-2">${process.title}</h3>
+<p>${process.description}</p>
+</div>
+</div>
+`;
+                    });
+                }
+
+                const template = `<section class="pt80 pb50 process-sec bg-color">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center">{main_heading}</h2>
+<div class="row">
+{process_items}
+</div>
+</div>
+</section>`;
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Our Development Process')
+                    .replace('{process_items}', processItems);
+            }
+
+            generateFeaturedInSection(content) {
+                console.log('🚀 GENERATE FEATURED_IN CALLED');
+                console.log('🚀 Content received:', content);
+                console.log('🚀 Brands array:', content.brands);
+                console.log('🚀 Brands length:', content.brands ? content.brands.length : 'no brands property');
+                
+                // ALWAYS return the exact static HTML for blank/empty/image content
+                if (!content.brands || content.brands.length === 0) {
+                    console.log('🚀 RETURNING EXACT STATIC HTML (blank content detected)');
+                    return `<!-- Featured In Section Start -->
+<section class="featured-in pt80 pb80 bg-color">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center mb-5">Our Solutions Recognized & Featured In</h2>
+<div class="brand-listing">
+<div class="brand-img">
+<img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Tech-Crunch.svg" alt="Tech Crunch" width="200" height="44"/>
+</div>
+<div class="brand-img">
+<img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/The-Guardian.svg" alt="The Guardian" width="200" height="44"/>
+</div>
+<div class="brand-img">
+<img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Bloomberg.svg" alt="Bloomberg" width="200" height="44"/>
+</div>
+<div class="brand-img">
+<img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/BBC.svg" alt="BBC" width="200" height="44"/>
+</div>
+<div class="brand-img">
+<img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Business-insider.svg" alt="Business insider" width="200" height="44"/>
+</div>
+<div class="brand-img">
+<img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/The-Telegraph.svg" alt="The Telegraph" width="200" height="44"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured In Section End -->`;
+                }
+
+                // If custom brands are provided, generate dynamic HTML
+                const brandImages = {
+                    'Tech Crunch': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Tech-Crunch.svg',
+                    'TechCrunch': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Tech-Crunch.svg',
+                    'The Guardian': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/The-Guardian.svg',
+                    'Guardian': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/The-Guardian.svg',
+                    'Bloomberg': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Bloomberg.svg',
+                    'BBC': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/BBC.svg',
+                    'Business Insider': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Business-insider.svg',
+                    'Business insider': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Business-insider.svg',
+                    'The Telegraph': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/The-Telegraph.svg',
+                    'Telegraph': 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/The-Telegraph.svg'
+                };
+
+                let brandItems = '';
+                content.brands.forEach((brand, index) => {
+                    const imageSrc = brandImages[brand] || brandImages['Tech Crunch']; // Default fallback
+                    brandItems += `<div class="brand-img">
+<img src="${imageSrc}" alt="${brand}" width="200" height="44"/>
+</div>
+`;
+                });
+
+                const template = `<section class="featured-in pt80 pb80 bg-color">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center mb-5">{main_heading}</h2>
+<div class="brand-listing">
+{brand_items}
+</div>
+</div>
+</section>`;
+
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Our Solutions Recognized & Featured In')
+                    .replace('{brand_items}', brandItems);
+            }
         }
 
         // Enhanced IDE Interface
@@ -2716,13 +4166,16 @@ ${portfolioItems}
                 this.processor = new RealDocumentProcessor();
                 this.currentFile = null;
                 this.generatedCode = '';
+                this.quill = null;
                 
                 this.initializeElements();
+                this.initializeQuillEditor();
                 this.bindEvents();
                 this.showWelcomeMessage();
             }
 
             initializeElements() {
+                // File elements
                 this.fileUpload = document.getElementById('fileUpload');
                 this.fileInput = document.getElementById('fileInput');
                 this.fileInfo = document.getElementById('fileInfo');
@@ -2730,12 +4183,22 @@ ${portfolioItems}
                 this.fileSize = document.getElementById('fileSize');
                 this.fileType = document.getElementById('fileType');
                 this.fileStatus = document.getElementById('fileStatus');
+                
+                // URL elements
+                this.documentUrl = document.getElementById('documentUrl');
+                this.fetchUrlBtn = document.getElementById('fetchUrlBtn');
+                
+                // Content elements
                 this.inputContent = document.getElementById('inputContent');
                 this.outputCode = document.getElementById('outputCode');
+                
+                // Control buttons
                 this.processBtn = document.getElementById('processBtn');
                 this.clearBtn = document.getElementById('clearBtn');
                 this.copyBtn = document.getElementById('copyBtn');
                 this.downloadBtn = document.getElementById('downloadBtn');
+                
+                // Status elements
                 this.statusText = document.getElementById('statusText');
                 this.detectedSections = document.getElementById('detectedSections');
                 this.sectionTags = document.getElementById('sectionTags');
@@ -2744,13 +4207,54 @@ ${portfolioItems}
                 this.lineCount = document.getElementById('lineCount');
                 this.wordCount = document.getElementById('wordCount');
                 this.processIcon = document.getElementById('processIcon');
+                
+                // AI configuration elements
                 this.aiConfigBtn = document.getElementById('aiConfigBtn');
                 this.aiConfig = document.getElementById('aiConfig');
                 this.apiKeyInput = document.getElementById('apiKeyInput');
                 this.useAICheckbox = document.getElementById('useAICheckbox');
             }
 
+            initializeQuillEditor() {
+                // Initialize Quill rich text editor
+                this.quill = new Quill('#editor-container', {
+                    theme: 'snow',
+                    placeholder: 'Paste your content here or upload a Word document...\n\nThe tool automatically detects sections from real Word docs!\n\nExample format:\n[HERO]\nHeading: Your Service Title\nDescription: Your service description...\nBullet 1: First benefit\n\n[FAQ]\nHeading: Frequently Asked Questions\nQuestion 1: What is this?\nAnswer 1: This is...',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['clean']
+                        ]
+                    }
+                });
+
+                // Sync Quill content with textarea for backward compatibility
+                this.quill.on('text-change', () => {
+                    const html = this.quill.root.innerHTML;
+                    const text = this.quill.getText();
+                    this.inputContent.value = text;
+                    this.handleContentChange();
+                });
+
+                // Handle paste events to preserve formatting
+                this.quill.on('selection-change', (range) => {
+                    if (range) {
+                        this.quill.focus();
+                    }
+                });
+            }
+
             bindEvents() {
+                // URL fetch events
+                this.fetchUrlBtn.addEventListener('click', () => this.handleUrlFetch());
+                this.documentUrl.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.handleUrlFetch();
+                    }
+                });
+                
                 // File upload events
                 this.fileUpload.addEventListener('click', () => this.fileInput.click());
                 this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
@@ -2830,6 +4334,316 @@ ${portfolioItems}
                 }
             }
 
+            convertToExportUrl(url) {
+                // Convert Google Docs edit URLs to export URLs
+                if (url.includes('docs.google.com/document')) {
+                    // Extract document ID from various Google Docs URL formats
+                    const docIdMatch = url.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
+                    if (docIdMatch) {
+                        const docId = docIdMatch[1];
+                        // Convert to export URL for plain text
+                        const exportUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+                        this.showToast('🔄 Converting Google Docs URL to export format...', 'info');
+                        return exportUrl;
+                    }
+                }
+                
+                // Convert Google Sheets URLs
+                if (url.includes('docs.google.com/spreadsheets')) {
+                    const sheetIdMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+                    if (sheetIdMatch) {
+                        const sheetId = sheetIdMatch[1];
+                        const exportUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+                        this.showToast('🔄 Converting Google Sheets URL to export format...', 'info');
+                        return exportUrl;
+                    }
+                }
+                
+                // Handle Dropbox share URLs
+                if (url.includes('dropbox.com') && url.includes('?dl=0')) {
+                    const directUrl = url.replace('?dl=0', '?dl=1');
+                    this.showToast('🔄 Converting Dropbox URL to direct download...', 'info');
+                    return directUrl;
+                }
+                
+                // Handle OneDrive share URLs
+                if (url.includes('1drv.ms') || url.includes('onedrive.live.com')) {
+                    this.showToast('⚠️ OneDrive URLs may require manual conversion to direct download links', 'warning');
+                }
+                
+                return url;
+            }
+            
+            getDocumentName(url) {
+                // Extract meaningful document name from URL
+                if (url.includes('docs.google.com/document')) {
+                    return 'Google Doc';
+                }
+                if (url.includes('docs.google.com/spreadsheets')) {
+                    return 'Google Sheet';
+                }
+                if (url.includes('dropbox.com')) {
+                    const pathParts = url.split('/');
+                    return pathParts[pathParts.length - 1].split('?')[0] || 'Dropbox Document';
+                }
+                return url.split('/').pop() || 'Document from URL';
+            }
+            
+            getDocumentType(url) {
+                if (url.includes('docs.google.com/document')) {
+                    return 'Google Docs (Text Export)';
+                }
+                if (url.includes('docs.google.com/spreadsheets')) {
+                    return 'Google Sheets (CSV Export)';
+                }
+                if (url.includes('dropbox.com')) {
+                    return 'Dropbox Document';
+                }
+                if (url.includes('onedrive.live.com') || url.includes('1drv.ms')) {
+                    return 'OneDrive Document';
+                }
+                return 'URL Document';
+            }
+
+            async handleUrlFetch() {
+                let url = this.documentUrl.value.trim();
+                
+                if (!url) {
+                    this.showToast('❌ Please enter a document URL', 'error');
+                    return;
+                }
+                
+                // Validate URL format
+                try {
+                    new URL(url);
+                } catch (e) {
+                    this.showToast('❌ Please enter a valid URL', 'error');
+                    return;
+                }
+                
+                // Convert Google Docs URLs to export format
+                url = this.convertToExportUrl(url);
+                
+                // Disable fetch button and show loading
+                this.fetchUrlBtn.disabled = true;
+                this.fetchUrlBtn.textContent = 'Fetching...';
+                
+                try {
+                    // Show file info for URL
+                    this.fileName.textContent = this.getDocumentName(url);
+                    this.fileSize.textContent = 'Unknown';
+                    this.fileType.textContent = this.getDocumentType(url);
+                    this.fileStatus.textContent = 'Fetching from URL...';
+                    this.fileInfo.style.display = 'block';
+                    
+                    // Fetch the document content
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'text/plain,text/html,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    // Get content type to determine how to process
+                    const contentType = response.headers.get('content-type') || '';
+                    let content = '';
+                    
+                    if (contentType.includes('text/')) {
+                        content = await response.text();
+                    } else if (contentType.includes('application/pdf')) {
+                        this.showToast('📄 PDF files are not yet supported. Please convert to text or Word format.', 'warning');
+                        return;
+                    } else if (contentType.includes('application/vnd.openxmlformats-officedocument')) {
+                        // Handle Word document from URL
+                        const blob = await response.blob();
+                        const reader = new FileReader();
+                        
+                        reader.onload = (e) => {
+                            content = this.processWordContent(e.target.result);
+                            this.displayFetchedContent(content, url);
+                        };
+                        
+                        reader.onerror = () => {
+                            throw new Error('Error reading Word document from URL');
+                        };
+                        
+                        reader.readAsText(blob);
+                        return;
+                    } else {
+                        // Try to get as text anyway
+                        content = await response.text();
+                    }
+                    
+                    this.displayFetchedContent(content, url);
+                    
+                } catch (error) {
+                    console.error('URL fetch error:', error);
+                    this.fileStatus.textContent = 'Error fetching URL ❌';
+                    
+                    // Provide specific error guidance based on URL type
+                    let errorMessage = `❌ Error fetching URL: ${error.message}`;
+                    let guidance = '';
+                    
+                    if (url.includes('docs.google.com')) {
+                        guidance = '\n\n📋 Google Docs Help:\n• Make sure the document is public (Anyone with the link can view)\n• Share → Change to "Anyone with the link" → Viewer access';
+                    } else if (url.includes('dropbox.com')) {
+                        guidance = '\n\n📋 Dropbox Help:\n• Make sure the file is publicly shared\n• Use direct download links ending with ?dl=1';
+                    } else if (url.includes('onedrive.live.com') || url.includes('1drv.ms')) {
+                        guidance = '\n\n📋 OneDrive Help:\n• OneDrive requires manual conversion to direct download links\n• Consider using Google Docs or Dropbox instead';
+                    } else {
+                        guidance = '\n\n📋 Supported URLs:\n• Google Docs (public documents)\n• Dropbox (shared files)\n• Direct file links (.txt, .docx)\n• Public GitHub raw files';
+                    }
+                    
+                    this.showToast(errorMessage + guidance, 'error');
+                } finally {
+                    // Re-enable fetch button
+                    this.fetchUrlBtn.disabled = false;
+                    this.fetchUrlBtn.textContent = 'Fetch';
+                }
+            }
+            
+            displayFetchedContent(content, url) {
+                // Filter and extract only supported sections
+                const filteredContent = this.extractSupportedSections(content);
+                
+                if (filteredContent.sections.length > 0) {
+                    // Found supported sections
+                    this.fileStatus.textContent = `Found ${filteredContent.sections.length} supported sections ✅`;
+                    this.showToast(`🎯 Extracted ${filteredContent.sections.length} supported sections: ${filteredContent.sections.join(', ')}`, 'success');
+                    
+                    // Set the filtered content
+                    this.inputContent.value = filteredContent.content;
+                    if (this.quill) {
+                        this.quill.setText(filteredContent.content);
+                    }
+                } else if (content.includes('[') && content.includes(']')) {
+                    // Has sections but none are supported
+                    this.fileStatus.textContent = 'No supported sections found ⚠️';
+                    this.showToast('⚠️ Document contains sections, but none match our 15 supported types. Using full content.', 'warning');
+                    
+                    // Set original content
+                    this.inputContent.value = content;
+                    if (this.quill) {
+                        this.quill.setText(content);
+                    }
+                } else {
+                    // Plain text - might need some processing
+                    this.fileStatus.textContent = 'Plain text content fetched ✅';
+                    this.showToast('📝 Plain text fetched. Add section markers like [HERO]...[HERO END] to structure it.', 'info');
+                    
+                    // Set original content
+                    this.inputContent.value = content;
+                    if (this.quill) {
+                        this.quill.setText(content);
+                    }
+                }
+                
+                // Update file size with actual content length
+                this.fileSize.textContent = this.formatFileSize(new Blob([this.inputContent.value]).size);
+                
+                // Clear the URL input
+                this.documentUrl.value = '';
+                
+                // Trigger content change to update UI
+                this.handleContentChange();
+            }
+
+            extractSupportedSections(content) {
+                // List of all 16 supported sections
+                const supportedSections = [
+                    'HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 
+                    'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 
+                    'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 
+                    'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'
+                ];
+                
+                // Find all sections in the document with their positions
+                const sectionsFound = [];
+                
+                // First pass: Find all sections with explicit END markers
+                supportedSections.forEach(sectionType => {
+                    const sectionPattern = new RegExp(
+                        `\\[${sectionType}\\]([\\s\\S]*?)\\[${sectionType}\\s*END\\]`, 
+                        'gi'
+                    );
+                    
+                    if (sectionType === 'FEATURED_IN_SECTION') {
+                        console.log('FEATURED_IN_SECTION extraction debug:', {
+                            pattern: sectionPattern,
+                            contentSnippet: content.substring(0, 200)
+                        });
+                    }
+                    
+                    let match;
+                    while ((match = sectionPattern.exec(content)) !== null) {
+                        if (sectionType === 'FEATURED_IN') {
+                            console.log('FEATURED_IN section extracted:', match[0]);
+                        }
+                        sectionsFound.push({
+                            type: sectionType,
+                            content: match[0],
+                            startIndex: match.index,
+                            endIndex: match.index + match[0].length
+                        });
+                    }
+                });
+                
+                // Second pass: If no sections found with END markers, look for sections without END markers
+                if (sectionsFound.length === 0) {
+                    supportedSections.forEach(sectionType => {
+                        const simpleSectionPattern = new RegExp(
+                            `\\[${sectionType}\\]([\\s\\S]*?)(?=\\[\\w+\\]|$)`, 
+                            'gi'
+                        );
+                        
+                        let match;
+                        while ((match = simpleSectionPattern.exec(content)) !== null) {
+                            let sectionContent = match[0].trim();
+                            
+                            // Add END marker if missing
+                            if (!sectionContent.includes(`[${sectionType} END]`)) {
+                                sectionContent += `\n[${sectionType} END]`;
+                            }
+                            
+                            sectionsFound.push({
+                                type: sectionType,
+                                content: sectionContent,
+                                startIndex: match.index,
+                                endIndex: match.index + match[0].length
+                            });
+                        }
+                    });
+                }
+                
+                // Sort sections by their original position in the document (preserve order)
+                sectionsFound.sort((a, b) => a.startIndex - b.startIndex);
+                
+                // Build the filtered content maintaining original order
+                let filteredContent = '';
+                const foundSectionTypes = [];
+                
+                sectionsFound.forEach(section => {
+                    filteredContent += section.content + '\n\n';
+                    
+                    // Track found section types (avoid duplicates)
+                    if (!foundSectionTypes.includes(section.type)) {
+                        foundSectionTypes.push(section.type);
+                    }
+                });
+                
+                return {
+                    content: filteredContent.trim(),
+                    sections: foundSectionTypes,
+                    totalSections: foundSectionTypes.length,
+                    originalOrder: sectionsFound.map(s => s.type) // For debugging/testing
+                };
+            }
+
             handleFileSelect(e) {
                 const files = e.target.files;
                 if (files.length > 0) {
@@ -2855,14 +4669,48 @@ ${portfolioItems}
                     // Handle Word document content (continuous text)
                     if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
                         content = this.processWordContent(content);
-                        this.fileStatus.textContent = 'Word document processed ✅';
-                        this.showToast('📄 Word document processed successfully!', 'success');
-                    } else {
-                        this.fileStatus.textContent = 'Text file loaded ✅';
-                        this.showToast('📝 Text file loaded successfully!', 'success');
                     }
                     
-                    this.inputContent.value = content;
+                    // Filter and extract only supported sections
+                    const filteredContent = this.extractSupportedSections(content);
+                    
+                    if (filteredContent.sections.length > 0) {
+                        // Found supported sections
+                        this.fileStatus.textContent = `Found ${filteredContent.sections.length} supported sections ✅`;
+                        this.showToast(`🎯 Extracted ${filteredContent.sections.length} supported sections: ${filteredContent.sections.join(', ')}`, 'success');
+                        
+                        // Set the filtered content
+                        this.inputContent.value = filteredContent.content;
+                        if (this.quill) {
+                            this.quill.setText(filteredContent.content);
+                        }
+                    } else if (content.includes('[') && content.includes(']')) {
+                        // Has sections but none are supported
+                        this.fileStatus.textContent = 'No supported sections found ⚠️';
+                        this.showToast('⚠️ File contains sections, but none match our 15 supported types. Using full content.', 'warning');
+                        
+                        // Set original content
+                        this.inputContent.value = content;
+                        if (this.quill) {
+                            this.quill.setText(content);
+                        }
+                    } else {
+                        // Plain text - no sections detected
+                        if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+                            this.fileStatus.textContent = 'Word document processed (no sections) ✅';
+                            this.showToast('📄 Word document processed. Add section markers like [HERO]...[HERO END] to structure it.', 'info');
+                        } else {
+                            this.fileStatus.textContent = 'Text file loaded (no sections) ✅';
+                            this.showToast('📝 Text file loaded. Add section markers like [HERO]...[HERO END] to structure it.', 'info');
+                        }
+                        
+                        // Set original content
+                        this.inputContent.value = content;
+                        if (this.quill) {
+                            this.quill.setText(content);
+                        }
+                    }
+                    
                     this.handleContentChange();
                 };
                 reader.onerror = () => {
@@ -2931,7 +4779,18 @@ ${portfolioItems}
             }
 
             convertBoldMarkers(text) {
-                // Return text as-is, no bold conversion
+                if (!text) return text;
+                
+                // Convert **text** to <strong>text</strong>
+                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                
+                // Convert __text__ to <strong>text</strong> (alternative bold syntax)
+                text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+                
+                // Convert single *text* to <strong>text</strong> (if used for bold)
+                // Be careful to not convert * used as bullet points
+                text = text.replace(/(?<![*\s])\*([^*\s][^*]*[^*\s])\*(?![*])/g, '<strong>$1</strong>');
+                
                 return text;
             }
 
@@ -2976,7 +4835,7 @@ ${portfolioItems}
                 this.sectionTags.innerHTML = '';
                 
                 // Show all supported sections
-                const allSections = ['HERO', 'SERVICES_GRID', 'SERVICES_ACCORDION', 'FAQ', 'CTA_SIMPLE', 'CTA_TWO', 'PROCESS', 'TECHNOLOGY', 'INDUSTRIES', 'PORTFOLIO', 'TESTIMONIAL', 'BENEFITS', 'BENEFITS_TWO', 'CONTENT_FORM'];
+                const allSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
                 
                 allSections.forEach(section => {
                     const tag = document.createElement('span');
@@ -2997,8 +4856,69 @@ ${portfolioItems}
                 });
             }
 
+            convertHtmlToMarkedText(html) {
+                // Create a temporary div to parse HTML
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                
+                // Convert <b> and <strong> tags to ** markers
+                const strongs = temp.querySelectorAll('strong, b');
+                strongs.forEach(el => {
+                    const textContent = el.textContent;
+                    el.outerHTML = `**${textContent}**`;
+                });
+                
+                // Convert <em> and <i> tags to * markers
+                const ems = temp.querySelectorAll('em, i');
+                ems.forEach(el => {
+                    const textContent = el.textContent;
+                    el.outerHTML = `*${textContent}*`;
+                });
+                
+                // Convert <u> tags to __ markers
+                const underlines = temp.querySelectorAll('u');
+                underlines.forEach(el => {
+                    const textContent = el.textContent;
+                    el.outerHTML = `__${textContent}__`;
+                });
+                
+                // Convert <p> tags to line breaks and preserve content
+                const paragraphs = temp.querySelectorAll('p');
+                paragraphs.forEach(p => {
+                    p.outerHTML = p.innerHTML + '\n';
+                });
+                
+                // Convert <br> tags to line breaks
+                temp.innerHTML = temp.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+                
+                // Get the text content while preserving line breaks and section markers
+                let text = temp.textContent || temp.innerText;
+                
+                // Clean up any double markers that might occur
+                text = text.replace(/\*\*\*\*/g, '**');
+                text = text.replace(/____/g, '__');
+                
+                // Normalize line breaks
+                text = text.replace(/\n\s*\n/g, '\n\n');
+                
+                return text.trim();
+            }
+
             async processContent() {
-                const content = this.inputContent.value.trim();
+                // Get content from Quill editor or fallback to textarea
+                let content;
+                if (this.quill) {
+                    // Get HTML content from Quill to preserve formatting
+                    const html = this.quill.root.innerHTML;
+                    // Convert HTML to plain text with markers for processing
+                    content = this.convertHtmlToMarkedText(html);
+                    
+                    // Debug: Log the conversion process
+                    console.log('Original HTML:', html);
+                    console.log('Converted content:', content);
+                } else {
+                    content = this.inputContent.value.trim();
+                }
 
                 if (!content) {
                     this.showToast('Please provide content to process', 'error');
@@ -3037,6 +4957,9 @@ ${portfolioItems}
 
             clearAll() {
                 this.inputContent.value = '';
+                if (this.quill) {
+                    this.quill.setText('');
+                }
                 this.outputCode.value = '';
                 this.fileInfo.style.display = 'none';
                 this.detectedSections.style.display = 'none';

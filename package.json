@@ -1,0 +1,38 @@
+{
+  "name": "document-to-html-converter",
+  "version": "3.7.0",
+  "description": "AI-powered web IDE for converting structured documents with section markers into professional HTML sections",
+  "main": "web_ide_final.html",
+  "homepage": ".",
+  "scripts": {
+    "start": "npx http-server -p 9000",
+    "dev": "npx http-server -p 9000",
+    "server": "python3 server.py",
+    "test": "python3 docx_content_tool.py test_new_section_names.txt",
+    "build": "echo 'Static site - no build required'"
+  },
+  "keywords": [
+    "html-converter",
+    "document-processor",
+    "ai-parsing",
+    "web-ide",
+    "bootstrap",
+    "groq-api",
+    "section-parser"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/document-to-html-converter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/document-to-html-converter/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

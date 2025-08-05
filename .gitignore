@@ -23,6 +23,25 @@ server_8001.log
 .DS_Store
 Thumbs.db
 
+# Claude Code settings (exclude from public repo)
+.claude/
+
+# Test files (exclude from deployment)
+test_*.txt
+test_*.html
+debug_*.html
+qa_*.html
+*_test.txt
+*_test.html
+
+# Development files (exclude from deployment)
+server.py
+docx_content_tool.py
+run_ide.sh
+
+# Sample documents (exclude large files)
+*.docx
+
 # Output files (you may want to track some of these)
 *_output.html
 *_docx_output.html
@@ -36,3 +55,6 @@ debug_*.py
 # API Keys (if stored in files)
 .env
 config.json
+
+# Node modules
+node_modules/

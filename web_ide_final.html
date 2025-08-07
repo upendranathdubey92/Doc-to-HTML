@@ -2247,9 +2247,9 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     main_heading = nonEmptyLines[0];
                 }
                 
-                // Find client name and title - they are usually at the end before button
+                // Find client name and title - improved logic
                 let testimonialLines = [];
-                let clientInfoFound = false;
+                let clientInfoLines = [];
                 
                 for (let i = 1; i < nonEmptyLines.length; i++) {
                     const line = nonEmptyLines[i].trim();
@@ -2260,48 +2260,40 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         continue;
                     }
                     
-                    // Check if this line looks like a client title (CEO, Manager, etc.)
-                    if (line.match(/^(CEO|CTO|Manager|Director|Founder|President|VP|Head|Chief),?\s/i)) {
+                    // Check if line contains title keywords anywhere in the line
+                    if (line.match(/(CEO|CTO|Manager|Director|Founder|President|VP|Head|Chief|Lead|Senior|Principal|Owner|Executive)/i)) {
                         client_title = line;
-                        clientInfoFound = true;
+                        clientInfoLines.push(line);
                         continue;
                     }
                     
-                    // If we found client title, the previous non-testimonial line should be client name
-                    if (clientInfoFound && !client_name && i > 1) {
-                        // Look backwards for the client name
-                        for (let j = i - 1; j >= 1; j--) {
-                            const prevLine = nonEmptyLines[j].trim();
-                            if (!prevLine.match(/^(CEO|CTO|Manager|Director)/i) && 
-                                prevLine.length < 50 && 
-                                !testimonialLines.includes(prevLine)) {
-                                client_name = prevLine;
-                                break;
-                            }
-                        }
-                        continue;
-                    }
-                    
-                    // If no client info found yet and line is short, it might be client name
-                    if (!clientInfoFound && line.length < 50 && !line.match(/\.\s+/)) {
-                        // Check if next line is a title
-                        if (i + 1 < nonEmptyLines.length) {
-                            const nextLine = nonEmptyLines[i + 1].trim();
-                            if (nextLine.match(/^(CEO|CTO|Manager|Director|Founder|President|VP|Head|Chief),?\s/i)) {
-                                client_name = line;
-                                continue;
-                            }
+                    // Check if this is a short line that could be a client name (last 2-3 lines before button)
+                    const isNearEnd = (nonEmptyLines.length - i) <= 3;
+                    if (isNearEnd && line.length < 60 && !line.match(/[.!?]$/)) {
+                        // Could be client name or company
+                        if (!client_name && !line.match(/(the|our|we|your|this|that|and|or|but)/i)) {
+                            client_name = line;
+                            clientInfoLines.push(line);
+                            continue;
                         }
                     }
                     
                     // Otherwise, it's part of the testimonial
-                    if (!clientInfoFound || (clientInfoFound && client_name && client_title)) {
-                        // Don't add client info to testimonial
-                        if (line !== client_name && line !== client_title) {
-                            testimonialLines.push(line);
+                    testimonialLines.push(line);
+                }
+                
+                // If we didn't find client name but have title, look for name in previous lines
+                if (!client_name && client_title) {
+                    for (let i = nonEmptyLines.length - 1; i >= 1; i--) {
+                        const line = nonEmptyLines[i].trim();
+                        if (line !== client_title && line.length < 60 && !line.match(/[.!?]$/) && 
+                            !clientInfoLines.includes(line) && !line.match(/(View all|See More|Read More)/i)) {
+                            client_name = line;
+                            // Remove from testimonial if it was added
+                            const index = testimonialLines.indexOf(line);
+                            if (index > -1) testimonialLines.splice(index, 1);
+                            break;
                         }
-                    } else {
-                        testimonialLines.push(line);
                     }
                 }
                 
@@ -2309,9 +2301,9 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 
                 return {
                     main_heading: this.convertBoldMarkers(main_heading || "Client Testimonials"),
-                    testimonial_text: this.convertBoldMarkers(testimonial_text || "Great service!"),
-                    client_name: this.convertBoldMarkers(client_name || "Client Name"),
-                    client_title: this.convertBoldMarkers(client_title || "Client Title"),
+                    testimonial_text: this.convertBoldMarkers(testimonial_text || "Working with this team has been an exceptional experience. Their expertise and dedication to our project exceeded our expectations."),
+                    client_name: this.convertBoldMarkers(client_name || "John Smith"),
+                    client_title: this.convertBoldMarkers(client_title || "CEO, Tech Solutions Inc"),
                     button_text: button_text || "View all Testimonials"
                 };
             }

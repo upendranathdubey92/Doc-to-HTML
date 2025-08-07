@@ -256,9 +256,22 @@ page-content-update/
 ├── package.json                # Node.js dependencies
 ├── package-lock.json           # Dependency lock file
 ├── run_ide.sh                  # Server startup script
-├── test_new_section_names.txt  # Test file with new section names
-├── test_benefits_fixed.txt     # Test file for BENEFITS section
-└── Content File- Web Development Consulting.docx  # Sample document
+└── sections/                    # Extracted section generation functions
+  ├── faq/faq.js
+  ├── cta_simple/cta_simple.js
+  ├── cta_with_list/cta_with_list.js
+  ├── technology_stack/technology_stack.js
+  ├── industries_we_serve/industries_we_serve.js
+  ├── services_grid/services_grid.js
+  ├── services_accordion/services_accordion.js
+  ├── portfolio/portfolio.js
+  ├── testimonial/testimonial.js
+  ├── benefits/benefits.js
+  ├── benefits_two/benefits_two.js
+  ├── content_with_form/content_with_form.js
+  ├── process/process.js
+  ├── featured_in/featured_in.js
+  └── hero_banner/hero_banner.js
 ```
 
 ## Version History

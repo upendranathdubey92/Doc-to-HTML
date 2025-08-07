@@ -20,8 +20,8 @@
 
         .ide-container {
             display: grid;
-            grid-template-columns: 300px 1fr 1fr;
-            grid-template-rows: 60px 1fr 40px;
+            grid-template-columns: 300px 1fr 1fr 1fr;
+            grid-template-rows: 60px 1fr 0px;
             height: 100vh;
             gap: 1px;
             background: #333;
@@ -29,23 +29,32 @@
         }
 
         /* Responsive breakpoints */
-        @media (max-width: 1200px) {
+        @media (max-width: 1400px) {
             .ide-container {
                 grid-template-columns: 280px 1fr 1fr;
+                grid-template-rows: 60px 1fr 40px;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .ide-container {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 60px 1fr 1fr 40px;
             }
         }
 
         @media (max-width: 992px) {
             .ide-container {
                 grid-template-columns: 1fr;
-                grid-template-rows: 60px auto auto 40px;
+                grid-template-rows: 60px auto auto auto auto 40px;
                 height: auto;
                 min-height: 100vh;
             }
+        }
             
             .sidebar {
                 order: 1;
-                max-height: 300px;
+                max-height: 100vh;
                 overflow-y: auto;
             }
             
@@ -137,8 +146,9 @@
 
         .sidebar {
             background: #252526;
-            padding: 20px;
+            padding: 12px;
             overflow-y: auto;
+            font-size: 13px;
         }
 
         .input-panel {
@@ -159,18 +169,19 @@
 
         .panel-header {
             background: #2d2d30;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-bottom: 1px solid #3e3e42;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .panel-content {
             flex: 1;
-            padding: 15px;
+            padding: 8px;
             overflow-y: auto;
             overflow-x: hidden; /* Prevent horizontal overflow */
             min-width: 0; /* Allow content to shrink */
@@ -226,13 +237,13 @@
             background: #1e1e1e;
             border: 1px solid #3e3e42;
             border-radius: 4px;
-            padding: 15px;
+            padding: 12px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 13px;
             color: #d4d4d4;
             resize: none;
             outline: none;
-            line-height: 1.5;
+            line-height: 1.4;
             box-sizing: border-box; /* Include padding in width calculation */
             min-width: 0; /* Allow content to shrink */
             word-wrap: break-word; /* Break long words */
@@ -248,31 +259,43 @@
             height: 100%;
             background: #1e1e1e;
             border: none;
-            padding: 15px;
+            padding: 10px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 12px;
             color: #d4d4d4;
             resize: none;
             outline: none;
             white-space: pre-wrap; /* Allow wrapping for responsive design */
             overflow-wrap: break-word; /* Break long words */
             overflow-x: auto;
-            line-height: 1.4;
+            line-height: 1.3;
             box-sizing: border-box; /* Include padding in width calculation */
             min-width: 0; /* Allow content to shrink */
+        }
+
+        /* Ensure all panels have proper flex layout */
+        .output-panel, .input-panel, .sidebar {
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* Allow panels to shrink */
+        }
+
+        .output-panel .panel-content, .input-panel .panel-content {
+            flex: 1;
+            min-height: 0; /* Important for proper sizing */
         }
 
         .btn {
             background: #007acc;
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 8px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
             transition: all 0.3s ease;
-            margin: 5px 0;
+            margin: 3px 0;
             width: 100%;
         }
 
@@ -357,6 +380,7 @@
         }
 
         .status {
+            grid-column: 1 / -1;
             padding: 12px 15px;
             background: #2d2d30;
             font-size: 12px;
@@ -793,7 +817,7 @@
             </div>
         </div>
 
-        <div class="output-panel">
+        <div class="output-panel html-output">
             <div class="panel-header">
                 <span>💻 Generated HTML Code</span>
                 <div>
@@ -810,7 +834,24 @@
             </div>
         </div>
 
-        <div class="status">
+        <div class="output-panel css-output">
+            <div class="panel-header">
+                <span>🎨 Generated CSS Code</span>
+                <div>
+                    <button class="btn btn-secondary btn-small" id="copyCssBtn" disabled>📋 Copy CSS</button>
+                    <button class="btn btn-secondary btn-small" id="downloadCssBtn" disabled>💾 Download CSS</button>
+                </div>
+            </div>
+            <div class="panel-content">
+                <textarea 
+                    class="code-editor" 
+                    id="outputCss" 
+                    readonly 
+                    placeholder="Generated CSS code will appear here based on your HTML sections...&#10;&#10;CSS will be automatically generated when you create HTML sections!"></textarea>
+            </div>
+        </div>
+
+        <!-- <div class="status">
             <div class="status-item">
                 <span>🚀</span>
                 <span>Ready for Production</span>
@@ -818,7 +859,7 @@
             <div class="status-item">
                 <span id="statusText">Upload a Word document or paste content to get started</span>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <script>
@@ -4183,12 +4224,32 @@ ${portfolioItems}
                 // Content elements
                 this.inputContent = document.getElementById('inputContent');
                 this.outputCode = document.getElementById('outputCode');
+                this.outputCss = document.getElementById('outputCss');
+                
+                // Debug CSS elements
+                console.log('🎨 CSS textarea element:', this.outputCss);
+                console.log('🎨 CSS textarea found:', !!this.outputCss);
+                
+                // Check for missing elements and warn
+                const requiredElements = ['fileInfo', 'fileName', 'fileSize', 'fileType', 'fileStatus', 'statusText'];
+                requiredElements.forEach(elementName => {
+                    if (!this[elementName]) {
+                        console.warn(`⚠️ Element missing: ${elementName}`);
+                    }
+                });
                 
                 // Control buttons
                 this.processBtn = document.getElementById('processBtn');
                 this.clearBtn = document.getElementById('clearBtn');
                 this.copyBtn = document.getElementById('copyBtn');
                 this.downloadBtn = document.getElementById('downloadBtn');
+                this.copyCssBtn = document.getElementById('copyCssBtn');
+                this.downloadCssBtn = document.getElementById('downloadCssBtn');
+                
+                // Debug CSS buttons
+                console.log('🎨 CSS copy button:', this.copyCssBtn);
+                console.log('🎨 CSS download button:', this.downloadCssBtn);
+                console.log('🎨 CSS buttons found:', !!this.copyCssBtn && !!this.downloadCssBtn);
                 
                 // Status elements
                 this.statusText = document.getElementById('statusText');
@@ -4265,6 +4326,8 @@ ${portfolioItems}
                 this.clearBtn.addEventListener('click', () => this.clearAll());
                 this.copyBtn.addEventListener('click', () => this.copyCode());
                 this.downloadBtn.addEventListener('click', () => this.downloadCode());
+                this.copyCssBtn.addEventListener('click', () => this.copyCss());
+                this.downloadCssBtn.addEventListener('click', () => this.downloadCss());
                 this.aiConfigBtn.addEventListener('click', () => this.toggleAIConfig());
                 
                 // AI configuration events
@@ -4279,6 +4342,12 @@ ${portfolioItems}
                 
                 // Load saved settings
                 this.loadAISettings();
+                
+                // Initialize button states
+                this.copyBtn.disabled = true;
+                this.downloadBtn.disabled = true;
+                this.copyCssBtn.disabled = true;
+                this.downloadCssBtn.disabled = true;
             }
             
             loadAISettings() {
@@ -4421,12 +4490,12 @@ ${portfolioItems}
                 this.fetchUrlBtn.textContent = 'Fetching...';
                 
                 try {
-                    // Show file info for URL
-                    this.fileName.textContent = this.getDocumentName(url);
-                    this.fileSize.textContent = 'Unknown';
-                    this.fileType.textContent = this.getDocumentType(url);
-                    this.fileStatus.textContent = 'Fetching from URL...';
-                    this.fileInfo.style.display = 'block';
+                    // Show file info for URL (with null checks)
+                    if (this.fileName) this.fileName.textContent = this.getDocumentName(url);
+                    if (this.fileSize) this.fileSize.textContent = 'Unknown';
+                    if (this.fileType) this.fileType.textContent = this.getDocumentType(url);
+                    if (this.fileStatus) this.fileStatus.textContent = 'Fetching from URL...';
+                    if (this.fileInfo) this.fileInfo.style.display = 'block';
                     
                     // Fetch the document content
                     const response = await fetch(url, {
@@ -4475,7 +4544,7 @@ ${portfolioItems}
                     
                 } catch (error) {
                     console.error('URL fetch error:', error);
-                    this.fileStatus.textContent = 'Error fetching URL ❌';
+                    if (this.fileStatus) this.fileStatus.textContent = 'Error fetching URL ❌';
                     
                     // Provide specific error guidance based on URL type
                     let errorMessage = `❌ Error fetching URL: ${error.message}`;
@@ -4505,7 +4574,7 @@ ${portfolioItems}
                 
                 if (filteredContent.sections.length > 0) {
                     // Found supported sections
-                    this.fileStatus.textContent = `Found ${filteredContent.sections.length} supported sections ✅`;
+                    if (this.fileStatus) this.fileStatus.textContent = `Found ${filteredContent.sections.length} supported sections ✅`;
                     this.showToast(`🎯 Extracted ${filteredContent.sections.length} supported sections: ${filteredContent.sections.join(', ')}`, 'success');
                     
                     // Set the filtered content
@@ -4515,8 +4584,8 @@ ${portfolioItems}
                     }
                 } else if (content.includes('[') && content.includes(']')) {
                     // Has sections but none are supported
-                    this.fileStatus.textContent = 'No supported sections found ⚠️';
-                    this.showToast('⚠️ Document contains sections, but none match our 15 supported types. Using full content.', 'warning');
+                    if (this.fileStatus) this.fileStatus.textContent = 'No supported sections found ⚠️';
+                    this.showToast('⚠️ Document contains sections, but none match our 16 supported types. Using full content.', 'warning');
                     
                     // Set original content
                     this.inputContent.value = content;
@@ -4525,7 +4594,7 @@ ${portfolioItems}
                     }
                 } else {
                     // Plain text - might need some processing
-                    this.fileStatus.textContent = 'Plain text content fetched ✅';
+                    if (this.fileStatus) this.fileStatus.textContent = 'Plain text content fetched ✅';
                     this.showToast('📝 Plain text fetched. Add section markers like [HERO]...[HERO END] to structure it.', 'info');
                     
                     // Set original content
@@ -4546,19 +4615,17 @@ ${portfolioItems}
             }
 
             extractSupportedSections(content) {
-                // List of all 16 supported sections
-                const supportedSections = [
-                    'HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 
-                    'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 
-                    'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 
-                    'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'
-                ];
-                
                 // Find all sections in the document with their positions
                 const sectionsFound = [];
                 
+                // Safety check: ensure supportedSections is defined
+                if (!this.supportedSections || !Array.isArray(this.supportedSections)) {
+                    console.warn('⚠️ supportedSections not initialized, using default list');
+                    this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                }
+                
                 // First pass: Find all sections with explicit END markers
-                supportedSections.forEach(sectionType => {
+                this.supportedSections.forEach(sectionType => {
                     const sectionPattern = new RegExp(
                         `\\[${sectionType}\\]([\\s\\S]*?)\\[${sectionType}\\s*END\\]`, 
                         'gi'
@@ -4587,7 +4654,11 @@ ${portfolioItems}
                 
                 // Second pass: If no sections found with END markers, look for sections without END markers
                 if (sectionsFound.length === 0) {
-                    supportedSections.forEach(sectionType => {
+                    // Double-check supportedSections is still defined
+                    if (!this.supportedSections || !Array.isArray(this.supportedSections)) {
+                        this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                    }
+                    this.supportedSections.forEach(sectionType => {
                         const simpleSectionPattern = new RegExp(
                             `\\[${sectionType}\\]([\\s\\S]*?)(?=\\[\\w+\\]|$)`, 
                             'gi'
@@ -4805,14 +4876,14 @@ ${portfolioItems}
                     this.updateDetectedSections(detectedSections);
                     
                     if (detectedSections.length > 0) {
-                        this.statusText.innerHTML = `✅ Content ready - ${detectedSections.length} sections detected`;
+                        if (this.statusText) this.statusText.innerHTML = `✅ Content ready - ${detectedSections.length} sections detected`;
                     } else {
-                        this.statusText.innerHTML = '⚠️ No valid sections detected - check format';
+                        if (this.statusText) this.statusText.innerHTML = '⚠️ No valid sections detected - check format';
                     }
                 } else {
-                    this.detectedSections.style.display = 'none';
-                    this.statsPanel.style.display = 'none';
-                    this.statusText.textContent = 'Upload a Word document or paste content to get started';
+                    if (this.detectedSections) this.detectedSections.style.display = 'none';
+                    if (this.statsPanel) this.statsPanel.style.display = 'none';
+                    if (this.statusText) this.statusText.textContent = 'Upload a Word document or paste content to get started';
                 }
             }
 
@@ -4917,7 +4988,7 @@ ${portfolioItems}
                     return;
                 }
 
-                this.statusText.innerHTML = '<span class="loading"></span> Processing content with AI...';
+                if (this.statusText) this.statusText.innerHTML = '<span class="loading"></span> Processing content with AI...';
                 this.processBtn.disabled = true;
                 this.processIcon.textContent = '⏳';
 
@@ -4931,14 +5002,23 @@ ${portfolioItems}
                         this.copyBtn.disabled = false;
                         this.downloadBtn.disabled = false;
                         
-                        this.statusText.innerHTML = `<span class="success">✅</span> Generated ${result.sectionsGenerated.length} sections successfully`;
-                        this.showToast(`🎉 Successfully generated ${result.sectionsGenerated.length} HTML sections!`, 'success');
+                        // Generate CSS based on detected sections
+                        console.log('🎨 Detected sections for CSS:', result.detectedSections);
+                        this.generatedCss = generateCSS(result.detectedSections);
+                        console.log('🎨 Generated CSS length:', this.generatedCss.length);
+                        console.log('🎨 Generated CSS preview:', this.generatedCss.substring(0, 200));
+                        this.outputCss.value = this.generatedCss;
+                        this.copyCssBtn.disabled = false;
+                        this.downloadCssBtn.disabled = false;
+                        
+                        if (this.statusText) this.statusText.innerHTML = `<span class="success">✅</span> Generated ${result.sectionsGenerated.length} sections successfully`;
+                        this.showToast(`🎉 Successfully generated ${result.sectionsGenerated.length} HTML sections and CSS!`, 'success');
                     } else {
-                        this.statusText.innerHTML = `<span class="error">❌</span> Processing failed`;
+                        if (this.statusText) this.statusText.innerHTML = `<span class="error">❌</span> Processing failed`;
                         this.showToast(`❌ Error: ${result.error}`, 'error');
                     }
                 } catch (error) {
-                    this.statusText.innerHTML = `<span class="error">❌</span> Processing failed`;
+                    if (this.statusText) this.statusText.innerHTML = `<span class="error">❌</span> Processing failed`;
                     this.showToast(`❌ Error: ${error.message}`, 'error');
                 } finally {
                     this.processBtn.disabled = false;
@@ -4952,19 +5032,22 @@ ${portfolioItems}
                 if (this.quill) {
                     this.quill.setText('');
                 }
-                this.outputCode.value = '';
-                this.fileInfo.style.display = 'none';
-                this.detectedSections.style.display = 'none';
-                this.statsPanel.style.display = 'none';
+                if (this.outputCode) this.outputCode.value = '';
+                if (this.outputCss) this.outputCss.value = '';
+                if (this.fileInfo) this.fileInfo.style.display = 'none';
+                if (this.detectedSections) this.detectedSections.style.display = 'none';
+                if (this.statsPanel) this.statsPanel.style.display = 'none';
                 this.currentFile = null;
                 this.generatedCode = '';
+                this.generatedCss = '';
                 this.fileInput.value = '';
-                
                 this.processBtn.disabled = true;
                 this.copyBtn.disabled = true;
                 this.downloadBtn.disabled = true;
+                this.copyCssBtn.disabled = true;
+                this.downloadCssBtn.disabled = true;
                 
-                this.statusText.textContent = 'Upload a Word document or paste content to get started';
+                if (this.statusText) this.statusText.textContent = 'Upload a Word document or paste content to get started';
                 this.showToast('🗑️ All content cleared', 'success');
             }
 
@@ -4999,6 +5082,37 @@ ${portfolioItems}
                 this.showToast(`💾 HTML file downloaded: ${filename}`, 'success');
             }
 
+            copyCss() {
+                if (!this.generatedCss) return;
+                
+                navigator.clipboard.writeText(this.generatedCss).then(() => {
+                    this.showToast('📋 CSS copied to clipboard!', 'success');
+                }).catch(() => {
+                    this.outputCss.select();
+                    document.execCommand('copy');
+                    this.showToast('📋 CSS copied to clipboard!', 'success');
+                });
+            }
+
+            downloadCss() {
+                if (!this.generatedCss) return;
+                
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                const filename = `generated-styles-${timestamp}.css`;
+                
+                const blob = new Blob([this.generatedCss], { type: 'text/css' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showToast(`💾 CSS file downloaded: ${filename}`, 'success');
+            }
+
             showToast(message, type = 'info') {
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
@@ -5008,6 +5122,565 @@ ${portfolioItems}
                 setTimeout(() => {
                     toast.remove();
                 }, 4000);
+            }
+        }
+
+        // CSS Data for Different Sections
+        const sectionCssMap = {
+            'HERO_BANNER_SECTION': `
+/********* HERO_BANNER_SECTION CSS **********/
+.rating-section a:not(.rating-section a:last-child){ padding-right: 30px; margin-right: 30px; border-right: solid 1px var(--bg-color-8);}
+@media screen and (max-width: 1440px) {
+.banner-text h1 { font-size: 35px; line-height: 1.5; }
+}
+@media screen and (max-width: 1199px) {
+.banner-text h1 {font-size: 30px;}
+}
+@media screen and (max-width:991px) {
+.banner-img img { margin-top: 25px; }
+}
+@media screen and (max-width:767px) {
+.banner-text h1 { font-size: 28px;}
+}
+@media screen and (max-width:575px) {
+.banner-text h1 { font-size: 26px;}
+.rating-section a:not(.rating-section a:last-child) { padding-right: 20px; margin-right: 20px;}
+}
+@media screen and (max-width:360px) {
+.banner-text h1 { font-size: 24px;}
+}
+
+.text-form-section .form-control,
+.text-form-section input[type=email],
+.text-form-section input[type=number],
+.text-form-section input[type=text],
+.text-form-section textarea { color: var(--gray3); border: 1px solid var(--gray2); border-radius: 5px; height: 50px; padding: 4px 12px; margin-bottom: 5px;}
+.text-form-section textarea.form-control { height: 95px !important}
+.text-form-section .homen_form {padding: 34px; background: var(--white);}
+.text-form-section .homen_form .fonts-24 { padding: 0px 0px 15px; display:block;}
+.text-form-section .homen_form .footer_form { padding: 0px;}
+.text-form-section .homen_form input#submit {  width: 100%;}
+.text-form-section .footer_form .error { font-size: 14px !important }
+.text-form-section a { color: #96b744;}
+
+@media (max-width: 1440px){
+.text-form-section .homen_form {padding: 24px;}
+.text-form-section .homen_form .fonts-24{ padding: 0px 0px 10px; }
+}
+
+@media (max-width: 1299px){
+.text-form-section .vcenter-parent {  align-items: flex-start;}
+}
+@media (max-width: 991px){
+.text-form-section .homen_form { margin-top: 30px; padding: 20px;}
+.text-form-section .homen_form::before{ top: 15px; }
+}
+@media (max-width: 767px){
+.text-form-section .homen_form .fonts-24{font-size: 20px;}
+.text-form-section p{font-size: 16px;}
+}
+
+.rank-math-breadcrumb a { color: #E23C3C; font-size:16px !important;}
+.rank-math-breadcrumb span{ font-size:16px !important;}
+@media screen and (max-width:1440px){
+.rank-math-breadcrumb a { font-size:14px!important;}
+.rank-math-breadcrumb span{ font-size:14px !important;}
+}
+
+.client-logo {display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;}
+.client-title { color: var(--black); font-size: 16px;}
+
+@media screen and (max-width:991px) {
+.client-title { text-align: center;}
+.client-logo img { margin: 10px 13px; max-width: 100px;}
+}
+/********* HERO_BANNER_SECTION CSS END **********/`,
+
+            'SERVICES_GRID_SECTION': `
+/********* SERVICES_GRID_SECTION CSS **********/
+.services-section .col-lg-4 { margin: 0 0 30px 0; display: flex;}
+.services-section .mad_service_box { width: 100%; transition: all .2s ease-in-out; padding: 25px; border-radius: 12px; background: var(--white); box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12);}
+.services-section .mad_service_box:hover { box-shadow: 0 15px 15px rgba(0, 0, 0, .25);}
+.services-section .mad_service_box img { margin: 0 0 22px;}
+.services-section .mad_service_box h3 {line-height: 28px; margin: 0 0 6px 0;}
+.services-section .mad_service_box p { font-size: 14px; line-height: 24px;}
+
+.services-section .experts_service_box { width: 100%; transition: all .2s ease-in-out; padding: 0px; border-radius: 12px;overflow: hidden; background: var(--white); box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12); height: 100%;}
+.services-section .experts_service_box:hover { box-shadow: 0 15px 15px rgba(0, 0, 0, .25);}
+.services-section .experts_service_box img {width: 100%;}
+.services-section .experts_service_box .experts_details {padding: 25px}
+.services-section .experts_service_box .experts_details h3 {line-height: 28px; margin:0;}
+.services-section .experts_service_box .experts_details .experts_position p { font-size: 14px; line-height: 24px; margin-bottom: 12px;}
+.services-section .experts_service_box .experts_details .experts_bio p { font-size: 14px; line-height: 24px;}
+
+.mad_service_box ul.bullet{ margin-bottom:0px; }
+.mad_service_box ul.bullet li { padding-left: 16px; padding-bottom: 5px;}
+.mad_service_box ul.bullet li:before { left: 0; top: 8px; background: var(--black);}
+
+.services-section.practices-we-follow .mad_service_box{position: relative; padding-left: 65px;}
+.services-section.practices-we-follow .mad_service_box::after {content: ""; position: absolute; margin: auto; top: 25px; left: 25px; background: url(https://test.spaceotechnologies.com/wp-content/uploads/2024/01/arrow-ne.svg); width: 24px; height: 24px;}
+.services-section.globle-clients .col-lg-3{  margin: 0 0 30px 0; display: flex; }
+
+@media screen and (max-width:991px) {
+.services-section .col-lg-4:last-child { margin: 0 auto 15px;}
+.services-section .col-lg-3{ margin-bottom: 30px;}
+}
+@media screen and (max-width:767px) {
+.services-section .col-lg-4{ margin-bottom: 20px;}
+.services-section .mad_service_box h3{font-size: 18px;}
+}
+/********* SERVICES_GRID_SECTION CSS END **********/`,
+
+            'SERVICES_ACCORDION_SECTION': `
+/********* SERVICES_ACCORDION_SECTION **********/
+.services-tab-new #accordion .card-body{padding-top: 25px;}
+.services-tab-new #accordion .left-icons { margin-right: 12px; position: absolute; left: 0;  margin: auto; top: 0; bottom: 0;}
+.services-tab-new #accordion>.card{ border:none; background: #fff; margin-bottom: 20px; padding: 20px; border-radius: 5px;}
+.services-tab-new #accordion .card .card-link{ font-size:18px; font-weight: 500 !important; padding-left: 50px;}
+.services-tab-new #accordion .card .card-link:after, .services-tab-new #accordion .card .card-link:before{ transform: rotate(0deg); height: 11px; width: 19px; right: 10px; top: 10px; background: url(https://test.spaceotechnologies.com/wp-content/uploads/2023/05/arrow-point-to-right.svg) no-repeat;}
+.services-tab-new #accordion .card .card-link:after{ display:none; }
+.services-tab-new #accordion .card .active .card-link:before{ transform: rotate(180deg); }
+.services-tab-new #accordion .card-body p{ font-size:14px; margin-bottom:10px;  }
+.services-tab-new .bullet li{ padding-left:20px }
+.services-tab-new .bullet li:before{ height: 5px; width: 5px; left: 0px; background:#000; top:8px}
+
+@media screen and (max-width:1200px){
+.services-tab-new #accordion .card .card-link{ font-size:16px; }
+.services-tab-new .left-img { text-align: center;margin: 0 0 20px 0;}
+}
+
+@media screen and (max-width:767px){
+.left-img{margin-bottom: 20px;}
+}
+/********* SERVICES_ACCORDION_SECTION END **********/`,
+
+            'CTA_SIMPLE_SECTION': `
+/********* CTA_SIMPLE_SECTION & CTA_WITH_LIST_SECTION **********/
+.cta-inner { border-radius: 24px; padding: 54px; position: relative; background: #EAF3FF url(/wp-content/uploads/2023/08/cta-bg-circle.png) no-repeat; background-size: cover;}
+.cta-inner .cta-title{line-height: 1.45}
+.hire-new-cta .cta-inner { background: #EAF3FF url(https://test.spaceotechnologies.com/wp-content/uploads/2024/01/hire-cta-bg.jpg) no-repeat; background-size: cover; background-position: center;}
+
+@media screen and (max-width:1440px) {
+.cta-inner:before { width: 100%;}
+}
+@media screen and (max-width:1024px) {
+.cta-inner { padding: 30px;}
+}
+@media screen and (max-width:991px) {
+.cta-inner { text-align: center;}
+.cta-inner .text-right { text-align: center !important; margin-top: 18px;}
+.hire-new-cta .cta-inner{ background:#EAF3FF; }
+}
+@media screen and (max-width:360px) {
+.new-cta-section .btn { font-size: 14px;}
+}
+/********* CTA_SIMPLE_SECTION END **********/`,
+
+            'CTA_WITH_LIST_SECTION': `
+/********* CTA_SIMPLE_SECTION & CTA_WITH_LIST_SECTION **********/
+.cta-inner { border-radius: 24px; padding: 54px; position: relative; background: #EAF3FF url(/wp-content/uploads/2023/08/cta-bg-circle.png) no-repeat; background-size: cover;}
+.cta-inner .cta-title{line-height: 1.45}
+.hire-new-cta .cta-inner { background: #EAF3FF url(https://test.spaceotechnologies.com/wp-content/uploads/2024/01/hire-cta-bg.jpg) no-repeat; background-size: cover; background-position: center;}
+
+.new-button-group .new-button-group-inner {
+    text-align: center;
+    font-size: 16px;
+    margin: 15px 0;
+    position: relative;
+    width: 100%;
+    border-right: solid 1px #EAEBED;
+}
+.new-button-group .new-button-group-inner strong{
+    font-size: 24px;
+    display: block;
+}
+.new-button-group .new-button-group-inner:last-child{
+    border: none;
+}
+
+@media screen and (max-width:1440px) {
+.cta-inner:before { width: 100%;}
+}
+@media screen and (max-width:1200px) {
+.hire-new-cta .mxw-650{max-width: 500px;}   
+}
+@media screen and (max-width:1024px) {
+.cta-inner { padding: 30px;}
+}
+@media screen and (max-width:991px) {
+.cta-inner { text-align: center;}
+.cta-inner .text-right { text-align: center !important; margin-top: 18px;}
+.hire-new-cta .cta-inner{ background:#EAF3FF; }
+}
+@media screen and (max-width:360px) {
+.new-cta-section .btn { font-size: 14px;}
+}
+/********* CTA_WITH_LIST_SECTION END **********/`,
+
+            'PORTFOLIO_SECTION': `
+/**** PORTFOLIO_SECTION ****/
+.our-work .slider_projects { padding: 35px 0; margin: 10px 0 50px; display: inline-block; position: relative; }
+.our-work .slider_projects::before { position: absolute; margin: auto; top: 0; bottom: 0px; content: ""; width: 70%; background: #FFFFFF; border-radius: 20px;}
+.our-work .slider_projects.order-2::before { right: 0}
+.our-work .slider_projects.order-2 .row { flex-direction: row-reverse;}
+.our-work .slider_projects:last-child{ margin-bottom:0px; }
+.our-work .slider-app-name { display: flex; align-items: center; padding: 10px 10px 10px 10px; }
+.our-work .slider_projects .project-img { border-radius: 30px; width: 100%;}
+.our-work .slider_projects .left_text{ padding-left:35px;}
+.our-work .slider_projects.order-2 .left_text{ padding-right: 35px; padding-left:0 }
+.our-work .slider_projects .left_text img { max-width: 120px; margin: 0 20px 0 0; border-radius: 35px; box-shadow: 0 0 10px rgba(0,0,0,.3);}
+.our-work .slider_projects .left_text>p { padding-left: 10px;}
+.our-work .slider_projects .left_text .portfolio_points { list-style: disc; margin-left: 30px;}
+.our-work .slider_projects .left_text .portfolio_points li { line-height: 26px;}
+
+.slider_projects.bg-01::before { background: #FBEFF0;}
+.slider_projects.bg-02::before { background: #f5f1ff;}
+.slider_projects.bg-03::before { background: rgba(75 133 217 / 9%);}
+.slider_projects.bg-04::before { background: #edfcff;}
+
+.owl-dots { margin-top: 60px;}
+.owl-dots span { height: 12px; width: 12px; border-radius: 50%;}
+.owl-nav.disabled { display: block !important;}
+.owl-nav .owl-next, .owl-nav .owl-prev { display: inline-block; width: 50px; height: 50px; position: absolute; font-size: 0; text-align: center; background-color: #fff !important; border-radius: 50%; pointer-events: auto; left: -26px; border: solid 1px #f4f4f4!important; transform: translateY(-45%); top: 45%; bottom: auto; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+.owl-nav button.owl-next { left: auto; right: -30px;}
+.owl-nav .owl-next::after, .owl-nav .owl-prev::after { content: ''; position: absolute; left: 0; top: 0; background: url(https://test.spaceotechnologies.com/wp-content/uploads/2022/12/arrow-left.svg) no-repeat center center; height: 100%; width: 100% }
+.owl-nav .owl-next::after { transform: scaleX(-1) }
+.owl-nav button.owl-next:hover, .owl-nav button.owl-prev:hover { border-color: var(--secoundy-color)!important }
+.owl-nav button.owl-next:hover::after, .owl-nav button.owl-prev:hover::after { filter: brightness(0) saturate(100%) invert(44%) sepia(14%) saturate(3368%) hue-rotate(317deg) brightness(113%) contrast(124%) }
+
+@media screen and (max-width:1440px){
+.our-work .slider_projects .left_text img{ width:100px; height:100px;}
+}
+
+@media screen and (max-width:991px){
+.slider_projects .row, .our-work .slider_projects.order-2 .row { flex-direction: column-reverse;}
+.our-work .slider_projects{padding: 0; margin-bottom: 30px}
+.our-work .slider_projects::before { height: 100%; width: 100%;}
+.our-work .slider_projects .left_text{padding: 0}
+.our-work .slider_projects .project-img{padding: 0px 10px;}
+.our-work .slider_projects .project-img{margin: 20px 0 0 0;}
+.owl-dots { margin-top: 20px; }
+.owl-nav .owl-next, .owl-nav .owl-prev{transform: translateY(50%); top: 50%;}
+}
+
+@media screen and (max-width:767px){
+.our-work .slider-app-name{ padding:0px 0px 10px;}
+.our-work .slider_projects .left_text { padding: 15px;}
+.our-work .slider_projects .left_text>p{padding:0px;}
+.our-work .slider_projects .left_text img{ margin: 0 0 10px;}
+.our-work .slider_projects .left_text .portfolio_points{margin-left: 15px}
+.our-work .slider-app-name{ flex-direction: column; align-items: baseline;}
+
+.owl-dots { margin-top: 10px; }
+.owl-nav .owl-next, .owl-nav .owl-prev{transform: translateY(50%); top: 50%;}
+}
+
+@media screen and (max-width:640px){
+.owl-nav .owl-next, .owl-nav .owl-prev{display:none !important;}
+}
+/**** PORTFOLIO_SECTION END ****/`,
+
+            'FEATURED_IN_SECTION': `
+/***** FEATURED_IN_SECTION *****/
+.featured-in h2{margin-bottom: 34px;}
+.featured-in .brand-listing { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;}
+.featured-in .brand-listing .brand-img { width: 16.66%;}
+
+@media screen and (max-width:991px){
+.featured-in .brand-listing .brand-img { width: 33.33%; margin: 10px 0; text-align: center;}
+}
+
+@media screen and (max-width:767px){
+.featured-in .brand-listing .brand-img { width: 50%;}
+}
+/***** FEATURED_IN_SECTION END *****/`,
+
+            'TECHNOLOGY_STACK_SECTION': `
+/******* TECHNOLOGY_STACK_SECTION ********/
+.technology-name { font-weight: 500;}
+.technology-icon-wrapper { display: flex; flex-wrap: wrap; margin-bottom:0;}
+.technology-icon-wrapper li { background: var(--white); border-radius: 30px; padding: 0px 16px; height:40px;  margin: 0 5px 15px 5px; font-size: 16px; display: flex; align-items: center; box-shadow: 0px 5px 14px rgb(129 141 160 / 11%);}
+.technology-icon-wrapper li>img{ margin-right:10px; }
+.technology-stack .technology-inner .row{  border-bottom: 1px solid #e9eef2; margin:0 0px 30px; padding-bottom: 15px; }
+.technology-stack .technology-inner .row .col-md-2{padding-left:0px;}
+.technology-stack .technology-inner .row:last-child {  border-bottom: none; margin-bottom:0px; padding-bottom: 0px; }
+
+@media screen and (max-width:1199px){
+.technology-icon-wrapper li { font-size: 14px;}
+}
+
+@media screen and (max-width:767px){
+.technology-name{margin-bottom: 10px;}
+.technology-icon-wrapper li{ margin: 8px 10px 8px 0px;}
+.technology-stack .technology-inner .row:not(.technology-stack .technology-inner .row:last-child){margin-bottom: 20px;}
+.technology-stack .technology-inner .row .col-md-10{padding-left:0px;}
+}
+/******* TECHNOLOGY_STACK_SECTION END ********/`,
+
+            'TESTIMONIAL_SECTION': `
+/******* TESTIMONIAL_SECTION ********/
+.blog-testimonial h3 { text-align: center; font-size: 32px; margin-bottom: 40px}
+.blog-testimonial .users-feedback { background: 0 0; padding: 18px 0 0; display: block; margin-bottom: 0; text-decoration: none; border-bottom: none; color: #1b1c1e; padding-top: 0;}
+.blog-testimonial .customer-feedback { position: relative; justify-content: space-between;}
+.blog-testimonial .customer-feedback p em { position: absolute; left: 0; top: -5px;}
+.blog-testimonial .customer-feedback .description {font-size: 20px; line-height: 34px; color: #1b1c1e; position: relative; z-index: 1; padding-top: 30px;}
+.blog-testimonial .customer-feedback .description::after { position: absolute; margin: auto; left: 0; top: 0px; background-image: url(/wp-content/uploads/2023/06/Quets.svg); background-repeat: no-repeat; width: 80px; height: 67px; content: ""; z-index: -1;}
+.blog-testimonial .users-feed-ibox { padding-top: 30px;}
+.blog-testimonial .userfedd-img-box { width: 70px; height: 58px; padding-right: 10px; margin-right: 10px; border-right: 1px solid #c5c5c5;}
+.blog-testimonial .userfedd-detbox { padding-bottom: 5px;}
+.blog-testimonial .userfedd-detbox p { line-height: 1;}
+.blog-testimonial .userfedd-detbox .user-name { color: #1b1c1e; font-size: 20px; line-height: 26px; font-weight: 500; margin-bottom: 0; padding-right: 15px;}
+.blog-testimonial .userfedd-detbox span { display: block; color: #1b1c1e; font-size: 16px; line-height: 18px; font-weight: 400; padding-top: 5px;}
+
+.blog-testimonial .owl-carousel .owl-item img { width: auto; display: inline-block;}
+
+@media screen and (max-width:1199px){
+.blog-testimonial .userfedd-detbox .user-name{ font-size: 18px; line-height: 28px;}
+.blog-testimonial .userfedd-detbox span{ font-size: 15px;}
+}
+@media screen and (max-width:767px){
+.blog-testimonial .customer-feedback .description{ font-size: 18px; line-height: 30px; padding-top: 20px;}
+.blog-testimonial .userfedd-detbox .user-name{ font-size: 16px;}
+.blog-testimonial .userfedd-detbox span{ font-size: 13px;}
+.blog-testimonial .right-img{ text-align: center !important; padding-top: 40px;}
+.blog-testimonial .customer-feedback .description::after { width: 60px; height: 50px; background-size: 100%;}
+}
+@media screen and (max-width:350px){
+.blog-testimonial .userfedd-img-box{ width: 50px; height: 40px; }
+.blog-testimonial .userfedd-detbox .user-name{ font-size: 14px; line-height: 1;}
+}
+/******* TESTIMONIAL_SECTION END ********/`,
+
+            'INDUSTRIES_WE_SERVE_SECTION': `
+/******* INDUSTRIES_WE_SERVE_SECTION ******/
+.industries-desc { border-radius: 16px; background: var(--bg-color-9); padding: 34px; min-height: calc(100% - 24px); display: flex; flex-direction: column; justify-content: center;}
+.services-section .industries-box p{font-size: 14px;   line-height: 24px;}
+.industries-box:hover::before { transform: rotate(0deg);}
+.industries-box:hover h3 a { color: var(--red-color);}
+.industries-box { padding: 24px 12px; border-radius: 12px; border: 1px solid #EAF3FF; background: var(--white); margin: 0 0 24px 0; transition: all .2s ease-in-out; height: calc(100% - 25px);
+color: var(--black); position: relative; cursor: pointer; box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.06);}
+.industries-box.no-url {  cursor: default;}
+.industries-box.no-url::before {display: none;}
+.industries-box h3 {  margin: 0 0 10px 0;}                              
+.industries-box:hover { box-shadow: 0 5px 15px rgba(0, 0, 0, .25);}
+.industries-box img{margin-bottom: 12px;}
+
+@media (min-width: 992px) and (max-width: 1080px){
+.industries-box p { font-size: 13px;}
+}
+
+@media screen and (max-width:991px){
+.industries-desc{padding:30px; text-align: center;}
+.industries-category { margin: 30px 0 0 0;}
+}
+/******* INDUSTRIES_WE_SERVE_SECTION END ******/`,
+
+            'PROCESS_SECTION': `
+/***** PROCESS_SECTION Start *****/
+.process-sec .row {  justify-content: normal; align-items: normal; align-content: stretch;}
+.process-sec .row .col-lg-4 { flex-shrink: 1; flex-basis: auto; align-self: auto; flex-grow: 0; }
+.process-sec .instalikeapp { position: relative; z-index: 1; background: var(--white); margin-top: 0; margin-bottom: 30px; padding: 25px; box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.06); border-radius: 10px; height: calc(100% - 30px);}
+.process-sec .instalikeapp .number {font-size: 55px;color:#d5dae1;font-weight: 700; line-height: 1; }
+.process-sec ul.bullet li:before {  left: 0; background: #000000;}
+.process-sec ul.bullet li{padding-left: 20px;padding-bottom: 5px;}
+
+@media (max-width: 1024px) {
+.process-sec .instalikeapp{padding: 15px;}
+.process-sec .instalikeapp .number{font-size: 40px;}
+}
+
+@media (max-width: 767px) {
+.process-sec .instalikeapp .number{font-size: 30px; margin-bottom: 0;}
+.process-sec .instalikeapp{margin-bottom: 20px; height: calc(100% - 20px);}
+}
+/***** PROCESS_SECTION END *****/`,
+
+            'COMMON': `
+/********* Add This CSS Before Banner  **********/
+ul.tags-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+ul.tags-list li {
+    background: #F4F4F4;
+    padding: 5px 15px;
+    border-radius: 35px;
+    font-size: 14px;
+}
+.new-button-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+        flex-wrap: wrap;
+}
+.new-button-group .new-button-group-inner {
+    text-align: center;
+    font-size: 16px;
+    margin: 15px 0;
+    position: relative;
+    width: 25%;
+    border-right: solid 1px #EAEBED;
+}
+.new-button-group .new-button-group-inner strong{
+    font-size: 24px;
+    display: block;
+}
+.new-button-group .new-button-group-inner:last-child{
+    border: none;
+}
+@media screen and (max-width:991px){
+    .new-button-group .new-button-group-inner {
+        width: 50%;
+        border-right: solid 1px #EAEBED;
+    }
+    .new-button-group .new-button-group-inner:nth-child(2){
+        border: none;
+    }
+}
+@media screen and (max-width:560px){
+    .new-button-group .new-button-group-inner {
+                width: 100%;
+        border: solid 1px #EAEBED !important;
+        padding: 15px;
+        margin: 5px;
+    }
+}
+.two-btn-group{
+    display: flex;
+    gap:10px;
+}
+.btn.btn-pop.white-btn{
+    background: transparent !important;
+    border:solid 1px #6C757D !important;
+    color: #6C757D !important;
+}
+
+.mxw-650{max-width: 650px; margin: 0 auto;}
+.bg-color { background: var(--bg-color-9);}
+.loader{width: auto; text-align: right; float: right;display:none;}
+.loader img{ width:30px;}
+.font-weight-bold { font-weight: 600 !important;}
+
+.right-desc-box[onclick], .industries-box[onclick], .mad_service_box[onclick] { cursor: pointer;}
+.right-desc-box[onclick]:hover, .industries-box[onclick]:hover, .mad_service_box[onclick]:hover  { box-shadow: 0 5px 15px rgba(0, 0, 0, .25);}
+.right-desc-box[onclick]:hover a, .industries-box[onclick]:hover a, .mad_service_box[onclick]:hover a { color: var(--red-color) !important;}
+.keep-reading {text-align: left;position: relative;margin: 18px 0 0 0;}
+.btn__label-wrapper{ padding: 0 10px 0 0;font-size: 14px;color: #fc5454;font-weight: 500;background-image: linear-gradient(180deg,transparent 97%,#fc5454 0%);
+background-size: 97% 100%;background-repeat: no-repeat;transition: background-size .4s ease; }
+.blog-testimonial .btn__label-wrapper{ font-size: 16px; }
+.btn-link-arrow{position: relative;}
+.btn-link-arrow:hover .btn__label-wrapper {color: #000;text-decoration: none;background-size: 0% 100%;}
+.btn-link-arrow:after {color: #005eb8;content: "";background: url(/wp-content/uploads/2023/11/arrow-right.svg) no-repeat;display: inline-block;height: 20px;position: absolute;
+top: 6px;width: 20px;right: auto;background-size: 75%;filter: hue-rotate(495deg) saturate(2);}
+.btn-link-arrow-right:hover.btn-link-arrow:after {animation: slide-left 1s ease-in-out .5s infinite;}
+.blog-div-descriptoin {min-height: 110px;}
+
+@keyframes slide-left {
+    0%,to { transform: translate(0);}
+    50% { transform: translate(-5px);}
+}
+.customer-feedback .read_more { margin: 30px 0 0 0;}
+.customer-feedback .read_more img { margin: 0 0 0 5px; width: 15px; filter: hue-rotate(495deg) saturate(2); display: inline-block;}
+.customer-feedback .read_more:hover img { animation: slide-left 1s ease-in-out .5s infinite;}
+.customer-feedback .read_more a { text-transform: capitalize; margin: 30px 0 0 0; font-size: 16px; color: #fc5454; font-weight: 500; position: relative; text-decoration: none;
+text-decoration-color: #000; background-image: linear-gradient(180deg,transparent 93%,#fc5454 0%); background-size: 88% 100%; background-repeat: no-repeat;transition: background-size .4s ease;}
+.customer-feedback .read_more a:hover { color: #000; text-decoration: none; background-size: 0% 100%;}
+
+/********************** Why Choose Box Section **********************/
+.why-chosse-section h2 {margin:0 0 15px 0;}
+.why-choose-box {display: flex;flex-wrap: wrap;flex-direction: column;align-items: center;width: 100%; background: var(--white);margin: 0;padding: 12px;border-radius: 12px;
+border: 1px solid #EAF3FF;box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.28);}
+.why-choose-box h3 {margin: 10px 0 5px;}
+.why-choose-box p.fonts-20 {margin: 10px 0 5px;}
+
+@media screen and (max-width: 1400px) {
+.why-choose-box-main {max-width: 100%;bottom: 20px;}
+.why-chosse-section h2 {margin-top: 0}
+.why-chosse-section .mt-4 {margin-top: 0.75rem !important;}
+.why-choose-box {max-width: 100%;}
+}
+
+@media screen and (max-width: 1199px) {
+.why-choose-box-main {position: relative;margin: 20px 0 0 0;bottom: 0;max-width: 100%;justify-content: center;}
+.why-chosse-section .row {align-items: center;}
+}
+
+@media screen and (max-width: 991px) {
+.why-chosse-section .mt-4 {margin-top: 0rem !important;}
+.why-chosse-section h2 {margin-bottom: 10px}
+.why-choose-box{margin: 0 0 20px;}
+}
+
+@media screen and (max-width: 767px) {
+.why-chosse-section .why-chosse-left-img img {width: 100%;}
+.why-choose-box .fonts-20 {font-size: 20px;}
+}
+
+@media screen and (max-width: 575px) {
+.why-chosse-section h2 {font-size: 26px;}
+}
+
+/***** Text & Images section Start *****/
+.guaranteed_txt ul li { padding: 0 0 20px 40px; position: relative; color: #000;}
+.guaranteed_txt ul li:before {position: absolute;left: 0;top: 5px;content: "";width: 24px;height: 24px;background: url(https://test.spaceotechnologies.com/wp-content/uploads/2024/01/arrow-ne.svg) no-repeat;}
+.guaranteed_img img{ border-radius:10px; }
+@media(max-width: 991px) {
+.guaranteed_txt { margin: 20px 0 0 0;}
+.guaranteed_img { text-align: center;}
+}`
+        };
+
+        // CSS Generation Function
+        function generateCSS(detectedSections) {
+            console.log('🎨 generateCSS called with sections:', detectedSections);
+            let generatedCSS = '';
+            
+            try {
+                // Check if sectionCssMap exists
+                if (!sectionCssMap) {
+                    console.error('🎨 sectionCssMap not found!');
+                    return '/* CSS Map not loaded */';
+                }
+                
+                // Always add common CSS
+                if (sectionCssMap['COMMON']) {
+                    generatedCSS += sectionCssMap['COMMON'] + '\n\n';
+                    console.log('🎨 Added common CSS, total length:', generatedCSS.length);
+                } else {
+                    console.error('🎨 Common CSS not found!');
+                    return '/* Common CSS not found */';
+                }
+                
+                // Add section-specific CSS
+                if (detectedSections && Array.isArray(detectedSections)) {
+                    detectedSections.forEach(section => {
+                        const baseSectionType = section.replace(/_\d+$/, '');
+                        console.log('🎨 Processing section:', section, 'base type:', baseSectionType);
+                        if (sectionCssMap[baseSectionType]) {
+                            generatedCSS += sectionCssMap[baseSectionType] + '\n\n';
+                            console.log('🎨 Added CSS for', baseSectionType, ', total length:', generatedCSS.length);
+                        } else {
+                            console.log('🎨 No CSS found for section:', baseSectionType);
+                        }
+                    });
+                } else {
+                    console.log('🎨 No detected sections or invalid format:', detectedSections);
+                }
+                
+                console.log('🎨 Final CSS length:', generatedCSS.length);
+                const finalCSS = generatedCSS.trim();
+                
+                // Ensure we always return at least common CSS
+                if (!finalCSS) {
+                    return sectionCssMap['COMMON'] || '/* No CSS generated */';
+                }
+                
+                return finalCSS;
+            } catch (error) {
+                console.error('🎨 Error in generateCSS:', error);
+                return sectionCssMap['COMMON'] || '/* Error generating CSS */';
             }
         }
 

@@ -28,6 +28,44 @@ function generateServicesGridSection(content) {
                 bulletHtml += '</ul>';
             }
             
+            // Parse service link if available
+            let serviceLink = '';
+            let readMoreButton = '';
+            
+            // Check if service has a link property
+            if (service.link && service.link.trim()) {
+                serviceLink = service.link.trim();
+            } else {
+                // Try to extract link from description using various patterns
+                const urlPattern = /(https?:\/\/[^\s]+)/gi;
+                const markdownLinkPattern = /\[([^\]]+)\]\(([^)]+)\)/gi;
+                
+                // Check for markdown-style links first
+                const markdownMatch = markdownLinkPattern.exec(service.description);
+                if (markdownMatch) {
+                    serviceLink = markdownMatch[2];
+                    // Remove the markdown link syntax from description
+                    service.description = service.description.replace(markdownLinkPattern, markdownMatch[1]);
+                } else {
+                    // Check for plain URLs
+                    const urlMatch = urlPattern.exec(service.description);
+                    if (urlMatch) {
+                        serviceLink = urlMatch[0];
+                        // Optionally remove the URL from description to avoid duplication
+                        service.description = service.description.replace(urlMatch[0], '').trim();
+                    }
+                }
+            }
+            
+            // Create read more button if link exists
+            if (serviceLink) {
+                readMoreButton = `<div class="service-link mt-3">
+                    <a href="${serviceLink}" class="btn-link-arrow btn-link-arrow-right" target="_blank" rel="noopener noreferrer">
+                        <span class="btn__label-wrapper">${service.buttonText || 'Learn More'}</span>
+                    </a>
+                </div>`;
+            }
+
             servicesGrid += `
 <div class="col-lg-4 col-md-6">
 <div class="mad_service_box">
@@ -35,6 +73,7 @@ function generateServicesGridSection(content) {
 <h3 class="fonts-18 font-weight-semibold">${service.title}</h3>
 <p>${service.description}</p>
 ${bulletHtml}
+${readMoreButton}
 </div>
 </div>
 `;

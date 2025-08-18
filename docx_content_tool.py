@@ -298,12 +298,49 @@ class DocxContentTool:
             elif i == 5:
                 icon_path = "/wp-content/uploads/2024/03/Third-party-Integrations.svg"
                 
+            # Check for links in service title or description
+            service_link = ''
+            button_text = 'Learn More'
+            clean_description = service.get('description', '')
+            
+            # Look for URLs in both title and description  
+            full_text = f"{service['title']} {clean_description}"
+            
+            # Try multiple link patterns
+            url_pattern = r'(https?://[^\s\)]+)'
+            markdown_pattern = r'\[([^\]]+)\]\(([^)]+)\)'
+            
+            # Check for markdown links first
+            markdown_match = re.search(markdown_pattern, full_text)
+            if markdown_match:
+                service_link = markdown_match.group(2)
+                button_text = markdown_match.group(1)
+                # Remove markdown syntax from description
+                clean_description = re.sub(markdown_pattern, markdown_match.group(1), clean_description)
+            else:
+                # Check for plain URLs
+                url_match = re.search(url_pattern, full_text)
+                if url_match:
+                    service_link = url_match.group(1)
+                    # Remove URL from description
+                    clean_description = clean_description.replace(url_match.group(1), '').strip()
+            
+            # Create read more button if link exists
+            read_more_button = ''
+            if service_link:
+                read_more_button = f'''<div class="service-link mt-3">
+                    <a href="{service_link}" class="btn-link-arrow btn-link-arrow-right" target="_blank" rel="noopener noreferrer">
+                        <span class="btn__label-wrapper">{button_text}</span>
+                    </a>
+                </div>'''
+
             services_html += f"""\n<div class="col-lg-4 col-md-6">
 <div class="mad_service_box">
 <img src="{icon_path}" alt="{service_icons[i]['alt'] if i < len(service_icons) else service['title']}" width="74" height="74" />
 <h3 class="fonts-18 font-weight-semibold">{service['title']}</h3>
-<p>{service.get('description', '')}</p>
+<p>{clean_description}</p>
 {points_html}
+{read_more_button}
 </div>
 </div>"""
         

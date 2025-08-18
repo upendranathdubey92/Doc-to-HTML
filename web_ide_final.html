@@ -946,7 +946,7 @@
                     // ... other templates
                 };
 
-                this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'WHY_CHOOSE_BOX', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
                 
                 // Debug: Verify FEATURED_IN is in supported sections at startup
                 console.log('🚀 Web IDE v3.4 SECTION NAMES UPDATED - All sections now use descriptive names:', this.supportedSections.includes('FEATURED_IN_SECTION') && this.supportedSections.includes('INDUSTRIES_WE_SERVE_SECTION'));
@@ -1060,7 +1060,7 @@
                         return this.parseTestimonialSection(content);
                     case 'BENEFITS_SECTION':
                         return await this.parseBenefitsSection(content);
-                    case 'BENEFITS_TWO':
+                    case 'WHY_CHOOSE_BOX':
                         return this.parseBenefitsTwoSection(content);
                     case 'CONTENT_WITH_FORM_SECTION':
                         return this.parseContentFormSection(content);
@@ -2696,6 +2696,8 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     return this.generateTechnologySection(content);
                 } else if (baseSectionType.includes('INDUSTRIES_WE_SERVE_SECTION')) {
                     return this.generateIndustriesSection(content);
+                } else if (baseSectionType.includes('SERVICES_GRID_SECTION_CENTER')) {
+                    return this.generateServicesGridSectionCenter(content);
                 } else if (baseSectionType.includes('SERVICES_GRID_SECTION')) {
                     return this.generateServicesGridSection(content);
                 } else if (baseSectionType.includes('SERVICES_ACCORDION_SECTION')) {
@@ -2704,10 +2706,8 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     return this.generatePortfolioSection(content);
                 } else if (baseSectionType.includes('TESTIMONIAL_SECTION')) {
                     return this.generateTestimonialSection(content);
-                } else if (baseSectionType.includes('BENEFITS_TWO')) {
+                } else if (baseSectionType.includes('WHY_CHOOSE_BOX')) {
                     return this.generateBenefitsTwoSection(content);
-                } else if (baseSectionType.includes('BENEFITS_SECTION')) {
-                    return this.generateBenefitsSection(content);
                 } else if (baseSectionType.includes('CONTENT_WITH_FORM_SECTION')) {
                     return this.generateContentFormSection(content);
                 } else if (baseSectionType.includes('PROCESS_SECTION')) {
@@ -3343,6 +3343,59 @@ ${servicesGrid}
                     .replace('{description}', content.description || 'Services we provide');
             }
 
+            generateServicesGridSectionCenter(content) {
+                // Return the exact HTML provided by the user
+                return `<section class="pt80 pb50 services-section bg-color">
+<div class="container-xl">
+<h2 class="fonts-40 text-center font-weight-bold">Explore Our Range of <br>Mobile App Development Services</h2>
+<div class="row justify-content-center">
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center" onclick="location.href='https://www.spaceotechnologies.com/services/app-development-consulting/';">
+<img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/10/SaaS-Consulting.svg" alt="Mobile App Consulting" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold"><a href="https://www.spaceotechnologies.com/services/app-development-consulting/">Mobile App Consulting</a></h3>
+<p>Our mobile app designers use the latest mobile UX/UI trends to create interactive interfaces optimized for different platforms. We focus on intuitive layouts, smooth navigation, and user-friendly experiences to improve the overall experience. </p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/UI-UX-Design.svg" alt="Mobile App Design" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">Mobile App Design</h3>
+<p>Best when you want stunning visuals and UX to attract and engage mobile users. Our designers craft beautiful, intuitive interfaces optimized for touchscreens, gestures, and different device capabilities.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/11/Custom-Cross-platform-App-Development.svg" alt="Custom Mobile App Development" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">Custom Mobile App Development</h3>
+<p>Our custom mobile app development services focus on delivering high-quality native and cross-platform apps using modern technologies like Swift, Kotlin, and Java. We apply best practices in DevOps, cloud backend development, and App Store Optimization (ASO).</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center" onclick="location.href='https://www.spaceotechnologies.com/ios-app-development-services/';">
+<img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/iPhone-App-Development.svg" alt="iOS App Development" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold"><a href="https://www.spaceotechnologies.com/ios-app-development-services/">iOS App Development</a></h3>
+<p>iPhone app development services include creating high-performing iOS applications using Swift and Objective-C and successfully deploying them on the Apple App Store. We offer expertise in native iOS apps, enterprise solutions, and app integration with other platforms. </p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center" onclick="location.href='https://www.spaceotechnologies.com/services/android-app-development/';">
+<img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/01/Android-Mobile-App-Development.svg" alt="Android App Development" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold"><a href="https://www.spaceotechnologies.com/services/android-app-development/">Android App Development</a></h3>
+<p>Our Android app developers utilize Kotlin and Java to create highly secure, feature-rich apps that are optimized for performance, UI consistency, and platform-specific behaviors. We ensure seamless deployment on the Google Play Store and offer post-launch maintenance.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center" onclick="location.href='https://www.spaceotechnologies.com/services/cross-platform-app-development/';">
+<img decoding="async" src="/wp-content/uploads/2024/01/Cross-platform-Android-App-Development.svg" alt="Cross-platform App Development" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold"><a href="https://www.spaceotechnologies.com/services/cross-platform-app-development/">Cross-platform App Development</a></h3>
+<p>Our mobile app developers are skilled in modern frameworks, such as React Native and Flutter, to create apps that run efficiently on iOS and Android devices. We follow best practices in code reusability, modular architecture, and native integration to reduce development costs. </p>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+            }
+
             generateServicesAccordionSection(content) {
                 if (!content.services || content.services.length === 0) {
                     return '<div>No services found</div>';
@@ -3621,103 +3674,6 @@ ${portfolioItems}
                     .replace('{client_image}', clientImageName);
             }
 
-            generateBenefitsSection(content) {
-                // Handle empty content with default static HTML using data URI images
-                if (!content || !content.benefits || content.benefits.length === 0) {
-                    return `<section class="pt80 pb50 services-section section-benefits">
-<div class="container-xl">
-<h2 class="fonts-40 font-weight-bold text-center mb-3 mxw-1000">Why Choose Our Services</h2>
-<p class="fonts-18 text-center mxw-1000 mb-4">We deliver exceptional solutions with proven expertise and dedication to your success.</p>
-<div class="row">
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box text-center">
-<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiMwMDc4ZmYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Expertise" width="74" height="74">
-<h3 class="fonts-18 font-weight-semibold">Expert Team</h3>
-<p>Skilled professionals with years of experience in modern technologies and best practices.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box text-center">
-<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiMxMGI5ODEiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTkgMTJMMTEgMTRMMTUgMTBNMjEgMTJDMjEgMTYuOTcwNiAxNi45NzA2IDIxIDEyIDIxQzcuMDI5NDQgMjEgMyAxNi45NzA2IDMgMTJDMyA3LjAyOTQ0IDcuMDI5NDQgMyAxMiAzQzE2Ljk3MDYgMyAyMSA3LjAyOTQ0IDIxIDEyWiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cjwvc3ZnPg==" alt="Quality" width="74" height="74">
-<h3 class="fonts-18 font-weight-semibold">Quality Assurance</h3>
-<p>Rigorous testing and quality control processes to ensure reliable and bug-free solutions.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box text-center">
-<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiNmNTk0MmYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTUuMDkgOC4yNkwyMiA5TDE2IDEzTDE3LjE4IDIwTDEyIDE2TDYuODIgMjBMOCAxM0wyIDlMOC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Support" width="74" height="74">
-<h3 class="fonts-18 font-weight-semibold">24/7 Support</h3>
-<p>Round-the-clock support and maintenance to keep your solutions running smoothly.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box text-center">
-<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiM4YjVjZjYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTMgN0gxMFYxNEgzVjdaTTE0IDdIMjFWMTBIMTRWN1pNMTQgMTRIMjFWMTdIMTRWMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Scalability" width="74" height="74">
-<h3 class="fonts-18 font-weight-semibold">Scalable Solutions</h3>
-<p>Build for growth with scalable architecture that adapts to your business needs.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box text-center">
-<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiNlZjQ0NDQiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMjUgOC4yNUwyMCA5TDEzLjc1IDEzLjc1TDE0IDIxTDEyIDE5TDEwIDIxTDEwLjI1IDEzLjc1TDQgOUwxMC43NSA4LjI1TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Innovation" width="74" height="74">
-<h3 class="fonts-18 font-weight-semibold">Innovation</h3>
-<p>Stay ahead with cutting-edge technologies and innovative approaches to solve challenges.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box text-center">
-<img loading="lazy" decoding="async" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiM2MzY2ZjEiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJWNE0xMiAyMFYyMk00LjIyIDQuMjJMNS42NCA1LjY0TTE4LjM2IDE4LjM2TDE5Ljc4IDE5Ljc4TTIgMTJINE0yMCAxMkgyMk00LjIyIDE5Ljc4TDUuNjQgMTguMzZNMTguMzYgNS42NEwxOS43OCA0LjIyIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4KPC9zdmc+" alt="Delivery" width="74" height="74">
-<h3 class="fonts-18 font-weight-semibold">On-time Delivery</h3>
-<p>Committed to delivering projects on schedule without compromising on quality.</p>
-</div>
-</div>
-</div>
-</div>
-</section>`;
-                }
-                
-                const template = `<section class="pt80 pb50 services-section section-benefits">
-<div class="container-xl">
-<h2 class="fonts-40 font-weight-bold text-center mb-3 mxw-1000">{main_heading}</h2>
-<p class="fonts-18 text-center mxw-1000 mb-4">{description}</p>
-<div class="row">
-{benefits_items}
-</div>
-</div>
-</section>`;
-
-                let benefitsItems = '';
-                if (content.benefits) {
-                    content.benefits.forEach((benefit, index) => {
-                        // Use static data URI images that will never break
-                        const staticDataImages = [
-                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiMwMDc4ZmYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+`, // Expertise - Blue star
-                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiMxMGI5ODEiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTkgMTJMMTEgMTRMMTUgMTBNMjEgMTJDMjEgMTYuOTcwNiAxNi45NzA2IDIxIDEyIDIxQzcuMDI5NDQgMjEgMyAxNi45NzA2IDMgMTJDMyA3LjAyOTQ0IDcuMDI5NDQgMyAxMiAzQzE2Ljk3MDYgMyAyMSA3LjAyOTQ0IDIxIDEyWiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cjwvc3ZnPg==`, // Quality - Green checkmark
-                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiNmNTk0MmYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTUuMDkgOC4yNkwyMiA5TDE2IDEzTDE3LjE4IDIwTDEyIDE2TDYuODIgMjBMOCAxM0wyIDlMOC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+`, // Support - Orange star
-                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiM4YjVjZjYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTMgN0gxMFYxNEgzVjdaTTE0IDdIMjFWMTBIMTRWN1pNMTQgMTRIMjFWMTdIMTRWMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+`, // Scalability - Purple blocks
-                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiNlZjQ0NDQiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMjUgOC4yNUwyMCA5TDEzLjc1IDEzLjc1TDE0IDIxTDEyIDE5TDEwIDIxTDEwLjI1IDEzLjc1TDQgOUwxMC43NSA4LjI1TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+`, // Innovation - Red star
-                            `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQiIGhlaWdodD0iNzQiIHZpZXdCb3g9IjAgMCA3NCA3NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzciIGN5PSIzNyIgcj0iMzciIGZpbGw9IiM2MzY2ZjEiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJWNE0xMiAyMFYyMk00LjIyIDQuMjJMNS42NCA1LjY0TTE4LjM2IDE4LjM2TDE5Ljc4IDE5Ljc4TTIgMTJINE0yMCAxMkgyMk00LjIyIDE5Ljc4TDUuNjQgMTguMzZNMTguMzYgNS42NEwxOS43OCA0LjIyIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4KPC9zdmc+` // Delivery - Indigo clock
-                        ];
-                        
-                        const imageUrl = staticDataImages[index % staticDataImages.length];
-                        const altText = benefit.title || `Benefit ${index + 1}`;
-                        
-                        benefitsItems += `<div class="col-lg-4 col-md-6">
-<div class="mad_service_box text-center">
-<img loading="lazy" decoding="async" src="${imageUrl}" alt="${altText}" width="74" height="74">
-<h3 class="fonts-18 font-weight-semibold">${benefit.title}</h3>
-<p>${benefit.description}</p>
-</div>
-</div>
-`;
-                    });
-                }
-
-                return template
-                    .replace('{main_heading}', content.main_heading || 'Key Benefits')
-                    .replace('{description}', content.description || 'Why choose us')
-                    .replace('{benefits_items}', benefitsItems);
-            }
 
             generateBenefitsTwoSection(content) {
                 const template = `<section class="pt80 pb50 services-section practices-we-follow section-benefits-two">
@@ -3991,9 +3947,9 @@ ${portfolioItems}
                 let statsHtml = '';
                 const statImages = [
                     'https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Frame-1.svg',
-                    '/wp-content/uploads/2025/07/frameworks-tools-mastered.svg',
-                    '/wp-content/uploads/2025/07/seo-mobile-optimized.svg',
-                    '/wp-content/uploads/2025/07/years-of-dev-expertise.svg'
+                    'https://www.spaceotechnologies.com/wp-content/uploads/2025/07/frameworks-tools-mastered.svg',
+                    'https://www.spaceotechnologies.com/wp-content/uploads/2025/07/seo-mobile-optimized.svg',
+                    'https://www.spaceotechnologies.com/wp-content/uploads/2025/07/years-of-dev-expertise.svg'
                 ];
                 
                 if (content.stats && content.stats.length > 0) {
@@ -4621,7 +4577,7 @@ ${portfolioItems}
                 // Safety check: ensure supportedSections is defined
                 if (!this.supportedSections || !Array.isArray(this.supportedSections)) {
                     console.warn('⚠️ supportedSections not initialized, using default list');
-                    this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                    this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'WHY_CHOOSE_BOX', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
                 }
                 
                 // First pass: Find all sections with explicit END markers
@@ -4656,7 +4612,7 @@ ${portfolioItems}
                 if (sectionsFound.length === 0) {
                     // Double-check supportedSections is still defined
                     if (!this.supportedSections || !Array.isArray(this.supportedSections)) {
-                        this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                        this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'WHY_CHOOSE_BOX', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
                     }
                     this.supportedSections.forEach(sectionType => {
                         const simpleSectionPattern = new RegExp(
@@ -4898,7 +4854,7 @@ ${portfolioItems}
                 this.sectionTags.innerHTML = '';
                 
                 // Show all supported sections
-                const allSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                const allSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'WHY_CHOOSE_BOX', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
                 
                 allSections.forEach(section => {
                     const tag = document.createElement('span');
@@ -5218,7 +5174,7 @@ ${portfolioItems}
 .mad_service_box ul.bullet li:before { left: 0; top: 8px; background: var(--black);}
 
 .services-section.practices-we-follow .mad_service_box{position: relative; padding-left: 65px;}
-.services-section.practices-we-follow .mad_service_box::after {content: ""; position: absolute; margin: auto; top: 25px; left: 25px; background: url(https://test.spaceotechnologies.com/wp-content/uploads/2024/01/arrow-ne.svg); width: 24px; height: 24px;}
+.services-section.practices-we-follow .mad_service_box::after {content: ""; position: absolute; margin: auto; top: 25px; left: 25px; background: url(https://www.spaceotechnologies.com/wp-content/uploads/2024/01/arrow-ne.svg); width: 24px; height: 24px;}
 .services-section.globle-clients .col-lg-3{  margin: 0 0 30px 0; display: flex; }
 
 @media screen and (max-width:991px) {
@@ -5237,7 +5193,7 @@ ${portfolioItems}
 .services-tab-new #accordion .left-icons { margin-right: 12px; position: absolute; left: 0;  margin: auto; top: 0; bottom: 0;}
 .services-tab-new #accordion>.card{ border:none; background: #fff; margin-bottom: 20px; padding: 20px; border-radius: 5px;}
 .services-tab-new #accordion .card .card-link{ font-size:18px; font-weight: 500 !important; padding-left: 50px;}
-.services-tab-new #accordion .card .card-link:after, .services-tab-new #accordion .card .card-link:before{ transform: rotate(0deg); height: 11px; width: 19px; right: 10px; top: 10px; background: url(https://test.spaceotechnologies.com/wp-content/uploads/2023/05/arrow-point-to-right.svg) no-repeat;}
+.services-tab-new #accordion .card .card-link:after, .services-tab-new #accordion .card .card-link:before{ transform: rotate(0deg); height: 11px; width: 19px; right: 10px; top: 10px; background: url(https://www.spaceotechnologies.com/wp-content/uploads/2023/05/arrow-point-to-right.svg) no-repeat;}
 .services-tab-new #accordion .card .card-link:after{ display:none; }
 .services-tab-new #accordion .card .active .card-link:before{ transform: rotate(180deg); }
 .services-tab-new #accordion .card-body p{ font-size:14px; margin-bottom:10px;  }
@@ -5258,7 +5214,7 @@ ${portfolioItems}
 /********* CTA_SIMPLE_SECTION & CTA_WITH_LIST_SECTION **********/
 .cta-inner { border-radius: 24px; padding: 54px; position: relative; background: #EAF3FF url(/wp-content/uploads/2023/08/cta-bg-circle.png) no-repeat; background-size: cover;}
 .cta-inner .cta-title{line-height: 1.45}
-.hire-new-cta .cta-inner { background: #EAF3FF url(https://test.spaceotechnologies.com/wp-content/uploads/2024/01/hire-cta-bg.jpg) no-repeat; background-size: cover; background-position: center;}
+.hire-new-cta .cta-inner { background: #EAF3FF url(https://www.spaceotechnologies.com/wp-content/uploads/2024/01/hire-cta-bg.jpg) no-repeat; background-size: cover; background-position: center;}
 
 @media screen and (max-width:1440px) {
 .cta-inner:before { width: 100%;}
@@ -5280,7 +5236,7 @@ ${portfolioItems}
 /********* CTA_SIMPLE_SECTION & CTA_WITH_LIST_SECTION **********/
 .cta-inner { border-radius: 24px; padding: 54px; position: relative; background: #EAF3FF url(/wp-content/uploads/2023/08/cta-bg-circle.png) no-repeat; background-size: cover;}
 .cta-inner .cta-title{line-height: 1.45}
-.hire-new-cta .cta-inner { background: #EAF3FF url(https://test.spaceotechnologies.com/wp-content/uploads/2024/01/hire-cta-bg.jpg) no-repeat; background-size: cover; background-position: center;}
+.hire-new-cta .cta-inner { background: #EAF3FF url(https://www.spaceotechnologies.com/wp-content/uploads/2024/01/hire-cta-bg.jpg) no-repeat; background-size: cover; background-position: center;}
 
 .new-button-group .new-button-group-inner {
     text-align: center;
@@ -5343,7 +5299,7 @@ ${portfolioItems}
 .owl-nav.disabled { display: block !important;}
 .owl-nav .owl-next, .owl-nav .owl-prev { display: inline-block; width: 50px; height: 50px; position: absolute; font-size: 0; text-align: center; background-color: #fff !important; border-radius: 50%; pointer-events: auto; left: -26px; border: solid 1px #f4f4f4!important; transform: translateY(-45%); top: 45%; bottom: auto; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
 .owl-nav button.owl-next { left: auto; right: -30px;}
-.owl-nav .owl-next::after, .owl-nav .owl-prev::after { content: ''; position: absolute; left: 0; top: 0; background: url(https://test.spaceotechnologies.com/wp-content/uploads/2022/12/arrow-left.svg) no-repeat center center; height: 100%; width: 100% }
+.owl-nav .owl-next::after, .owl-nav .owl-prev::after { content: ''; position: absolute; left: 0; top: 0; background: url(https://www.spaceotechnologies.com/wp-content/uploads/2022/12/arrow-left.svg) no-repeat center center; height: 100%; width: 100% }
 .owl-nav .owl-next::after { transform: scaleX(-1) }
 .owl-nav button.owl-next:hover, .owl-nav button.owl-prev:hover { border-color: var(--secoundy-color)!important }
 .owl-nav button.owl-next:hover::after, .owl-nav button.owl-prev:hover::after { filter: brightness(0) saturate(100%) invert(44%) sepia(14%) saturate(3368%) hue-rotate(317deg) brightness(113%) contrast(124%) }
@@ -5624,7 +5580,7 @@ border: 1px solid #EAF3FF;box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.28);}
 
 /***** Text & Images section Start *****/
 .guaranteed_txt ul li { padding: 0 0 20px 40px; position: relative; color: #000;}
-.guaranteed_txt ul li:before {position: absolute;left: 0;top: 5px;content: "";width: 24px;height: 24px;background: url(https://test.spaceotechnologies.com/wp-content/uploads/2024/01/arrow-ne.svg) no-repeat;}
+.guaranteed_txt ul li:before {position: absolute;left: 0;top: 5px;content: "";width: 24px;height: 24px;background: url(https://www.spaceotechnologies.com/wp-content/uploads/2024/01/arrow-ne.svg) no-repeat;}
 .guaranteed_img img{ border-radius:10px; }
 @media(max-width: 991px) {
 .guaranteed_txt { margin: 20px 0 0 0;}

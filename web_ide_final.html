@@ -1910,11 +1910,14 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 let currentMode = 'heading';
                 let serviceContent = [];
                 
-                // Debug logging
-                console.log('SERVICES_GRID parsing - Lines after number removal:', lines);
+                // Enhanced debug logging
+                console.log('🔧 SERVICES_GRID parsing - Raw content:', content);
+                console.log('🔧 SERVICES_GRID parsing - Lines after number removal:', lines);
+                console.log('🔧 SERVICES_GRID parsing - Total lines count:', lines.length);
                 
                 for (let i = 0; i < lines.length; i++) {
                     const trimmedLine = lines[i];
+                    console.log(`🔧 SERVICES_GRID Line ${i}: "${trimmedLine}" (Mode: ${currentMode})`);
                     
                     // First line is main heading
                     if (currentMode === 'heading' && !main_heading) {
@@ -1940,9 +1943,14 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     if (currentMode === 'services') {
                         // Check if this is a new service title
                         if (this.isNewServiceCard(trimmedLine, lines, i)) {
+                            console.log(`🔧 SERVICES_GRID NEW SERVICE detected: "${trimmedLine}"`);
                             // Save previous service
                             if (currentService) {
-                                currentService.description = serviceContent.join(' ');
+                                // Only set description if it's not already set and we have content
+                                if (!currentService.description && serviceContent.length > 0) {
+                                    currentService.description = serviceContent.join(' ');
+                                }
+                                console.log(`🔧 SERVICES_GRID Saving previous service: ${currentService.title} with description: "${currentService.description}" (${currentService.description ? 'HAS DESCRIPTION' : 'NO DESCRIPTION'})`);
                                 services.push(currentService);
                                 serviceContent = [];
                             }
@@ -1955,15 +1963,18 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                                 bullets: [], // Will only add if explicit bullets exist
                                 link: titleWithLink.link // Extract link from title
                             };
+                            console.log(`🔧 SERVICES_GRID Started new service: ${currentService.title}`);
                         }
                         // Handle explicit bullets ONLY if they exist
                         else if (trimmedLine.match(/^[●\-\*•‑]\s*/) && currentService) {
                             const bulletText = trimmedLine.replace(/^[●\-\*•‑]\s*/, '').trim();
                             currentService.bullets.push(bulletText);
+                            console.log(`🔧 SERVICES_GRID Added bullet to service "${currentService.title}": "${bulletText}"`);
                             
-                            // Finish current content before bullets
-                            if (serviceContent.length > 0) {
+                            // Finish current content before bullets - assign description if we have content
+                            if (serviceContent.length > 0 && !currentService.description) {
                                 currentService.description = serviceContent.join(' ');
+                                console.log(`🔧 SERVICES_GRID Set description for service "${currentService.title}" before bullets: "${currentService.description}"`);
                                 serviceContent = [];
                             }
                         }
@@ -1974,26 +1985,42 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             if (lineWithLink.link && !currentService.link) {
                                 currentService.link = lineWithLink.link;
                             }
-                            serviceContent.push(lineWithLink.text);
+                            
+                            // Only add to serviceContent if we haven't set the description yet
+                            if (!currentService.description) {
+                                serviceContent.push(lineWithLink.text);
+                                console.log(`🔧 SERVICES_GRID Added content to service "${currentService.title}": "${lineWithLink.text}"`);
+                                console.log(`🔧 SERVICES_GRID Current serviceContent array:`, serviceContent);
+                            } else {
+                                // If description is already set, this might be additional content - treat as bullet if it looks like one
+                                console.log(`🔧 SERVICES_GRID Service "${currentService.title}" already has description, treating line as potential additional content: "${lineWithLink.text}"`);
+                            }
                         }
                     }
                 }
                 
                 // Add last service with link processing
                 if (currentService) {
-                    if (serviceContent.length > 0) {
+                    // Only set description if not already set and we have content
+                    if (!currentService.description && serviceContent.length > 0) {
                         const descriptionContent = serviceContent.join(' ');
                         const descWithLink = this.processTextWithLinks(descriptionContent);
                         currentService.description = descWithLink.text;
+                        console.log(`🔧 SERVICES_GRID Final service "${currentService.title}" description: "${currentService.description}"`);
                         // If no link in title, use link from description
                         if (!currentService.link && descWithLink.link) {
                             currentService.link = descWithLink.link;
                         }
+                    } else if (!currentService.description) {
+                        console.log(`🔧 SERVICES_GRID WARNING: Final service "${currentService.title}" has no content!`);
+                    } else {
+                        console.log(`🔧 SERVICES_GRID Final service "${currentService.title}" already has description: "${currentService.description}"`);
                     }
                     services.push(currentService);
                 }
                 
-                console.log('SERVICES_GRID final result:', { main_heading, description, services });
+                console.log('🔧 SERVICES_GRID final result:', { main_heading, description, services });
+                console.log('🔧 SERVICES_GRID final services array:', services.map(s => ({title: s.title, description: s.description})));
                 
                 return {
                     main_heading: main_heading || "Our Services",
@@ -2007,7 +2034,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 const isReasonableLength = line.length > 5 && line.length < 80;
                 const startsWithCapital = /^[A-Z]/.test(line);
                 const notBullet = !line.match(/^[●\-\*•‑]\s*/);
-                const hasKeywords = /\b(development|consulting|portal|service|solution|platform|integration|migration|design|custom|b2b)\b/i.test(line);
+                const hasKeywords = /\b(development|consulting|portal|service|solution|platform|integration|migration|design|custom|b2b|api|support|maintenance|ui|ux)\b/i.test(line);
                 
                 // Check if this line is separated from previous content
                 const prevLine = currentIndex > 0 ? allLines[currentIndex - 1] : '';
@@ -2016,9 +2043,24 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 // Good indicators this is a title:
                 const hasSubstantialNextContent = nextLine && nextLine.length > 20;
                 const followsShortLine = !prevLine || prevLine.length < 40;
+                const isShortAndCapitalized = line.length < 50 && startsWithCapital;
+                
+                // Enhanced detection: if line is short, capitalized, and followed by longer content
+                const looksLikeTitle = isShortAndCapitalized && hasSubstantialNextContent;
+                
+                console.log(`🔧 SERVICES_GRID isNewServiceCard check for "${line}":`, {
+                    isReasonableLength,
+                    startsWithCapital,
+                    notBullet,
+                    hasKeywords,
+                    hasSubstantialNextContent,
+                    followsShortLine,
+                    looksLikeTitle,
+                    result: isReasonableLength && startsWithCapital && notBullet && (hasKeywords || looksLikeTitle || followsShortLine)
+                });
                 
                 return isReasonableLength && startsWithCapital && notBullet && 
-                       (hasKeywords || hasSubstantialNextContent || followsShortLine);
+                       (hasKeywords || looksLikeTitle || followsShortLine);
             }
             
             hasEmptyLineAfterInOriginal(targetLine, allLines) {

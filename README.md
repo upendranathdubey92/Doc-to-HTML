@@ -51,11 +51,8 @@ Access the live version: [Document to HTML Converter](https://your-vercel-app.ve
    # Option 1: HTTP Server (Recommended)
    npx http-server -p 9000
    
-   # Option 2: Python Server
-   python server.py
-   
-   # Option 3: Alternative port
-   python -m http.server 8001
+   # Option 2: Alternative port
+   npx http-server -p 8001
    ```
 
 4. **Open the application**
@@ -135,22 +132,10 @@ document-to-html-converter/
 ├── web_ide_final.html          # Main application (v3.7)
 ├── README.md                   # This file
 ├── CLAUDE.md                   # Detailed documentation
-├── server.py                   # Python development server
-├── docx_content_tool.py        # Document processing backend
 ├── package.json                # Node.js dependencies
-├── run_ide.sh                  # Server startup script
-├── test_new_section_names.txt  # Test file with new section names
-├── test_benefits_fixed.txt     # BENEFITS section test file
-└── Content File- Web Development Consulting.docx  # Sample document
+├── package-lock.json           # Node.js dependency lock file
+└── vercel.json                 # Vercel deployment configuration
 ```
-
-## 🔧 API Endpoints
-
-When running locally with `server.py`:
-
-- `POST /upload` - Upload and process documents
-- `POST /process_text` - Process text content directly
-- `GET /health` - Server health check
 
 ## 🌐 Deployment
 

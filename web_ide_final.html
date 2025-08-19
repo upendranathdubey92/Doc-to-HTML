@@ -2205,7 +2205,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     }
                 }
                 
-                // Fallback to rule-based parsing
+                // Enhanced rule-based parsing with debugging
                 const lines = content.split('\n');
                 const projects = [];
                 let main_heading = '';
@@ -2213,6 +2213,9 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 
                 // Filter out empty lines for easier processing
                 const nonEmptyLines = lines.filter(line => line.trim());
+                
+                console.log('🔧 PORTFOLIO_SECTION parsing - Raw content:', content);
+                console.log('🔧 PORTFOLIO_SECTION parsing - NonEmpty lines:', nonEmptyLines);
                 
                 if (nonEmptyLines.length >= 2) {
                     main_heading = nonEmptyLines[0];
@@ -2225,11 +2228,13 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 
                 for (let i = 0; i < projectLines.length; i++) {
                     const line = projectLines[i].trim();
+                    console.log(`🔧 PORTFOLIO_SECTION Line ${i}: "${line}"`);
                     
                     // Check if this line is a button text (like "See Project Details")
-                    const isButtonText = line.match(/^(See Project Details|Check Project Details|View Project|Learn More)$/i);
+                    const isButtonText = line.match(/^(See Project Details|Check Project Details|View Project|Learn More|Navigate to Project Details)$/i);
                     
                     if (isButtonText) {
+                        console.log(`🔧 PORTFOLIO_SECTION Button text detected: "${line}"`);
                         // This is button text, add it to current project and don't include in description
                         if (currentProject) {
                             currentProject.buttonText = line;
@@ -2240,14 +2245,18 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     // Detect if this line is likely a project title
                     // Project titles are usually shorter and don't start with common description words
                     const isLikelyTitle = (
-                        line.length < 150 && // Titles are usually shorter
+                        line.length < 200 && // Increased from 150 to catch longer titles
                         !line.startsWith('Space-O Technologies') && // Descriptions often start with company name
                         !line.startsWith('We designed') && // Common description starters
                         !line.startsWith('At Space-O Technologies') &&
                         !line.startsWith('The platform') &&
                         !line.startsWith('The system') &&
-                        (line.includes('—') || line.includes('for ') || line.includes('System') || line.includes('Platform') || line.includes('Marketplace') || line.includes('Using AI'))
+                        !line.startsWith('Managing ') && // Avoid description starters
+                        !line.startsWith('With ') && // Avoid description starters
+                        (line.includes('—') || line.includes('for ') || line.includes('System') || line.includes('Platform') || line.includes('Marketplace') || line.includes('Using AI') || line.includes('Solution') || line.includes('Built') || line.includes('We developed') || line.includes('GPTVix') || line.includes('NDIS'))
                     );
+                    
+                    console.log(`🔧 PORTFOLIO_SECTION Title check for "${line}": ${isLikelyTitle}`);
                     
                     if (isLikelyTitle || currentProject === null) {
                         // Save previous project if exists
@@ -2258,9 +2267,35 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             cleanDescription = cleanDescription.replace(/\s+Check\s+(?:the\s+)?Project\s+Details\.?$/i, '');
                             cleanDescription = cleanDescription.replace(/\s+View\s+Project\.?$/i, '');
                             cleanDescription = cleanDescription.replace(/\s+Learn\s+More\.?$/i, '');
+                            cleanDescription = cleanDescription.replace(/\s+Navigate\s+to\s+Project\s+Details\.?$/i, '');
+                            
+                            // Limit title length and move excess to description if needed
+                            let finalTitle = currentProject.title;
+                            if (finalTitle.length > 80) {
+                                // Keep first part as title and add rest to beginning of description
+                                const titleParts = finalTitle.split(' ');
+                                let shortTitle = '';
+                                let remainingTitle = '';
+                                
+                                for (let j = 0; j < titleParts.length; j++) {
+                                    if ((shortTitle + ' ' + titleParts[j]).length <= 80) {
+                                        shortTitle += (shortTitle ? ' ' : '') + titleParts[j];
+                                    } else {
+                                        remainingTitle = titleParts.slice(j).join(' ');
+                                        break;
+                                    }
+                                }
+                                
+                                finalTitle = shortTitle;
+                                if (remainingTitle) {
+                                    cleanDescription = remainingTitle + (cleanDescription ? ' ' + cleanDescription : '');
+                                }
+                            }
+                            
+                            console.log(`🔧 PORTFOLIO_SECTION Saving project: "${finalTitle}" with description length: ${cleanDescription.length}`);
                             
                             projects.push({
-                                title: currentProject.title,
+                                title: finalTitle,
                                 description: cleanDescription,
                                 buttonText: currentProject.buttonText || 'See Project Details',
                                 image: '/wp-content/uploads/2025/06/CCTV-Data-Management-Platform-for-Public-Safety.png',
@@ -2269,8 +2304,9 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         }
                         
                         // Start new project
+                        console.log(`🔧 PORTFOLIO_SECTION Starting new project: "${line}"`);
                         currentProject = {
-                            title: this.convertBoldMarkers(line),
+                            title: this.convertBoldMarkers ? this.convertBoldMarkers(line) : line,
                             description: '',
                             buttonText: ''
                         };
@@ -2283,6 +2319,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             
                             // More comprehensive button text patterns
                             const buttonPatterns = [
+                                /^(.*?)\s+Navigate\s+to\s+Project\s+Details\.?$/i,
                                 /^(.*?)\s+See\s+(?:the\s+)?Project\s+Details\.?$/i,
                                 /^(.*?)\s+Check\s+(?:the\s+)?Project\s+Details\.?$/i,
                                 /^(.*?)\s+View\s+Project\.?$/i,
@@ -2307,7 +2344,10 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             
                             if (!foundButton) {
                                 // No button text found, add entire line to description
-                                currentProject.description += (currentProject.description ? ' ' : '') + this.convertBoldMarkers(processedLine);
+                                currentProject.description += (currentProject.description ? ' ' : '') + (this.convertBoldMarkers ? this.convertBoldMarkers(processedLine) : processedLine);
+                                console.log(`🔧 PORTFOLIO_SECTION Added to description: "${processedLine}"`);
+                            } else {
+                                console.log(`🔧 PORTFOLIO_SECTION Found button text, split line: description="${processedLine.split('Navigate to Project Details')[0] || processedLine.split('See Project Details')[0] || processedLine}" button="${currentProject.buttonText}"`);
                             }
                         }
                     }
@@ -2317,13 +2357,38 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 if (currentProject && currentProject.description.trim()) {
                     // Final cleanup: remove any remaining button text from description
                     let cleanDescription = currentProject.description.trim();
+                    cleanDescription = cleanDescription.replace(/\s+Navigate\s+to\s+Project\s+Details\.?$/i, '');
                     cleanDescription = cleanDescription.replace(/\s+See\s+(?:the\s+)?Project\s+Details\.?$/i, '');
                     cleanDescription = cleanDescription.replace(/\s+Check\s+(?:the\s+)?Project\s+Details\.?$/i, '');
                     cleanDescription = cleanDescription.replace(/\s+View\s+Project\.?$/i, '');
                     cleanDescription = cleanDescription.replace(/\s+Learn\s+More\.?$/i, '');
                     
+                    // Apply title length limit to final project too
+                    let finalTitle = currentProject.title;
+                    if (finalTitle.length > 80) {
+                        const titleParts = finalTitle.split(' ');
+                        let shortTitle = '';
+                        let remainingTitle = '';
+                        
+                        for (let j = 0; j < titleParts.length; j++) {
+                            if ((shortTitle + ' ' + titleParts[j]).length <= 80) {
+                                shortTitle += (shortTitle ? ' ' : '') + titleParts[j];
+                            } else {
+                                remainingTitle = titleParts.slice(j).join(' ');
+                                break;
+                            }
+                        }
+                        
+                        finalTitle = shortTitle;
+                        if (remainingTitle) {
+                            cleanDescription = remainingTitle + (cleanDescription ? ' ' + cleanDescription : '');
+                        }
+                    }
+                    
+                    console.log(`🔧 PORTFOLIO_SECTION Final project: "${finalTitle}" with description length: ${cleanDescription.length}`);
+                    
                     projects.push({
-                        title: currentProject.title,
+                        title: finalTitle,
                         description: cleanDescription,
                         buttonText: currentProject.buttonText || 'See Project Details',
                         image: '/wp-content/uploads/2025/06/CCTV-Data-Management-Platform-for-Public-Safety.png',
@@ -2331,9 +2396,12 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     });
                 }
                 
+                console.log('🔧 PORTFOLIO_SECTION final result:', { main_heading, description, projects });
+                console.log('🔧 PORTFOLIO_SECTION final projects array:', projects.map(p => ({title: p.title, description: p.description.substring(0, 100) + '...'})));
+                
                 return {
-                    main_heading: this.convertBoldMarkers(main_heading || 'Proven Results: Real Projects That Drive Business Growth'),
-                    description: this.convertBoldMarkers(description || 'See how we\'ve transformed complex business challenges.'),
+                    main_heading: this.convertBoldMarkers ? this.convertBoldMarkers(main_heading || 'Proven Results: Real Projects That Drive Business Growth') : (main_heading || 'Proven Results: Real Projects That Drive Business Growth'),
+                    description: this.convertBoldMarkers ? this.convertBoldMarkers(description || 'See how we\'ve transformed complex business challenges.') : (description || 'See how we\'ve transformed complex business challenges.'),
                     projects: projects
                 };
             }
@@ -3882,15 +3950,17 @@ ${accordionItems}
                     });
                 }
                 
-                return `<div class="our-work pt70 pb70 bg-color section-portfolio">
+                return `<section class="pt80 pb50 our-work">
 <div class="container-xl">
-<div class="text-center">
+<div class="row">
+<div class="col-lg-12">
 <h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">${content.main_heading || 'Proven Results: Real Projects That Drive Business Growth'}</h2>
 <p class="fonts-18 text-center mb-3 mxw-900">${content.description || 'See how we\'ve transformed complex business challenges into measurable success stories.'}</p>
 </div>
+</div>
 ${portfolioItems}
 </div>
-</div>`;
+</section>`;
             }
 
             generateTestimonialSection(content) {

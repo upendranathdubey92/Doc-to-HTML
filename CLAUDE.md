@@ -5,11 +5,9 @@ This project contains a web-based IDE for converting structured documents with s
 
 ## Key Files
 - `web_ide_final.html` - Main web IDE with AI-powered content parsing (v3.7)
-- `docx_content_tool.py` - Python backend for document processing
-- `server.py` - Local development server
 - `CLAUDE.md` - Project documentation and instructions
 - `package.json` & `package-lock.json` - Node.js dependencies
-- `run_ide.sh` - Server startup script
+- `vercel.json` - Deployment configuration
 
 ## Main Features
 - **Document Processing**: Converts documents with descriptive section markers
@@ -197,11 +195,8 @@ The TECHNOLOGY_STACK_SECTION supports category-based parsing:
 # Start development server (recommended)
 npx http-server -p 9000
 
-# Alternative Python server
-python server.py
-
-# Alternative server on different port
-python -m http.server 8001
+# Alternative port
+npx http-server -p 8001
 
 # Kill existing processes (Windows)
 taskkill //F //PID [PID_NUMBER]

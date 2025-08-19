@@ -793,7 +793,6 @@
                     <span class="supported-item">INDUSTRIES_WE_SERVE_SECTION</span>
                     <span class="supported-item">PORTFOLIO_SECTION</span>
                     <span class="supported-item">TESTIMONIAL_SECTION</span>
-                    <span class="supported-item">BENEFITS_SECTION</span>
                 </div>
             </div>
         </div>
@@ -946,7 +945,7 @@
                     // ... other templates
                 };
 
-                this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'WHY_CHOOSE_BOX', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION'];
                 
                 // Debug: Verify FEATURED_IN is in supported sections at startup
                 console.log('🚀 Web IDE v3.4 SECTION NAMES UPDATED - All sections now use descriptive names:', this.supportedSections.includes('FEATURED_IN_SECTION') && this.supportedSections.includes('INDUSTRIES_WE_SERVE_SECTION'));
@@ -1044,7 +1043,6 @@
                         return await this.parseFaqSection(content);
                     case 'CTA_SIMPLE_SECTION':
                     case 'CTA SIMPLE':
-                    case 'CTA_ENHANCED':
                         return this.parseCtaSection(content);
                     case 'TECHNOLOGY_STACK_SECTION':
                         return this.parseTechnologySection(content);
@@ -1052,14 +1050,14 @@
                         return this.parseIndustriesSection(content);
                     case 'SERVICES_GRID_SECTION':
                         return await this.parseServicesGridSection(content);
+                    case 'SERVICES_GRID_SECTION_CENTER':
+                        return await this.parseServicesGridSection(content); // Uses same parser as regular grid
                     case 'SERVICES_ACCORDION_SECTION':
                         return await this.parseServicesAccordionSection(content);
                     case 'PORTFOLIO_SECTION':
                         return await this.parsePortfolioSection(content);
                     case 'TESTIMONIAL_SECTION':
                         return this.parseTestimonialSection(content);
-                    case 'BENEFITS_SECTION':
-                        return await this.parseBenefitsSection(content);
                     case 'WHY_CHOOSE_BOX':
                         return this.parseBenefitsTwoSection(content);
                     case 'CONTENT_WITH_FORM_SECTION':
@@ -1497,22 +1495,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 }
                 
                 return `Parse this ${sectionType} section content and return appropriate JSON structure.`;
-            }
-
-            convertBoldMarkers(text) {
-                if (!text) return text;
-                
-                // Convert **text** to <strong>text</strong>
-                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-                
-                // Convert __text__ to <strong>text</strong> (alternative bold syntax)
-                text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-                
-                // Convert single *text* to <strong>text</strong> (if used for bold)
-                // Be careful to not convert * used as bullet points
-                text = text.replace(/(?<![*\s])\*([^*\s][^*]*[^*\s])\*(?![*])/g, '<strong>$1</strong>');
-                
-                return text;
             }
 
             extractBulletPoints(content) {
@@ -1965,11 +1947,13 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                                 serviceContent = [];
                             }
                             
-                            // Start new service
+                            // Start new service with link extraction
+                            const titleWithLink = this.processTextWithLinks(trimmedLine);
                             currentService = {
-                                title: trimmedLine,
+                                title: titleWithLink.text,
                                 description: '',
-                                bullets: [] // Will only add if explicit bullets exist
+                                bullets: [], // Will only add if explicit bullets exist
+                                link: titleWithLink.link // Extract link from title
                             };
                         }
                         // Handle explicit bullets ONLY if they exist
@@ -1985,15 +1969,26 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         }
                         // Regular content - accumulate for description
                         else if (currentService && trimmedLine.length > 0) {
-                            serviceContent.push(trimmedLine);
+                            // Check if this line contains a link and extract it
+                            const lineWithLink = this.processTextWithLinks(trimmedLine);
+                            if (lineWithLink.link && !currentService.link) {
+                                currentService.link = lineWithLink.link;
+                            }
+                            serviceContent.push(lineWithLink.text);
                         }
                     }
                 }
                 
-                // Add last service
+                // Add last service with link processing
                 if (currentService) {
                     if (serviceContent.length > 0) {
-                        currentService.description = serviceContent.join(' ');
+                        const descriptionContent = serviceContent.join(' ');
+                        const descWithLink = this.processTextWithLinks(descriptionContent);
+                        currentService.description = descWithLink.text;
+                        // If no link in title, use link from description
+                        if (!currentService.link && descWithLink.link) {
+                            currentService.link = descWithLink.link;
+                        }
                     }
                     services.push(currentService);
                 }
@@ -2054,7 +2049,45 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 return isShort && isCapitalized && notBullet && notNumber && isStandalone;
             }
 
+            isLikelyMainHeading(text) {
+                // Check if text looks like a main section heading (usually very short and generic)
+                const mainHeadingPatterns = [
+                    /^(our\s+)?services?$/i,
+                    /^what\s+we\s+offer$/i,
+                    /^solutions?$/i,
+                    /^offerings?$/i
+                ];
+                return mainHeadingPatterns.some(pattern => pattern.test(text.trim()));
+            }
+
+            isLikelyServiceTitle(text, allLines, currentIndex) {
+                if (!text || text.length < 10) return false; // Too short
+                if (text.length > 100) return false; // Too long for a title
+                if (text.match(/^[●\-\*•‑]\s*/)) return false; // Is a bullet point
+                
+                // Service title patterns
+                const servicePatterns = [
+                    /\b(development|services?|support|maintenance|customization|extension|migration|consulting|solutions?)\b/i,
+                    /\b(web|mobile|app|application|software|system|platform)\b/i,
+                    /\b(custom|professional|expert|advanced|comprehensive)\b/i
+                ];
+                
+                // Must match at least one service pattern
+                const hasServiceKeyword = servicePatterns.some(pattern => pattern.test(text));
+                
+                // Check if next line looks like description (longer text)
+                const nextLine = allLines[currentIndex + 1];
+                const hasDescriptionAfter = nextLine && nextLine.length > 30 && !nextLine.match(/^[●\-\*•‑]\s*/);
+                
+                // Check capitalization (service titles are usually title case)
+                const hasProperCapitalization = /^[A-Z]/.test(text) && (text.includes(' ') ? /[A-Z].*[A-Z]/.test(text) : true);
+                
+                return hasServiceKeyword && hasProperCapitalization && (hasDescriptionAfter || text.includes('&'));
+            }
+
             async parseServicesAccordionSection(content) {
+                console.log('🔧 SERVICES_ACCORDION_SECTION parseServicesAccordionSection called with content:', content);
+                
                 if (this.useAI) {
                     try {
                         return await this.parseWithAI(content, 'SERVICES_ACCORDION');
@@ -2063,69 +2096,58 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     }
                 }
                 
-                // Fallback to rule-based parsing
-                const lines = content.split('\n').filter(line => line.trim());
+                // Enhanced rule-based parsing for accordion services
+                const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+                console.log('🔧 SERVICES_ACCORDION_SECTION parsed lines:', lines);
                 const services = [];
                 
                 let currentService = null;
-                let awaitingDescription = false;
-                let inBullets = false;
                 
                 for (let i = 0; i < lines.length; i++) {
-                    const trimmedLine = lines[i].trim();
+                    const line = lines[i];
                     
-                    // Handle bullets (●, -, *, •, ‑)
-                    if (trimmedLine.match(/^[●\-\*•‑]\s*/)) {
-                        const bulletText = trimmedLine.replace(/^[●\-\*•‑]\s*/, '').trim();
-                        if (currentService) {
-                            currentService.bullets.push(bulletText);
-                            inBullets = true;
-                            awaitingDescription = false;
-                        }
+                    // Skip section headers/main headings
+                    if (i === 0 && this.isLikelyMainHeading(line)) {
+                        continue;
                     }
-                    // Non-bullet line
-                    else if (trimmedLine) {
-                        // If we were in bullets and hit a non-bullet line, this might be a new service title
-                        if (inBullets) {
-                            // Save previous service
-                            if (currentService) services.push(currentService);
-                            
-                            // Start new service
-                            currentService = {
-                                title: trimmedLine,
-                                description: '',
-                                bullets: []
-                            };
-                            awaitingDescription = true;
-                            inBullets = false;
+                    
+                    // Check if this line looks like a service title
+                    if (this.isLikelyServiceTitle(line, lines, i)) {
+                        // Save previous service if exists
+                        if (currentService) {
+                            services.push(currentService);
                         }
-                        // If we're awaiting description after a title
-                        else if (awaitingDescription && currentService) {
-                            currentService.description = trimmedLine;
-                            awaitingDescription = false;
+                        
+                        // Start new service
+                        currentService = {
+                            title: line,
+                            description: '',
+                            bullets: []
+                        };
+                        console.log('🔧 Found service title:', line);
+                    }
+                    // Handle bullets
+                    else if (line.match(/^[●\-\*•‑]\s*/) && currentService) {
+                        const bulletText = line.replace(/^[●\-\*•‑]\s*/, '').trim();
+                        currentService.bullets.push(bulletText);
+                        console.log('🔧 Found bullet for', currentService.title, ':', bulletText);
+                    }
+                    // Regular content - add to description
+                    else if (currentService && line.length > 0) {
+                        if (currentService.description) {
+                            currentService.description += ' ' + line;
+                        } else {
+                            currentService.description = line;
                         }
-                        // First service title (no current service yet)
-                        else if (!currentService) {
-                            currentService = {
-                                title: trimmedLine,
-                                description: '',
-                                bullets: []
-                            };
-                            awaitingDescription = true;
-                        }
-                        // Additional description text
-                        else if (currentService && !inBullets) {
-                            if (currentService.description) {
-                                currentService.description += ' ' + trimmedLine;
-                            } else {
-                                currentService.description = trimmedLine;
-                            }
-                        }
+                        console.log('🔧 Added description to', currentService.title);
                     }
                 }
                 
                 // Add last service
                 if (currentService) services.push(currentService);
+                
+                console.log('🔧 SERVICES_ACCORDION_SECTION final parsed services:', services);
+                console.log('🔧 SERVICES_ACCORDION_SECTION services count:', services.length);
                 
                 return {
                     services: services
@@ -3291,6 +3313,39 @@ ${categoriesHTML}</div>
             }
 
             generateServicesGridSection(content) {
+                // Handle empty content with default static HTML
+                if (!content || !content.services || content.services.length === 0) {
+                    return `<section class="pt80 pb50 services-section bg-color section-services-grid">
+<div class="container-xl">
+<h2 class="fonts-40 text-center font-weight-bold mb-3 mxw-1000">Our Comprehensive Development Services</h2>
+<p class="fonts-18 text-center mxw-1000 mb-4">Professional development solutions tailored to your business needs</p>
+<div class="row">
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<img src="/wp-content/uploads/2023/09/Architecture-and-Design-Consulting.svg" alt="Architecture Consulting" width="74" height="74" />
+<h3 class="fonts-18 font-weight-semibold">Architecture Consulting</h3>
+<p>Strategic guidance for building scalable and maintainable software architectures that grow with your business.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<img src="/wp-content/uploads/2025/07/ux-performance-optimization.svg" alt="Performance Optimization" width="74" height="74" />
+<h3 class="fonts-18 font-weight-semibold">Performance Optimization</h3>
+<p>Enhance your application's speed and efficiency with our comprehensive performance optimization services.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<img src="/wp-content/uploads/2024/02/Legacy-App-Modernization.svg" alt="Legacy Modernization" width="74" height="74" />
+<h3 class="fonts-18 font-weight-semibold">Legacy Modernization</h3>
+<p>Transform your legacy systems into modern, efficient applications with minimal disruption to your operations.</p>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+                
                 const serviceImages = [
                     '/wp-content/uploads/2023/09/Architecture-and-Design-Consulting.svg',
                     '/wp-content/uploads/2025/07/ux-performance-optimization.svg',
@@ -3344,8 +3399,9 @@ ${servicesGrid}
             }
 
             generateServicesGridSectionCenter(content) {
-                // Return the exact HTML provided by the user
-                return `<section class="pt80 pb50 services-section bg-color">
+                // Handle empty content with default static HTML
+                if (!content || !content.services || content.services.length === 0) {
+                    return `<section class="pt80 pb50 services-section bg-color">
 <div class="container-xl">
 <h2 class="fonts-40 text-center font-weight-bold">Explore Our Range of <br>Mobile App Development Services</h2>
 <div class="row justify-content-center">
@@ -3394,22 +3450,129 @@ ${servicesGrid}
 </div>
 </div>
 </section>`;
+                }
+                
+                // Generate dynamic content based on parsed services
+                let servicesHtml = '';
+                if (content.services && content.services.length > 0) {
+                    content.services.forEach((service, index) => {
+                        const clickHandler = service.link ? `onclick="location.href='${service.link}';"` : '';
+                        const linkTag = service.link ? `<a href="${service.link}">${service.title}</a>` : service.title;
+                        
+                        servicesHtml += `
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center" ${clickHandler}>
+<img decoding="async" src="${service.image || 'https://www.spaceotechnologies.com/wp-content/uploads/2023/10/SaaS-Consulting.svg'}" alt="${service.title}" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">${linkTag}</h3>
+<p>${service.description}</p>
+</div>
+</div>`;
+                    });
+                } else {
+                    // Use default services if none provided
+                    servicesHtml = `
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/10/SaaS-Consulting.svg" alt="Service 1" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">Service Title 1</h3>
+<p>Service description goes here.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box text-center">
+<img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/UI-UX-Design.svg" alt="Service 2" width="74" height="74">
+<h3 class="fonts-18 font-weight-semibold">Service Title 2</h3>
+<p>Service description goes here.</p>
+</div>
+</div>`;
+                }
+                
+                const template = `<section class="pt80 pb50 services-section bg-color">
+<div class="container-xl">
+<h2 class="fonts-40 text-center font-weight-bold">{main_heading}</h2>
+<div class="row justify-content-center">
+{services_html}
+</div>
+</div>
+</section>`;
+                
+                return template
+                    .replace('{main_heading}', content.main_heading || 'Our Services')
+                    .replace('{services_html}', servicesHtml);
             }
 
             generateServicesAccordionSection(content) {
-                if (!content.services || content.services.length === 0) {
-                    return '<div>No services found</div>';
+                console.log('🔧 SERVICES_ACCORDION_SECTION generateServicesAccordionSection called with:', content);
+                console.log('🔧 Content services:', content?.services);
+                console.log('🔧 Services length:', content?.services?.length);
+                
+                // Handle empty content with default static HTML
+                // Check for truly empty content OR content with no meaningful services
+                if (!content || !content.services || content.services.length === 0 || 
+                    (content.services.length > 0 && content.services.every(service => !service.title || service.title.trim() === ''))) {
+                    console.log('🚀 SERVICES_ACCORDION_SECTION: Using default static HTML (empty content detected)');
+                    return `<section class="techno-stack pb80 bg-color services-tab-new section-services-accordion">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-6">
+<div class="left-img">
+<img src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="Our Development Services" width="630" height="500" loading="lazy" decoding="async" onerror="handleImageError(this)">
+</div>
+</div>
+<div class="col-lg-6">
+<div id="accordion" class="text-left">
+<div class="card">
+<div class="card-header active">
+<h3 class="card-link" data-toggle="collapse" href="#services_item_1"><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/10/SaaS-Consulting.svg" width="34" height="34" alt="Web Development" class="left-icons" loading="lazy" decoding="async">Web Development</h3>
+<div id="services_item_1" class="collapse" data-parent="#accordion" style="display:block;">
+<div class="card card-body">
+<p>Complete web development solutions using modern technologies and best practices for scalable applications.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-header">
+<h3 class="card-link" data-toggle="collapse" href="#services_item_2"><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/UI-UX-Design.svg" width="34" height="34" alt="UI/UX Design" class="left-icons" loading="lazy" decoding="async">UI/UX Design</h3>
+<div id="services_item_2" class="collapse" data-parent="#accordion">
+<div class="card card-body">
+<p>Professional UI/UX design services to create intuitive and engaging user experiences that drive conversions.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-header">
+<h3 class="card-link" data-toggle="collapse" href="#services_item_3"><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/09/MVP-Development.svg" width="34" height="34" alt="MVP Development" class="left-icons" loading="lazy" decoding="async">MVP Development</h3>
+<div id="services_item_3" class="collapse" data-parent="#accordion">
+<div class="card card-body">
+<p>Rapid MVP development to validate your business ideas with minimal viable products that can scale.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>`;
                 }
 
                 const services = content.services;
                 const totalServices = services.length;
+                
+                console.log('🔧 SERVICES_ACCORDION_SECTION proceeding to generate dynamic content');
+                console.log('🔧 Services array:', services);
+                console.log('🔧 Total services:', totalServices);
 
-                // If 3 or fewer services, use single section
-                if (totalServices <= 3) {
+                // If 4 or fewer services, use single section
+                if (totalServices <= 4) {
+                    console.log('🔧 SERVICES_ACCORDION_SECTION using single section (≤4 services)');
                     return this.generateSingleAccordionSection(services);
                 }
 
-                // If more than 3, split into multiple sections with swapped columns
+                // If more than 4, split into multiple sections with 4 services each
+                console.log('🔧 SERVICES_ACCORDION_SECTION using multiple sections (>4 services, grouped by 4)');
                 return this.generateMultipleAccordionSections(services);
             }
 
@@ -3417,10 +3580,11 @@ ${servicesGrid}
                 const accordionImages = [
                     '/wp-content/uploads/2025/07/security-compliance-advisory.svg',
                     '/wp-content/uploads/2025/07/cloud-infrastructure-planning.svg',
+                    '/wp-content/uploads/2025/07/security-compliance-advisory.svg',
                     '/wp-content/uploads/2025/07/cloud-infrastructure-planning.svg'
                 ];
 
-                const collapseIds = ['one', 'two', 'three'];
+                const collapseIds = ['one', 'two', 'three', 'four'];
                 let accordionItems = '';
 
                 services.forEach((service, index) => {
@@ -3474,10 +3638,10 @@ ${accordionItems}
             }
 
             generateMultipleAccordionSections(services) {
-                // Split services into groups of 3
+                // Split services into groups of 4
                 const serviceGroups = [];
-                for (let i = 0; i < services.length; i += 3) {
-                    serviceGroups.push(services.slice(i, i + 3));
+                for (let i = 0; i < services.length; i += 4) {
+                    serviceGroups.push(services.slice(i, i + 4));
                 }
 
                 let sectionsHtml = '';
@@ -3486,10 +3650,11 @@ ${accordionItems}
                     const accordionImages = [
                         '/wp-content/uploads/2025/07/security-compliance-advisory.svg',
                         '/wp-content/uploads/2025/07/cloud-infrastructure-planning.svg',
+                        '/wp-content/uploads/2025/07/security-compliance-advisory.svg',
                         '/wp-content/uploads/2025/07/cloud-infrastructure-planning.svg'
                     ];
 
-                    const collapseIds = ['one', 'two', 'three'];
+                    const collapseIds = ['one', 'two', 'three', 'four'];
                     let accordionItems = '';
 
                     group.forEach((service, index) => {
@@ -3574,6 +3739,55 @@ ${accordionItems}
             }
 
             generatePortfolioSection(content) {
+                // Handle empty content with default static HTML
+                if (!content || !content.projects || content.projects.length === 0) {
+                    return `<section class="pt80 pb50 our-work">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-12">
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Proven Results: Real Projects That Drive Business Growth</h2>
+<p class="fonts-18 text-center mb-3 mxw-900">See how we've transformed complex business challenges into measurable success stories.</p>
+</div>
+<div class="slider_projects order-1">
+<div class="row vcenter-parent">
+<div class="col-lg-6 col-12">
+<div class="left_text">
+<div class="slider-app-name">
+<div class="top-heading">
+<h3 class="fonts-26 mb-2 font-weight-bold"><a href="#">E-Commerce Platform</a></h3>
+</div>
+</div>
+<p class="mb-3">A scalable e-commerce solution built with modern technologies, featuring advanced inventory management and seamless payment integration.</p>
+<div class="keep-reading ml-2"><a class="btn-link-arrow btn-link-arrow-right" href="#"><span class="btn__label-wrapper">See Project Details</span></a></div>
+</div>
+</div>
+<div class="col-lg-6 col-12">
+<img loading="lazy" decoding="async" class="project-img" src="/wp-content/uploads/2025/07/default-project.jpg" alt="E-Commerce Platform" width="600" height="459" onerror="handleImageError(this)">
+</div>
+</div>
+</div>
+<div class="slider_projects order-2">
+<div class="row vcenter-parent">
+<div class="col-lg-6 col-12">
+<div class="left_text">
+<div class="slider-app-name">
+<div class="top-heading">
+<h3 class="fonts-26 mb-2 font-weight-bold"><a href="#">Business Management App</a></h3>
+</div>
+</div>
+<p class="mb-3">Comprehensive business management solution with real-time analytics and automated workflow management capabilities.</p>
+<div class="keep-reading ml-2"><a class="btn-link-arrow btn-link-arrow-right" href="#"><span class="btn__label-wrapper">See Project Details</span></a></div>
+</div>
+</div>
+<div class="col-lg-6 col-12">
+<img loading="lazy" decoding="async" class="project-img" src="/wp-content/uploads/2025/07/default-project.jpg" alt="Business Management App" width="600" height="459" onerror="handleImageError(this)">
+</div>
+</div>
+</div>
+</div>
+</div>`;
+                }
+                
                 let portfolioItems = '';
                 if (content.projects && content.projects.length > 0) {
                     content.projects.forEach((project, index) => {
@@ -3638,6 +3852,33 @@ ${portfolioItems}
             }
 
             generateTestimonialSection(content) {
+                // Handle empty content with default static HTML
+                if (!content || (!content.main_heading && !content.testimonial_text && !content.client_name)) {
+                    return `<div class="blog-testimonial pb80 pt80 bg-color section-testimonial">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center mb-5">Client Testimonials</h2>
+<div class="row align-items-center customer-feedback">
+<div class="col-lg-7 blog-testimonial-left">
+<p class="description mb-0">"Working with this development team has been an exceptional experience. Their expertise in modern web technologies and dedication to our project exceeded all our expectations. The final product is exactly what we envisioned."</p>
+<div class="users-feed-ibox d-flex flex-row">
+<div class="userfedd-detbox justify-content-between">
+<div class="d-flex align-items-center mb-2">
+<p class="user-name">John Smith</p>
+<p><img loading="lazy" decoding="async" src="/wp-content/uploads/2023/06/Rating.svg" alt="review-star" width="82" height="13">
+</p></div>
+<p>CEO, Tech Solutions Inc</p>
+</div>
+</div>
+<div class="read_more">
+<a class="btn-link-arrow btn-link-arrow-right" href="/company/client-testimonials/"><span class="btn__label-wrapper">View all Testimonials</span></a>
+</div>
+</div>
+<div class="col-lg-5 right-img text-right"><img loading="lazy" decoding="async" src="/wp-content/uploads/2024/01/default-client.png" alt="John Smith" width="434" height="402" onerror="handleImageError(this)"></div>
+</div>
+</div>
+</div>`;
+                }
+                
                 const template = `<div class="blog-testimonial pb80 pt80 bg-color section-testimonial">
 <div class="container-xl">
 <h2 class="fonts-40 font-weight-bold text-center mb-5">{main_heading}</h2>
@@ -3676,6 +3917,54 @@ ${portfolioItems}
 
 
             generateBenefitsTwoSection(content) {
+                // Handle empty content with default static HTML
+                if (!content || !content.benefits || content.benefits.length === 0) {
+                    return `<section class="pt80 pb50 services-section practices-we-follow section-benefits-two">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold text-center mb-3">Why Choose Our Development Services</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">Professional development solutions that deliver measurable results for your business</p>
+<div class="row">
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<h3 class="fonts-18 font-weight-semibold">Expert Development Team</h3>
+<p>Our experienced developers use the latest technologies and best practices to build robust, scalable solutions.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<h3 class="fonts-18 font-weight-semibold">Agile Methodology</h3>
+<p>We follow agile development practices for faster delivery and better collaboration throughout the project lifecycle.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<h3 class="fonts-18 font-weight-semibold">Quality Assurance</h3>
+<p>Comprehensive testing and quality assurance processes ensure your application performs flawlessly.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<h3 class="fonts-18 font-weight-semibold">Ongoing Support</h3>
+<p>Dedicated support and maintenance services to keep your applications running smoothly after deployment.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<h3 class="fonts-18 font-weight-semibold">Scalable Solutions</h3>
+<p>Build applications that grow with your business using scalable architectures and modern technologies.</p>
+</div>
+</div>
+<div class="col-lg-4 col-md-6">
+<div class="mad_service_box">
+<h3 class="fonts-18 font-weight-semibold">Cost-Effective</h3>
+<p>Get maximum value for your investment with efficient development processes and competitive pricing.</p>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+                
                 const template = `<section class="pt80 pb50 services-section practices-we-follow section-benefits-two">
 <div class="container-xl">
 <h2 class="fonts-40 font-weight-bold text-center mb-3">{main_heading}</h2>
@@ -3880,6 +4169,47 @@ ${portfolioItems}
             }
 
             generateContentFormSection(content) {
+                // Handle empty content with default static HTML
+                if (!content || (!content.main_heading && !content.description)) {
+                    return `<section class="pt80 pb80 text-form-section bg-color section-content-form">
+<div class="container-xl">
+<div class="row">
+<div class="col-lg-7 col-md-12 col-sm-12">
+<h2 class="fonts-40 font-weight-bold text-left mb-4">Ready to Start Your Project?</h2>
+<p>Let's discuss your requirements and build something amazing together. Our team is ready to help you achieve your development goals with cutting-edge solutions.</p>
+<strong>Why Choose Our Services:</strong>
+<ul class="bullet fonts-14 mb-3">
+<li>Expert team with proven track record</li>
+<li>Modern technologies and best practices</li>
+<li>Transparent communication throughout</li>
+<li>Timely delivery and ongoing support</li>
+</ul>
+</div>
+<div class="col-lg-5 col-md-12 col-sm-12">
+<div class="form-box-out">
+<div class="container">
+<div class="row">
+<div class="col-lg-12">
+<div class="form-box section-form-box bg-white">
+<h3 class="fonts-20 mb-3 font-weight-bold text-center">Get Free Consultation</h3>
+<form>
+<input type="text" class="form-control" placeholder="Full Name" required>
+<input type="email" class="form-control" placeholder="Email Address" required>
+<input type="tel" class="form-control" placeholder="Phone Number" required>
+<textarea class="form-control" rows="4" placeholder="Project Details" required></textarea>
+<button type="submit" class="btn btn-primary w-100">Send Message</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+                
                 let bulletHtml = '';
                 if (content.bullet_points && content.bullet_points.length > 0) {
                     bulletHtml = `<strong>${content.bullet_intro || 'Key Points:'}</strong>\n<ul class="bullet fonts-14 mb-3">\n`;
@@ -3944,6 +4274,42 @@ ${portfolioItems}
             }
 
             generateCtaTwoSection(content) {
+                // Handle empty content with default static HTML
+                if (!content || !content.stats || content.stats.length === 0) {
+                    return `<section class="pt50 pb80 new-cta-section">
+<div class="container-xl">
+<div class="cta-inner">
+<div class="row align-items-center">
+<div class="col-md-12 text-center">
+<p class="fonts-40 font-weight-bold cta-title">Start Your Web App Project with Zend Experts</p>
+<p class="fonts-20 mxw-900">Have an idea for a secure, scalable web application? Our Zend developers can turn it into reality with clean architecture and reliable performance.</p>
+</div>
+<div class="new-button-group">
+<div class="new-button-group-inner">
+        <img decoding="async" src="https://test.spaceotechnologies.com/wp-content/uploads/2025/06/Frame-1.svg"><br>
+        <strong>350+</strong> Projects Delivered
+    </div>
+<div class="new-button-group-inner">
+        <img decoding="async" src="https://test.spaceotechnologies.com/wp-content/uploads/2025/06/Frame-3.svg"><br>
+        <strong>98%</strong> Client Satisfaction
+    </div>
+<div class="new-button-group-inner">
+        <img decoding="async" src="https://test.spaceotechnologies.com/wp-content/uploads/2025/06/Frame-4.svg"><br>
+        <strong>99%</strong> Bug-Free Delivery
+    </div>
+<div class="new-button-group-inner">
+        <img decoding="async" src="https://test.spaceotechnologies.com/wp-content/uploads/2025/06/Frame-5.svg"><br>
+        <strong>24/7</strong> Technical Support
+    </div>
+</div>
+<div class="col-md-12 text-center mt-4 d-flex justify-content-center two-btn-group"><button class="btn btn-pop open-qouteform" type="button" data-medium="B_2">Request for Free Consultation</button> <a class="btn btn-pop open-qouteform white-btn" href="/project/">View Portfolio</a></div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+                
+                // Generate dynamic content based on parsed stats
                 let statsHtml = '';
                 const statImages = [
                     'https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Frame-1.svg',
@@ -3959,8 +4325,8 @@ ${portfolioItems}
                         const number = parts[0];
                         const text = parts.slice(1).join(' ');
                         
-                        statsHtml += `    <div class="new-button-group-inner">
-        <img src="${imgSrc}">
+                        statsHtml += `<div class="new-button-group-inner">
+        <img decoding="async" src="${imgSrc}"><br>
         <strong>${number}</strong> ${text}
     </div>
 `;
@@ -4146,6 +4512,123 @@ ${portfolioItems}
                 return template
                     .replace('{main_heading}', content.main_heading || 'Our Solutions Recognized & Featured In')
                     .replace('{brand_items}', brandItems);
+            }
+
+            convertBoldMarkers(text) {
+                if (!text) return text;
+                
+                // Convert **text** to <strong>text</strong>
+                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                
+                // Convert __text__ to <strong>text</strong> (alternative bold syntax)
+                text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+                
+                // Convert single *text* to <strong>text</strong> (if used for bold)
+                // Be careful to not convert * used as bullet points
+                text = text.replace(/(?<![*\s])\*([^*\s][^*]*[^*\s])\*(?![*])/g, '<strong>$1</strong>');
+                
+                // Enhanced patterns for common bold text scenarios
+                
+                // Company names with common suffixes
+                text = text.replace(/\b([A-Z][a-zA-Z0-9\-]*(?:\s+[A-Z][a-zA-Z0-9\-]*)*)\s+(Technologies|Tech|Solutions|Inc|LLC|Ltd|Corporation|Corp|Company|Co)\b/g, '<strong>$1 $2</strong>');
+                
+                // Numbers with descriptive text (like "14+ years of expertise")
+                text = text.replace(/\b(\d+\+?\s+(?:years?|months?|days?)\s+of\s+[a-zA-Z\s]+(?:development|experience|expertise|service|business))\b/gi, '<strong>$1</strong>');
+                
+                // Standalone numbers with + (like "350+" in statistics)
+                text = text.replace(/\b(\d+\+)\b(?=\s|$)/g, '<strong>$1</strong>');
+                
+                return text;
+            }
+
+            extractLinksFromText(text) {
+                const links = [];
+                console.log('🔗 Extracting links from text:', text);
+                
+                // Pattern 1: URLs in text (http://... or https://...)
+                const urlPattern = /(https?:\/\/[^\s\)\]]+)/gi;
+                let match;
+                while ((match = urlPattern.exec(text)) !== null) {
+                    links.push({
+                        url: match[1],
+                        text: match[1],
+                        originalText: match[0]
+                    });
+                    console.log('🔗 Found URL:', match[1]);
+                }
+                
+                // Pattern 2: Markdown-style links [text](url)
+                const markdownPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+                while ((match = markdownPattern.exec(text)) !== null) {
+                    links.push({
+                        url: match[2],
+                        text: match[1],
+                        originalText: match[0]
+                    });
+                    console.log('🔗 Found markdown link:', match[1], '->', match[2]);
+                }
+                
+                // Pattern 3: Google Docs style links (text followed by URL in parentheses)
+                const googleDocsPattern = /([^(]+)\s*\((https?:\/\/[^)]+)\)/g;
+                while ((match = googleDocsPattern.exec(text)) !== null) {
+                    const linkText = match[1].trim();
+                    const linkUrl = match[2].trim();
+                    links.push({
+                        url: linkUrl,
+                        text: linkText,
+                        originalText: match[0]
+                    });
+                    console.log('🔗 Found Google Docs style link:', linkText, '->', linkUrl);
+                }
+                
+                // Pattern 4: Common link patterns like "visit our website: URL"
+                const descriptivePattern = /(visit|see|check|view|go to|click here):?\s*(https?:\/\/[^\s\)\]]+)/gi;
+                while ((match = descriptivePattern.exec(text)) !== null) {
+                    links.push({
+                        url: match[2],
+                        text: `${match[1]} ${match[2]}`,
+                        originalText: match[0]
+                    });
+                    console.log('🔗 Found descriptive link:', match[0]);
+                }
+                
+                // Pattern 5: Text with embedded links (Google Docs sometimes exports this way)
+                const embeddedPattern = /([^"]*)"([^"]*)"[^(]*\((https?:\/\/[^)]+)\)/g;
+                while ((match = embeddedPattern.exec(text)) !== null) {
+                    const linkText = match[2].trim() || match[1].trim();
+                    const linkUrl = match[3].trim();
+                    links.push({
+                        url: linkUrl,
+                        text: linkText,
+                        originalText: match[0]
+                    });
+                    console.log('🔗 Found embedded link:', linkText, '->', linkUrl);
+                }
+                
+                console.log('🔗 Total links found:', links.length);
+                return links;
+            }
+
+            processTextWithLinks(text, defaultLink = null) {
+                if (!text) return { text: '', link: defaultLink };
+                
+                const links = this.extractLinksFromText(text);
+                
+                if (links.length > 0) {
+                    // Use the first link found
+                    const firstLink = links[0];
+                    // Remove the link from the text and clean it up
+                    let cleanText = text.replace(firstLink.originalText, '').trim();
+                    if (!cleanText) {
+                        cleanText = firstLink.text;
+                    }
+                    return { 
+                        text: cleanText, 
+                        link: firstLink.url 
+                    };
+                }
+                
+                return { text: text, link: defaultLink };
             }
         }
 
@@ -4577,7 +5060,7 @@ ${portfolioItems}
                 // Safety check: ensure supportedSections is defined
                 if (!this.supportedSections || !Array.isArray(this.supportedSections)) {
                     console.warn('⚠️ supportedSections not initialized, using default list');
-                    this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'WHY_CHOOSE_BOX', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                    this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION'];
                 }
                 
                 // First pass: Find all sections with explicit END markers
@@ -4612,7 +5095,7 @@ ${portfolioItems}
                 if (sectionsFound.length === 0) {
                     // Double-check supportedSections is still defined
                     if (!this.supportedSections || !Array.isArray(this.supportedSections)) {
-                        this.supportedSections = ['HERO_BANNER_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_ENHANCED', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'WHY_CHOOSE_BOX', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                        this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION'];
                     }
                     this.supportedSections.forEach(sectionType => {
                         const simpleSectionPattern = new RegExp(
@@ -4778,6 +5261,33 @@ ${portfolioItems}
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
 
+            convertBoldMarkers(text) {
+                if (!text) return text;
+                
+                // Convert **text** to <strong>text</strong>
+                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                
+                // Convert __text__ to <strong>text</strong> (alternative bold syntax)
+                text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+                
+                // Convert single *text* to <strong>text</strong> (if used for bold)
+                // Be careful to not convert * used as bullet points
+                text = text.replace(/(?<![*\s])\*([^*\s][^*]*[^*\s])\*(?![*])/g, '<strong>$1</strong>');
+                
+                // Enhanced patterns for common bold text scenarios
+                
+                // Company names with common suffixes
+                text = text.replace(/\b([A-Z][a-zA-Z0-9\-]*(?:\s+[A-Z][a-zA-Z0-9\-]*)*)\s+(Technologies|Tech|Solutions|Inc|LLC|Ltd|Corporation|Corp|Company|Co)\b/g, '<strong>$1 $2</strong>');
+                
+                // Numbers with descriptive text (like "14+ years of expertise")
+                text = text.replace(/\b(\d+\+?\s+(?:years?|months?|days?)\s+of\s+[a-zA-Z\s]+(?:development|experience|expertise|service|business))\b/gi, '<strong>$1</strong>');
+                
+                // Standalone numbers with + (like "350+" in statistics)
+                text = text.replace(/\b(\d+\+)\b(?=\s|$)/g, '<strong>$1</strong>');
+                
+                return text;
+            }
+
             handlePaste(e) {
                 // Let the paste happen normally, then process the content
                 setTimeout(() => {
@@ -4795,22 +5305,6 @@ ${portfolioItems}
                     // Handle copied bold text that might have special characters
                     .replace(/\u{E000}(.*?)\u{E000}/gu, '[[BOLD]]$1[[/BOLD]]') // Private use area chars
                     .replace(/\u{200B}(.*?)\u{200B}/gu, '[[BOLD]]$1[[/BOLD]]'); // Zero-width spaces
-            }
-
-            convertBoldMarkers(text) {
-                if (!text) return text;
-                
-                // Convert **text** to <strong>text</strong>
-                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-                
-                // Convert __text__ to <strong>text</strong> (alternative bold syntax)
-                text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-                
-                // Convert single *text* to <strong>text</strong> (if used for bold)
-                // Be careful to not convert * used as bullet points
-                text = text.replace(/(?<![*\s])\*([^*\s][^*]*[^*\s])\*(?![*])/g, '<strong>$1</strong>');
-                
-                return text;
             }
 
             handleContentChange() {
@@ -4854,13 +5348,13 @@ ${portfolioItems}
                 this.sectionTags.innerHTML = '';
                 
                 // Show all supported sections
-                const allSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION', 'SERVICES_ACCORDION_SECTION', 'FAQ_SECTION', 'CTA_SIMPLE_SECTION', 'CTA_WITH_LIST_SECTION', 'PROCESS_SECTION', 'TECHNOLOGY_STACK_SECTION', 'INDUSTRIES_WE_SERVE_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'WHY_CHOOSE_BOX', 'CONTENT_WITH_FORM_SECTION', 'FEATURED_IN_SECTION'];
+                const allSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION'];
                 
                 allSections.forEach(section => {
                     const tag = document.createElement('span');
                     tag.className = 'section-tag';
                     
-                    const isFound = sections.some(s => s.includes(section) || section.includes(s));
+                    const isFound = sections.includes(section);
                     if (!isFound) {
                         tag.className += ' not-found';
                     }
@@ -5177,6 +5671,11 @@ ${portfolioItems}
 .services-section.practices-we-follow .mad_service_box::after {content: ""; position: absolute; margin: auto; top: 25px; left: 25px; background: url(https://www.spaceotechnologies.com/wp-content/uploads/2024/01/arrow-ne.svg); width: 24px; height: 24px;}
 .services-section.globle-clients .col-lg-3{  margin: 0 0 30px 0; display: flex; }
 
+.service-link { margin-top: 15px; }
+.service-link .btn-link-arrow { display: inline-block; }
+// .mad_service_box.text-center { cursor: pointer; }
+.mad_service_box.text-center:hover { transform: translateY(-5px); transition: transform 0.3s ease; }
+
 @media screen and (max-width:991px) {
 .services-section .col-lg-4:last-child { margin: 0 auto 15px;}
 .services-section .col-lg-3{ margin-bottom: 30px;}
@@ -5186,6 +5685,7 @@ ${portfolioItems}
 .services-section .mad_service_box h3{font-size: 18px;}
 }
 /********* SERVICES_GRID_SECTION CSS END **********/`,
+
 
             'SERVICES_ACCORDION_SECTION': `
 /********* SERVICES_ACCORDION_SECTION **********/
@@ -5212,7 +5712,7 @@ ${portfolioItems}
 
             'CTA_SIMPLE_SECTION': `
 /********* CTA_SIMPLE_SECTION & CTA_WITH_LIST_SECTION **********/
-.cta-inner { border-radius: 24px; padding: 54px; position: relative; background: #EAF3FF url(/wp-content/uploads/2023/08/cta-bg-circle.png) no-repeat; background-size: cover;}
+.cta-inner { border-radius: 24px; padding: 54px; position: relative; background: #EAF3FF url(https://www.spaceotechnologies.com/wp-content/uploads/2023/08/cta-bg-circle.png) no-repeat; background-size: cover;}
 .cta-inner .cta-title{line-height: 1.45}
 .hire-new-cta .cta-inner { background: #EAF3FF url(https://www.spaceotechnologies.com/wp-content/uploads/2024/01/hire-cta-bg.jpg) no-repeat; background-size: cover; background-position: center;}
 
@@ -5234,7 +5734,7 @@ ${portfolioItems}
 
             'CTA_WITH_LIST_SECTION': `
 /********* CTA_SIMPLE_SECTION & CTA_WITH_LIST_SECTION **********/
-.cta-inner { border-radius: 24px; padding: 54px; position: relative; background: #EAF3FF url(/wp-content/uploads/2023/08/cta-bg-circle.png) no-repeat; background-size: cover;}
+.cta-inner { border-radius: 24px; padding: 54px; position: relative; background: #EAF3FF url(https://www.spaceotechnologies.com/wp-content/uploads/2023/08/cta-bg-circle.png) no-repeat; background-size: cover;}
 .cta-inner .cta-title{line-height: 1.45}
 .hire-new-cta .cta-inner { background: #EAF3FF url(https://www.spaceotechnologies.com/wp-content/uploads/2024/01/hire-cta-bg.jpg) no-repeat; background-size: cover; background-position: center;}
 
@@ -5243,7 +5743,6 @@ ${portfolioItems}
     font-size: 16px;
     margin: 15px 0;
     position: relative;
-    width: 100%;
     border-right: solid 1px #EAEBED;
 }
 .new-button-group .new-button-group-inner strong{
@@ -5380,7 +5879,7 @@ ${portfolioItems}
 .blog-testimonial .customer-feedback { position: relative; justify-content: space-between;}
 .blog-testimonial .customer-feedback p em { position: absolute; left: 0; top: -5px;}
 .blog-testimonial .customer-feedback .description {font-size: 20px; line-height: 34px; color: #1b1c1e; position: relative; z-index: 1; padding-top: 30px;}
-.blog-testimonial .customer-feedback .description::after { position: absolute; margin: auto; left: 0; top: 0px; background-image: url(/wp-content/uploads/2023/06/Quets.svg); background-repeat: no-repeat; width: 80px; height: 67px; content: ""; z-index: -1;}
+.blog-testimonial .customer-feedback .description::after { position: absolute; margin: auto; left: 0; top: 0px; background-image: url(https://www.spaceotechnologies.com/wp-content/uploads/2023/06/Quets.svg); background-repeat: no-repeat; width: 80px; height: 67px; content: ""; z-index: -1;}
 .blog-testimonial .users-feed-ibox { padding-top: 30px;}
 .blog-testimonial .userfedd-img-box { width: 70px; height: 58px; padding-right: 10px; margin-right: 10px; border-right: 1px solid #c5c5c5;}
 .blog-testimonial .userfedd-detbox { padding-bottom: 5px;}
@@ -5497,7 +5996,7 @@ ul.tags-list li {
 }
 @media screen and (max-width:560px){
     .new-button-group .new-button-group-inner {
-                width: 100%;
+        width: 100%;
         border: solid 1px #EAEBED !important;
         padding: 15px;
         margin: 5px;
@@ -5528,7 +6027,7 @@ background-size: 97% 100%;background-repeat: no-repeat;transition: background-si
 .blog-testimonial .btn__label-wrapper{ font-size: 16px; }
 .btn-link-arrow{position: relative;}
 .btn-link-arrow:hover .btn__label-wrapper {color: #000;text-decoration: none;background-size: 0% 100%;}
-.btn-link-arrow:after {color: #005eb8;content: "";background: url(/wp-content/uploads/2023/11/arrow-right.svg) no-repeat;display: inline-block;height: 20px;position: absolute;
+.btn-link-arrow:after {color: #005eb8;content: "";background: url(https://www.spaceotechnologies.com/wp-content/uploads/2023/11/arrow-right.svg) no-repeat;display: inline-block;height: 20px;position: absolute;
 top: 6px;width: 20px;right: auto;background-size: 75%;filter: hue-rotate(495deg) saturate(2);}
 .btn-link-arrow-right:hover.btn-link-arrow:after {animation: slide-left 1s ease-in-out .5s infinite;}
 .blog-div-descriptoin {min-height: 110px;}
@@ -5609,14 +6108,27 @@ border: 1px solid #EAF3FF;box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.28);}
                     return '/* Common CSS not found */';
                 }
                 
-                // Add section-specific CSS
+                // Add section-specific CSS (avoid duplicates)
                 if (detectedSections && Array.isArray(detectedSections)) {
+                    const addedCssTypes = new Set(); // Track added CSS to avoid duplicates
+                    
                     detectedSections.forEach(section => {
-                        const baseSectionType = section.replace(/_\d+$/, '');
+                        let baseSectionType = section.replace(/_\d+$/, '');
+                        
+                        // Handle SERVICES_GRID_SECTION variants - use shared CSS
+                        if (baseSectionType === 'SERVICES_GRID_SECTION_CENTER') {
+                            baseSectionType = 'SERVICES_GRID_SECTION'; // Use same CSS as regular grid
+                        }
+                        
                         console.log('🎨 Processing section:', section, 'base type:', baseSectionType);
-                        if (sectionCssMap[baseSectionType]) {
+                        
+                        // Only add CSS if we haven't added it already
+                        if (!addedCssTypes.has(baseSectionType) && sectionCssMap[baseSectionType]) {
                             generatedCSS += sectionCssMap[baseSectionType] + '\n\n';
+                            addedCssTypes.add(baseSectionType);
                             console.log('🎨 Added CSS for', baseSectionType, ', total length:', generatedCSS.length);
+                        } else if (addedCssTypes.has(baseSectionType)) {
+                            console.log('🎨 CSS already added for', baseSectionType, '- skipping duplicate');
                         } else {
                             console.log('🎨 No CSS found for section:', baseSectionType);
                         }

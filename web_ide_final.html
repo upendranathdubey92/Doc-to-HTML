@@ -865,7 +865,7 @@
         // Global image error handler for broken images
         function handleImageError(img) {
             if (img.src.includes('wp-content/uploads/2023/08/') || img.src.includes('wp-content/uploads/2024/02/')) {
-                img.src = 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg';
+                img.src = 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg';
             } else if (img.src.includes('wp-content/uploads/2025/07/')) {
                 img.src = '/wp-content/uploads/2025/07/default-placeholder.svg';
             } else if (img.src.includes('wp-content/uploads/2024/01/')) {
@@ -1800,78 +1800,155 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
 
 
             parseTechnologySection(content) {
+                console.log('🔧 TECHNOLOGY_STACK_SECTION DYNAMIC Parsing Debug:');
+                console.log('Raw content:', content);
+                console.log('Raw content length:', content.length);
+                
                 const lines = content.split('\n').filter(line => line.trim());
+                console.log('Filtered lines:', lines);
+                console.log('Number of filtered lines:', lines.length);
                 
                 let main_heading = "Technology Stack";
                 let description = "Technologies we use";
                 let categories = [];
                 
                 // Check for custom main heading (first line if descriptive)
-                if (lines.length > 0 && lines[0].length > 10 && !lines[0].includes(':')) {
+                if (lines.length > 0 && lines[0].length > 10 && !lines[0].includes(':') && !lines[0].includes('|')) {
                     main_heading = lines[0].trim();
                     lines.shift(); // Remove heading from lines
+                    console.log('Found DYNAMIC main_heading:', main_heading);
+                    console.log('Remaining lines after heading removal:', lines);
                 }
                 
-                // Check for description (second line if descriptive and no colon)
-                if (lines.length > 0 && lines[0].length > 30 && !lines[0].includes(':')) {
+                // Check for description (second line if descriptive and no colon or pipe)
+                if (lines.length > 0 && lines[0].length > 20 && !lines[0].includes(':') && !lines[0].includes('|')) {
                     description = lines[0].trim();
                     lines.shift(); // Remove description from lines
+                    console.log('Found DYNAMIC description:', description);
+                    console.log('Remaining lines after description removal:', lines);
                 }
                 
-                // Parse categories that end with ':'
-                let currentCategory = null;
-                let currentTechs = [];
+                console.log('Starting DYNAMIC category parsing with lines:', lines);
                 
-                for (let line of lines) {
-                    line = line.trim();
+                // Process each line for pipe-separated format (Category | Tech1 | Tech2 | Tech3)
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
                     if (!line) continue;
                     
-                    // Check if line is a category (ends with ':')
+                    console.log(`Processing line ${i}: "${line}"`);
+                    
+                    // Check if this line contains pipe separators (table format)
+                    if (line.includes('|')) {
+                        console.log(`Found TABLE FORMAT line with pipe separator: "${line}"`);
+                        
+                        // Split by pipe - first part is category, rest are individual technologies
+                        const parts = line.split('|').map(part => part.trim()).filter(part => part.length > 0);
+                        
+                        if (parts.length >= 2) {
+                            const categoryName = parts[0];
+                            // Each remaining part is a separate technology
+                            const techs = parts.slice(1);
+                            
+                            console.log(`TABLE FORMAT - Category: "${categoryName}", Individual Technologies:`, techs);
+                            
+                            if (categoryName && techs.length > 0) {
+                                categories.push({
+                                    name: categoryName,
+                                    technologies: techs
+                                });
+                                console.log(`✅ Added TABLE FORMAT category: ${categoryName} with ${techs.length} individual technologies`);
+                            }
+                        } else {
+                            console.log(`⚠️ TABLE FORMAT line has insufficient parts:`, parts);
+                        }
+                        continue;
+                    }
+                    
+                    // Handle colon-based category format (Category:)
                     if (line.endsWith(':')) {
-                        // Save previous category if exists
-                        if (currentCategory) {
-                            categories.push({
-                                name: currentCategory,
-                                technologies: [...currentTechs]
-                            });
+                        console.log(`Found COLON FORMAT category: "${line}"`);
+                        
+                        const categoryName = line.replace(':', '').trim();
+                        
+                        // Look ahead to collect technologies for this category
+                        const categoryTechs = [];
+                        let j = i + 1;
+                        
+                        // Collect all following non-category lines as technologies
+                        while (j < lines.length && !lines[j].trim().endsWith(':') && !lines[j].trim().includes('|')) {
+                            const techLine = lines[j].trim();
+                            if (techLine) {
+                                // Clean up bullet points and split by commas or other separators
+                                const cleanTech = techLine.replace(/^\s*[\*\•\-\►]\s*/, '').trim();
+                                
+                                if (cleanTech.includes(',')) {
+                                    const techs = cleanTech.split(',').map(tech => tech.trim()).filter(tech => tech.length > 0);
+                                    categoryTechs.push(...techs);
+                                } else {
+                                    categoryTechs.push(cleanTech);
+                                }
+                            }
+                            j++;
                         }
                         
-                        // Start new category
-                        currentCategory = line.slice(0, -1).trim();
-                        currentTechs = [];
-                    } else {
-                        // Add technology to current category
-                        if (currentCategory) {
-                            currentTechs.push(line);
+                        if (categoryTechs.length > 0) {
+                            categories.push({
+                                name: categoryName,
+                                technologies: categoryTechs
+                            });
+                            console.log(`✅ Added COLON FORMAT category: ${categoryName} with technologies:`, categoryTechs);
                         }
+                        
+                        // Skip the processed lines
+                        i = j - 1;
                     }
                 }
                 
-                // Add final category
-                if (currentCategory && currentTechs.length > 0) {
-                    categories.push({
-                        name: currentCategory,
-                        technologies: currentTechs
-                    });
-                }
+                console.log('Final DYNAMIC categories array:', categories);
                 
-                // If no categories found, return legacy format
+                // If no categories found, try to extract individual technologies
                 if (categories.length === 0) {
-                    const commonTech = ['React', 'Node.js', 'Python', 'Laravel', 'MySQL', 'PostgreSQL', 'AWS', 'Docker', 'JavaScript', 'PHP'];
-                    const foundTech = commonTech.filter(tech => content.includes(tech));
+                    console.log('⚠️ No categories found, attempting to extract individual technologies from content');
+                    const foundTech = [];
                     
-                    return {
+                    // Look for technology keywords in the content
+                    const techKeywords = ['React', 'Vue', 'Angular', 'Node', 'Python', 'Django', 'Laravel', 'PHP', 'MySQL', 'PostgreSQL', 'MongoDB', 'AWS', 'Docker', 'JavaScript', 'TypeScript', 'Next'];
+                    
+                    lines.forEach(line => {
+                        const cleanLine = line.trim();
+                        // Check if line contains technology keywords
+                        techKeywords.forEach(tech => {
+                            if (cleanLine.toLowerCase().includes(tech.toLowerCase()) && !foundTech.includes(tech)) {
+                                foundTech.push(tech);
+                            }
+                        });
+                        
+                        // Also add the line itself if it looks like a technology (short and no special chars)
+                        if (cleanLine.length > 2 && cleanLine.length < 20 && !cleanLine.includes(' ') && /^[a-zA-Z0-9.-]+$/.test(cleanLine)) {
+                            if (!foundTech.includes(cleanLine)) {
+                                foundTech.push(cleanLine);
+                            }
+                        }
+                    });
+                    
+                    const result = {
                         main_heading,
                         description,
-                        technologies: foundTech.length > 0 ? foundTech : commonTech
+                        technologies: foundTech.length > 0 ? foundTech : ['React', 'Node.js', 'Python'] // Minimal fallback
                     };
+                    
+                    console.log('DYNAMIC legacy format result with extracted technologies:', result);
+                    return result;
                 }
                 
-                return {
+                const result = {
                     main_heading,
                     description,
                     categories
                 };
+                
+                console.log('Final DYNAMIC parsed result:', result);
+                return result;
             }
 
             parseIndustriesSection(content) {
@@ -3147,100 +3224,29 @@ ${faqItems}
 
 
             generateTechnologySection(content) {
-                // Handle empty content with default static HTML using your exact format
-                if (!content || !content.categories || content.categories.length === 0) {
-                    return `<div class="technology-stack pt80 pb60 bg-color">
-<div class="container-xl">
-<div class="row">
-<div class="col-md-12">
-<h2 class="fonts-40 text-center font-weight-bold mb-5">Technology Stack for Web Development</h2>
-</div>
-</div>
-<div class="technology-inner">
-<div class="row">
-<div class="col-md-2">
-<div class="technology-name fonts-20">Frontend Technologies</div>
-</div>
-<div class="col-md-10">
-<ul class="technology-icon-wrapper">
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg" alt="React" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> React</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Vue.svg" alt="Vue.js" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Vue.js</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Angular.svg" alt="Angular" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Angular</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Next-js.svg" alt="Next.js" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Next.js</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/TypeScript.svg" alt="TypeScript" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> TypeScript</li>
-</ul>
-</div>
-</div>
-<div class="row">
-<div class="col-md-2">
-<div class="technology-name fonts-20">Backend Technologies</div>
-</div>
-<div class="col-md-10">
-<ul class="technology-icon-wrapper">
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Node-js.svg" alt="Node.js" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Node.js</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Python.svg" alt="Python" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Python</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Django.svg" alt="Django" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Django</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/PHP.svg" alt="PHP" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> PHP</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Laravel.svg" alt="Laravel" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="this.src='https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg'"/> Laravel</li>
-</ul>
-</div>
-</div>
-<div class="row">
-<div class="col-md-2">
-<div class="technology-name fonts-20">Database</div>
-</div>
-<div class="col-md-10">
-<ul class="technology-icon-wrapper">
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/PostgreSQL.svg" alt="PostgreSQL" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> PostgreSQL</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/MongoDB.svg" alt="MongoDB" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> MongoDB</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/MySQL.svg" alt="MySQL" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> MySQL</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Redis.svg" alt="Redis" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> Redis</li>
-</ul>
-</div>
-</div>
-<div class="row">
-<div class="col-md-2">
-<div class="technology-name fonts-20">Cloud & DevOps</div>
-</div>
-<div class="col-md-10">
-<ul class="technology-icon-wrapper">
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/AWS.svg" alt="AWS" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> AWS</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Google-Cloud.svg" alt="Google Cloud" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> Google Cloud</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Docker.svg" alt="Docker" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> Docker</li>
-<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Kubernetes.svg" alt="Kubernetes" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> Kubernetes</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>`;
-                }
+                console.log('🎨 TECHNOLOGY_STACK_SECTION HTML Generation Debug:');
+                console.log('Input content:', content);
+                console.log('Content type:', typeof content);
+                console.log('Has categories?', content && content.categories);
+                console.log('Categories length:', content && content.categories ? content.categories.length : 'N/A');
                 
-                // If categories are provided, generate dynamic HTML
+                // ⚠️ IMPORTANT: TECHNOLOGY_STACK_SECTION should ALWAYS be dynamic from DOC content
+                // NO static defaults - only process actual document content
+                
+                // Process dynamic categories from document content
                 if (content && content.categories && content.categories.length > 0) {
+                    console.log('✅ Using DYNAMIC category-based HTML from document content');
+                    console.log('Categories to process:', content.categories);
+                    
                     let categoriesHTML = '';
-                    content.categories.forEach(category => {
+                    content.categories.forEach((category, index) => {
+                        console.log(`Processing category ${index + 1}:`, category);
+                        
                         let techList = '';
                         if (category.technologies && category.technologies.length > 0) {
                             category.technologies.forEach(tech => {
-                                // Create a more robust tech slug and provide fallback
-                                const techSlug = tech.toLowerCase()
-                                    .replace(/\./g, '')
-                                    .replace(/\s+/g, '-')
-                                    .replace(/[^a-z0-9-]/g, '');
-                                
-                                // Try different possible paths for tech icons
-                                const possiblePaths = [
-                                    `https://www.spaceotechnologies.com/wp-content/uploads/2023/08/${tech}.svg`,
-                                    `https://www.spaceotechnologies.com/wp-content/uploads/2024/02/${tech}.svg`,
-                                    `https://www.spaceotechnologies.com/wp-content/uploads/2023/08/${techSlug}.svg`,
-                                    `https://www.spaceotechnologies.com/wp-content/uploads/2024/02/${techSlug}.svg`,
-                                    // Fallback placeholder
-                                    `https://www.spaceotechnologies.com/wp-content/uploads/2023/08/default-tech.svg`
-                                ];
-                                
-                                // Use the first path as primary with global error handler
-                                techList += `<li><img src="${possiblePaths[0]}" alt="${tech}" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> ${tech}</li>
+                                // Use static React icon for all technologies, only update alt tag dynamically
+                                techList += `<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg" alt="${tech}" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> ${tech}</li>
 `;
                             });
                         }
@@ -3257,7 +3263,9 @@ ${techList}</ul>
 `;
                     });
                     
-                    return `<div class="technology-stack pt80 pb60 bg-color">
+                    console.log('Generated DYNAMIC categoriesHTML:', categoriesHTML);
+                    
+                    const finalHTML = `<div class="technology-stack pt80 pb60 bg-color">
 <div class="container-xl">
 <div class="row">
 <div class="col-md-12">
@@ -3268,39 +3276,69 @@ ${techList}</ul>
 ${categoriesHTML}</div>
 </div>
 </div>`;
+                    
+                    console.log('Final DYNAMIC category-based HTML:', finalHTML);
+                    return finalHTML;
                 }
 
-                // Legacy fallback for old format
-                const template = `<section class="pt70 pb40 technology-section bg-light section-technology">
+                // ⚠️ FALLBACK: If no categories found, try to create categories from content
+                console.log('⚠️ No categories detected - attempting to create from document content');
+                console.log('Content for processing:', content);
+                
+                // If we have content but no categories, try to parse it manually
+                if (content && (content.technologies || content.main_heading)) {
+                    console.log('Attempting to process content as legacy format or create basic structure');
+                    
+                    let categoriesHTML = '';
+                    
+                    // Create a single "Technologies" category from the content
+                    if (content.technologies && content.technologies.length > 0) {
+                        let techList = '';
+                        content.technologies.forEach(tech => {
+                            techList += `<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg" alt="${tech}" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> ${tech}</li>
+`;
+                        });
+                        
+                        categoriesHTML = `<div class="row">
+<div class="col-md-2">
+<div class="technology-name fonts-20">Technologies</div>
+</div>
+<div class="col-md-10">
+<ul class="technology-icon-wrapper">
+${techList}</ul>
+</div>
+</div>
+`;
+                    }
+                    
+                    const fallbackHTML = `<div class="technology-stack pt80 pb60 bg-color">
 <div class="container-xl">
 <div class="row">
-<div class="col-lg-12 text-center">
-<h2 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h2>
-<p class="fonts-18 mb-5">{description}</p>
+<div class="col-md-12">
+<h2 class="fonts-40 text-center font-weight-bold mb-5">${content.main_heading || 'Technology Stack'}</h2>
 </div>
 </div>
-<div class="row">
-<div class="col-lg-12">
-<div class="tech-stack">
-{tech_items}
+<div class="technology-inner">
+${categoriesHTML}</div>
 </div>
-</div>
-</div>
-</div>
-</section>`;
-
-                let techItems = '';
-                if (content && content.technologies) {
-                    content.technologies.forEach(tech => {
-                        techItems += `<span class="tech-item badge badge-primary mr-2 mb-2 fonts-16">${tech}</span>
-`;
-                    });
+</div>`;
+                    
+                    console.log('Generated fallback HTML from document content:', fallbackHTML);
+                    return fallbackHTML;
                 }
-
-                return template
-                    .replace('{main_heading}', (content && content.main_heading) || 'Technology Stack')
-                    .replace('{description}', (content && content.description) || 'Technologies we use')
-                    .replace('{tech_items}', techItems);
+                
+                // If absolutely no content, return minimal placeholder
+                console.log('⚠️ NO CONTENT PROVIDED - returning minimal placeholder');
+                return `<div class="technology-stack pt80 pb60 bg-color">
+<div class="container-xl">
+<div class="row">
+<div class="col-md-12">
+<h2 class="fonts-40 text-center font-weight-bold mb-5">Technology Stack</h2>
+<p class="text-center">No technology stack content provided in document.</p>
+</div>
+</div>
+</div>
+</div>`;
             }
 
             generateIndustriesSection(content) {
@@ -3572,7 +3610,7 @@ ${servicesGrid}
                         servicesHtml += `
 <div class="col-lg-4 col-md-6">
 <div class="mad_service_box text-center" ${clickHandler}>
-<img decoding="async" src="${service.image || 'https://www.spaceotechnologies.com/wp-content/uploads/2023/10/SaaS-Consulting.svg'}" alt="${service.title}" width="74" height="74">
+<img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/10/SaaS-Consulting.svg" alt="${service.title}" width="74" height="74">
 <h3 class="fonts-18 font-weight-semibold">${linkTag}</h3>
 <p>${service.description}</p>
 </div>
@@ -3872,7 +3910,7 @@ ${accordionItems}
 </div>
 </div>
 <div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="/wp-content/uploads/2025/07/default-project.jpg" alt="E-Commerce Platform" width="600" height="459" onerror="handleImageError(this)">
+<img loading="lazy" decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="E-Commerce Platform" width="600" height="459" onerror="handleImageError(this)">
 </div>
 </div>
 </div>
@@ -3890,7 +3928,7 @@ ${accordionItems}
 </div>
 </div>
 <div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="/wp-content/uploads/2025/07/default-project.jpg" alt="Business Management App" width="600" height="459" onerror="handleImageError(this)">
+<img loading="lazy" decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="Business Management App" width="600" height="459" onerror="handleImageError(this)">
 </div>
 </div>
 </div>
@@ -3920,7 +3958,7 @@ ${accordionItems}
 </div>
 </div>
 <div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="${project.image || '/wp-content/uploads/2025/07/default-project.jpg'}" alt="${project.title}" width="600" height="459" onerror="handleImageError(this)">
+<img loading="lazy" decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="${project.title}" width="600" height="459" onerror="handleImageError(this)">
 </div>
 </div>
 </div>
@@ -3941,7 +3979,7 @@ ${accordionItems}
 </div>
 </div>
 <div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="${project.image || '/wp-content/uploads/2025/07/default-project.jpg'}" alt="${project.title}" width="600" height="459" onerror="handleImageError(this)">
+<img loading="lazy" decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="${project.title}" width="600" height="459" onerror="handleImageError(this)">
 </div>
 </div>
 </div>
@@ -3985,7 +4023,7 @@ ${portfolioItems}
 <a class="btn-link-arrow btn-link-arrow-right" href="/company/client-testimonials/"><span class="btn__label-wrapper">View all Testimonials</span></a>
 </div>
 </div>
-<div class="col-lg-5 right-img text-right"><img loading="lazy" decoding="async" src="/wp-content/uploads/2024/01/default-client.png" alt="John Smith" width="434" height="402" onerror="handleImageError(this)"></div>
+<div class="col-lg-5 right-img text-right"><img loading="lazy" decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/01/Michael-Davis.png" alt="John Smith" width="434" height="402" onerror="handleImageError(this)"></div>
 </div>
 </div>
 </div>`;
@@ -4010,21 +4048,18 @@ ${portfolioItems}
 <a class="btn-link-arrow btn-link-arrow-right" href="/company/client-testimonials/"><span class="btn__label-wrapper">{button_text}</span></a>
 </div>
 </div>
-<div class="col-lg-5 right-img text-right"><img loading="lazy" decoding="async" src="/wp-content/uploads/2024/01/{client_image}" alt="{client_name}" width="434" height="402" onerror="handleImageError(this)"></div>
+<div class="col-lg-5 right-img text-right"><img loading="lazy" decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/01/Michael-Davis.png" alt="{client_name}" width="434" height="402" onerror="handleImageError(this)"></div>
 </div>
 </div>
 </div>`;
 
-                // Generate client image filename from name
-                const clientImageName = (content.client_name || 'Client-Name').replace(/\s+/g, '-') + '.png';
-
+                // Use static image, only update alt tag dynamically
                 return template
                     .replace('{main_heading}', content.main_heading || 'Client Testimonials')
                     .replace('{testimonial_text}', content.testimonial_text || 'Great service!')
                     .replace(/{client_name}/g, content.client_name || 'Client Name')
                     .replace('{client_title}', content.client_title || 'Client Title')
-                    .replace('{button_text}', content.button_text || 'View all Testimonials')
-                    .replace('{client_image}', clientImageName);
+                    .replace('{button_text}', content.button_text || 'View all Testimonials');
             }
 
 

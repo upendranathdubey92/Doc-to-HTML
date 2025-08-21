@@ -4,7 +4,7 @@
 This project contains a web-based IDE for converting structured documents with section markers into HTML code. The main tool processes documents with `[SECTION_NAME]...[SECTION_NAME END]` markers and generates corresponding HTML sections with intelligent fallback content and comprehensive image handling.
 
 ## Key Files
-- `web_ide_final.html` - Main web IDE with AI-powered content parsing (v3.7)
+- `web_ide_final.html` - Main web IDE with AI-powered content parsing (v3.9)
 - `CLAUDE.md` - Project documentation and instructions
 - `package.json` & `package-lock.json` - Node.js dependencies
 - `vercel.json` - Deployment configuration
@@ -20,7 +20,7 @@ This project contains a web-based IDE for converting structured documents with s
 - **Technology Stack Parsing**: Advanced category-based technology parsing
 - **Descriptive Section Names**: All sections use clear, descriptive naming conventions
 
-## Section Types Supported (14 Total)
+## Section Types Supported (15 Total)
 
 ### Updated Section Names (v3.5+):
 - **HERO_BANNER_SECTION**: Main landing section with title, description, bullet points, and contact form
@@ -34,10 +34,11 @@ This project contains a web-based IDE for converting structured documents with s
 - **CONTENT_WITH_FORM_SECTION**: Contact forms with customizable fields
 - **PORTFOLIO_SECTION**: Project showcase with technology stacks
 - **TESTIMONIAL_SECTION**: Customer testimonials with author attribution
-- **TECHNOLOGY_STACK_SECTION**: Technology stack display with categories and icons
+- **TECHNOLOGY_STACK_SECTION**: Technology stack display with categories and icons (supports pipe and colon formats)
 - **INDUSTRIES_WE_SERVE_SECTION**: Industry-specific content with 12 default categories
 - **PROCESS_SECTION**: Development process steps
 - **FEATURED_IN_SECTION**: Brand recognition section with media logos
+- **FLEXIBLE_PACKAGE_SECTION**: Pricing packages with features, costs, and call-to-action buttons
 
 ## Document Format
 Documents should use the new descriptive section markers:
@@ -113,6 +114,43 @@ Frameworks Mastered
 
 Start Your Project View Portfolio
 [CTA_WITH_LIST_SECTION END]
+
+[FLEXIBLE_PACKAGE_SECTION]
+Our Flexible Packages for Mobile App Maintenance Services
+Space-O Technologies offers three flexible mobile app maintenance packages to suit businesses of all sizes.
+
+Package: Standard
+Basic Maintenance for Smooth Performance
+Price: $999
+- 35–40 Hours
+- iOS, Android
+- Swift, Kotlin, React Native, and Flutter
+- Dedicated Project Manager
+- Manual and Automated QA
+- Email Communication
+
+Package: Advanced
+Enhanced Support for Growing Mobile Apps
+Price: $1499
+- 65–70 Hours
+- iOS, Android
+- Swift, Kotlin, React Native, and Flutter
+- Dedicated Project Manager
+- Manual and Automated QA
+- Skype, Zoom, and WhatsApp Support
+- Best for Advanced App Change Requests
+
+Package: Pro
+Premium Support with Feature Expansion
+Price: $2499
+- 100–120 Hours
+- iOS, Android
+- Swift, Kotlin, React Native, and Flutter
+- Dedicated Project Manager
+- Manual and Automated QA
+- Skype, Zoom, WhatsApp, and Phone Support
+- Ideal for Continuous Maintenance and New Feature Development
+[FLEXIBLE_PACKAGE_SECTION END]
 ```
 
 ## Empty Content Handling
@@ -124,13 +162,41 @@ Start Your Project View Portfolio
 - **Consistent branding** across all default content
 - **Static HTML Images**: Uses exact same image paths as default sections to prevent broken images
 
-## Technology Section Format
-The TECHNOLOGY_STACK_SECTION supports category-based parsing:
-- **Categories** end with `:` (e.g., "Frontend Technologies:")
-- **Technologies** listed under each category
-- **Automatic icon mapping** with fallback support
-- **Multiple upload path attempts** (2023/08/, 2024/02/, etc.)
-- **Proper HTML structure** matching user specifications
+## Technology Section Format (Enhanced v3.8)
+The TECHNOLOGY_STACK_SECTION supports **two parsing formats** for maximum flexibility:
+
+### **Format 1: Pipe-Separated (Table Format)**
+```
+Front-End Programming | JavaScript | Angular | React | Vue.js | CSS | HTML
+Back-End Programming | Java | Python | .Net | Node.js | Go | PHP | Ruby on Rails
+Mobile App Technologies | Kotlin | Swift | C++ | Flutter | Xamarin | Ionic | React Native
+Database Management | PostgreSQL | MySQL | MongoDB | Redis
+```
+
+### **Format 2: Colon-Separated (List Format)**  
+```
+Frontend Technologies:
+React
+Vue.js
+Angular
+Next.js
+TypeScript
+
+Backend Technologies:
+Node.js
+Python
+Django
+PHP
+Laravel
+```
+
+### **Key Features:**
+- **Left Column**: Category names display in `technology-name` div
+- **Right Column**: Each technology gets separate `<li>` element in `technology-icon-wrapper`
+- **Automatic icon mapping** with React.svg fallback for all technologies
+- **Enhanced debugging** with comprehensive console logging
+- **Flexible parsing** handles both formats seamlessly
+- **Dynamic alt text** updates based on technology names
 
 ## Image Handling System (v3.7)
 **Comprehensive image management**:
@@ -153,14 +219,29 @@ The TECHNOLOGY_STACK_SECTION supports category-based parsing:
 - **Professional Default Content**: Every section has meaningful fallback HTML
 - **Consistent Structure**: Generated HTML matches static HTML exactly
 
-## Recent Updates & Fixes (v3.7)
+## Recent Updates & Fixes (v3.9)
 
-### Major Features Added:
+### Latest Features (v3.9):
+- **FLEXIBLE_PACKAGE_SECTION**: New pricing packages section with three-card layout
+- **Package Parsing**: Dynamic parsing of package names, descriptions, prices, and features
+- **Responsive Pricing Cards**: Mobile-optimized pricing layout with hover effects
+- **Most Popular Badge**: Automatic "Most Popular" badge for advanced packages
+- **Feature Lists**: Bullet-point features with check mark icons
+- **Call-to-Action Buttons**: Get Started buttons with hover animations
+
+### Major Features (v3.8):
+- **TECHNOLOGY_STACK_SECTION Enhancement**: Complete rewrite with dual format support
+- **Pipe Format Support**: Category | Tech1 | Tech2 | Tech3 table format parsing
+- **Colon Format Support**: Category: followed by technology list format
+- **Enhanced HTML Structure**: Proper left/right column separation with technology-name and technology-icon-wrapper
+- **Advanced Debugging**: Comprehensive console logging for troubleshooting
+- **Individual Technology Elements**: Each tech gets separate <li> element for better styling
+
+### Major Features Added (v3.5-v3.7):
 - **Section Name Updates (v3.5)**: All sections now use descriptive names for clarity
 - **BENEFITS Image Fix (v3.6-v3.7)**: Uses exact same static HTML images as default section
 - **Default Static HTML**: All 14 sections generate professional content when empty
 - **Broken Image Fixes**: Comprehensive image fallback system with global error handler
-- **Technology Section Overhaul**: Category-based parsing with proper HTML structure
 - **Empty Section Processing**: Fixed core parsing to handle all sections even when empty
 
 ### Specific Improvements:
@@ -168,7 +249,7 @@ The TECHNOLOGY_STACK_SECTION supports category-based parsing:
 - **BENEFITS_SECTION**: Uses exact static HTML images, only updates alt text dynamically
 - **FAQ_SECTION**: 5 comprehensive default FAQ items about web development
 - **CTA_WITH_LIST_SECTION**: Professional call-to-action with statistics and dual buttons
-- **TECHNOLOGY_STACK_SECTION**: Category-based parsing with proper HTML structure and icons
+- **TECHNOLOGY_STACK_SECTION**: Dual-format parsing (pipe/colon) with proper HTML structure, individual tech elements, and enhanced debugging
 - **INDUSTRIES_WE_SERVE_SECTION**: 12 industry categories with proper images and links
 - **PROCESS_SECTION**: 6-step development process with professional content
 - **FEATURED_IN_SECTION**: 6 brand logos with proper media recognition content
@@ -238,20 +319,24 @@ HERO_BANNER_SECTION, FAQ_SECTION, CTA_SIMPLE_SECTION, CTA_WITH_LIST_SECTION,
 TECHNOLOGY_STACK_SECTION, INDUSTRIES_WE_SERVE_SECTION, SERVICES_GRID_SECTION, 
 SERVICES_ACCORDION_SECTION, PORTFOLIO_SECTION, TESTIMONIAL_SECTION, 
 BENEFITS_SECTION, BENEFITS_TWO, CONTENT_WITH_FORM_SECTION, PROCESS_SECTION, 
-FEATURED_IN_SECTION
+FEATURED_IN_SECTION, FLEXIBLE_PACKAGE_SECTION
 ```
 
 ## Project Structure
 ```
-page-content-update/
-├── web_ide_final.html          # Main application (v3.7)
-├── CLAUDE.md                   # This documentation
+Doc-to-HTML/
+├── web_ide_final.html          # Original application (v3.9)
+├── mcb_web_ide.html            # MonoCubed version (v1.0)
+├── CLAUDE.md                   # Original tool documentation
+├── MCB_CLAUDE.md               # MonoCubed tool documentation
 ├── server.py                   # Python development server
 ├── docx_content_tool.py        # Document processing backend
 ├── package.json                # Node.js dependencies
 ├── package-lock.json           # Dependency lock file
 ├── run_ide.sh                  # Server startup script
-└── sections/                    # Extracted section generation functions
+├── test_content.txt            # Sample content for testing
+├── mcb_sample_content.txt      # MonoCubed sample content
+└── sections/                   # Extracted section generation functions
   ├── faq/faq.js
   ├── cta_simple/cta_simple.js
   ├── cta_with_list/cta_with_list.js
@@ -270,6 +355,8 @@ page-content-update/
 ```
 
 ## Version History
+- **v3.9**: Added FLEXIBLE_PACKAGE_SECTION with pricing cards, package parsing, responsive design, and call-to-action buttons
+- **v3.8**: TECHNOLOGY_STACK_SECTION enhanced with dual-format parsing (pipe/colon), individual tech elements, advanced debugging
 - **v3.7**: BENEFITS section uses exact static HTML images, only updates alt text
 - **v3.6**: Broken image fixes with global error handler  
 - **v3.5**: All section names updated to descriptive format
@@ -301,9 +388,12 @@ If upgrading from older versions, update your document section names:
 - **Smart Processing**: Handles empty sections with professional defaults
 
 ## Current Status
-- **Version**: v3.7 "BENEFITS EXACT STATIC HTML"
+- **Version**: v3.9 "FLEXIBLE PACKAGE PRICING"
 - **Status**: Production ready
-- **Server**: Running on port 9000
-- **All Features**: Fully functional with comprehensive image handling
+- **Server**: Running on port 8000, 8001, or 9000 (original tool)
+- **All Features**: Fully functional with enhanced technology parsing
 - **Section Names**: Updated to descriptive format
+- **Technology Parsing**: Enhanced with pipe and colon format support
+- **HTML Structure**: Proper left/right column separation for technology sections
 - **Image Issues**: Resolved using static HTML approach
+- **Companion Tool**: MonoCubed version available on port 9001

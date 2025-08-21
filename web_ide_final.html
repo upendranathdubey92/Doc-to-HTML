@@ -1068,6 +1068,8 @@
                         return this.parseProcessSection(content);
                     case 'FEATURED_IN_SECTION':
                         return this.parseFeaturedInSection(content);
+                    case 'FLEXIBLE_PACKAGE_SECTION':
+                        return this.parseFlexiblePackageSection(content);
                     default:
                         return { raw_content: content };
                 }
@@ -1960,6 +1962,134 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 };
             }
 
+            parseFlexiblePackageSection(content) {
+                console.log('🔧 FLEXIBLE_PACKAGE_SECTION Parsing Debug:');
+                console.log('Raw content:', content);
+                
+                const lines = content.split('\n').filter(line => line.trim());
+                console.log('Filtered lines:', lines);
+                
+                let main_heading = "Our Flexible Packages for Mobile App Maintenance Services";
+                let description = "Space-O Technologies offers three flexible mobile app maintenance packages to suit businesses of all sizes and app complexities. Each package is designed to meet your needs, ensuring your app remains efficient, secure, and up-to-date.";
+                let packages = [];
+                
+                // Check for custom main heading (first line if descriptive)
+                if (lines.length > 0 && lines[0].length > 10 && !lines[0].includes('Package:') && !lines[0].includes('Price:')) {
+                    main_heading = lines[0].trim();
+                    lines.shift();
+                    console.log('Found custom main_heading:', main_heading);
+                }
+                
+                // Check for description (second line if descriptive)
+                if (lines.length > 0 && lines[0].length > 20 && !lines[0].includes('Package:') && !lines[0].includes('Price:')) {
+                    description = lines[0].trim();
+                    lines.shift();
+                    console.log('Found custom description:', description);
+                }
+                
+                // Parse packages
+                let currentPackage = null;
+                let currentFeatures = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    console.log(`Processing line ${i}: "${line}"`);
+                    
+                    // Check if this line defines a package (Package: Name format)
+                    if (line.toLowerCase().startsWith('package:') || line.toLowerCase().includes('standard') || line.toLowerCase().includes('advanced') || line.toLowerCase().includes('pro')) {
+                        // Save previous package if exists
+                        if (currentPackage) {
+                            currentPackage.features = [...currentFeatures];
+                            packages.push(currentPackage);
+                            console.log('Added package:', currentPackage);
+                        }
+                        
+                        // Start new package
+                        let packageName = line.replace(/^package:\s*/i, '').trim();
+                        
+                        // Extract package name from line
+                        if (line.toLowerCase().includes('standard')) packageName = 'Standard';
+                        else if (line.toLowerCase().includes('advanced')) packageName = 'Advanced';  
+                        else if (line.toLowerCase().includes('pro')) packageName = 'Pro';
+                        
+                        currentPackage = {
+                            name: packageName,
+                            description: '',
+                            price: '$999',
+                            features: []
+                        };
+                        currentFeatures = [];
+                        console.log('Started new package:', packageName);
+                    }
+                    // Check if this line defines a price
+                    else if (line.toLowerCase().includes('price:') || line.includes('$')) {
+                        if (currentPackage) {
+                            const priceMatch = line.match(/\$[\d,]+/);
+                            if (priceMatch) {
+                                currentPackage.price = priceMatch[0];
+                                console.log('Found price:', priceMatch[0]);
+                            }
+                        }
+                    }
+                    // Check if this is a description line (after package name, before features)
+                    else if (currentPackage && !currentPackage.description && line.length > 10 && !line.startsWith('-') && !line.startsWith('•')) {
+                        currentPackage.description = line;
+                        console.log('Found package description:', line);
+                    }
+                    // Check if this is a feature line
+                    else if (currentPackage && (line.startsWith('-') || line.startsWith('•') || line.includes('Hours') || line.includes('iOS') || line.includes('Android') || line.includes('Support'))) {
+                        const cleanFeature = line.replace(/^[\-\•]\s*/, '').trim();
+                        if (cleanFeature.length > 0) {
+                            currentFeatures.push(cleanFeature);
+                            console.log('Added feature:', cleanFeature);
+                        }
+                    }
+                }
+                
+                // Add final package
+                if (currentPackage) {
+                    currentPackage.features = [...currentFeatures];
+                    packages.push(currentPackage);
+                    console.log('Added final package:', currentPackage);
+                }
+                
+                // If no packages found, create default packages
+                if (packages.length === 0) {
+                    console.log('No packages found, creating default packages');
+                    packages = [
+                        {
+                            name: 'Standard',
+                            description: 'Basic Maintenance for Smooth Performance',
+                            price: '$999',
+                            features: ['35–40 Hours', 'iOS, Android', 'Swift, Kotlin, React Native, and Flutter', 'XD, Sketch, Figma', 'PHP, (JS Frameworks)', 'Dedicated Project Manager', 'Manual and Automated QA', 'Shared Resources', 'Email Communication', 'Skype and Zoom Support', 'Basecamp Project Management', '36 Hours Turnaround Time', 'Suited for Minor App Changes and Maintenance']
+                        },
+                        {
+                            name: 'Advanced',
+                            description: 'Enhanced Support for Growing Mobile Apps', 
+                            price: '$1499',
+                            features: ['65–70 Hours', 'iOS, Android', 'Swift, Kotlin, React Native, and Flutter', 'XD, Sketch, Figma', 'PHP, RoR, (JS Frameworks)', 'Dedicated Project Manager', 'Manual and Automated QA', 'Shared Resources', 'Email Communication', 'Skype, Zoom, and WhatsApp Support', 'Basecamp Project Management', '36 Hours Turnaround Time', 'Best for Advanced App Change Requests']
+                        },
+                        {
+                            name: 'Pro',
+                            description: 'Premium Support with Feature Expansion',
+                            price: '$2499', 
+                            features: ['100–120 Hours', 'iOS, Android', 'Swift, Kotlin, React Native, and Flutter', 'XD, Sketch, Figma', 'PHP, Golang, Laravel, RoR and (JS Frameworks)', 'Dedicated Project Manager', 'Manual and Automated QA', 'Shared Resources', 'Email Communication', 'Skype, Zoom, WhatsApp, and Phone Support', 'Basecamp Project Management', '24 Hours Turnaround Time', 'Ideal for Continuous Maintenance and New Feature Development']
+                        }
+                    ];
+                }
+                
+                const result = {
+                    main_heading,
+                    description,
+                    packages
+                };
+                
+                console.log('Final FLEXIBLE_PACKAGE_SECTION parsed result:', result);
+                return result;
+            }
+
             async parseServicesGridSection(content) {
                 if (this.useAI) {
                     try {
@@ -2320,17 +2450,23 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     }
                     
                     // Detect if this line is likely a project title
-                    // Project titles are usually shorter and don't start with common description words
+                    // More flexible title detection - check if it's NOT a description
                     const isLikelyTitle = (
-                        line.length < 200 && // Increased from 150 to catch longer titles
+                        line.length < 300 && // Allow longer titles
                         !line.startsWith('Space-O Technologies') && // Descriptions often start with company name
                         !line.startsWith('We designed') && // Common description starters
                         !line.startsWith('At Space-O Technologies') &&
-                        !line.startsWith('The platform') &&
-                        !line.startsWith('The system') &&
-                        !line.startsWith('Managing ') && // Avoid description starters
-                        !line.startsWith('With ') && // Avoid description starters
-                        (line.includes('—') || line.includes('for ') || line.includes('System') || line.includes('Platform') || line.includes('Marketplace') || line.includes('Using AI') || line.includes('Solution') || line.includes('Built') || line.includes('We developed') || line.includes('GPTVix') || line.includes('NDIS'))
+                        !line.startsWith('The platform features') &&
+                        !line.startsWith('The system includes') &&
+                        !line.startsWith('Managing multiple') && // Avoid description starters
+                        !line.startsWith('With advanced') && // Avoid description starters
+                        !line.startsWith('Our comprehensive') && // Avoid description starters
+                        !line.match(/^(We developed|Built|Created|Designed)\s+a\s+(responsive|comprehensive|sophisticated|advanced|scalable)/i) && // Common description patterns
+                        // More inclusive - if it contains title-like patterns OR if it's the first line after heading/description
+                        (line.includes(':') || line.includes('—') || line.includes(' for ') || line.includes(' - ') || 
+                         line.match(/^[A-Z][a-zA-Z\s&'-]+(\s+(App|Platform|System|Solution|Tool|Lab|Portal|Marketplace|Website|Application|Service))(\s|:|$)/i) ||
+                         line.match(/\b(EdTech|FinTech|HealthTech|PropTech|E-commerce|SaaS|B2B|AI|ML|IoT|AR|VR)\b/i) ||
+                         (currentProject === null && i === 0)) // First project line is likely a title
                     );
                     
                     console.log(`🔧 PORTFOLIO_SECTION Title check for "${line}": ${isLikelyTitle}`);
@@ -2923,6 +3059,8 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     return this.generateProcessSection(content);
                 } else if (baseSectionType.includes('FEATURED_IN_SECTION')) {
                     return this.generateFeaturedInSection(content);
+                } else if (baseSectionType.includes('FLEXIBLE_PACKAGE_SECTION')) {
+                    return this.generateFlexiblePackageSection(content);
                 }
                 return `<div><!-- ${sectionType} section not implemented yet --></div>`;
             }
@@ -3339,6 +3477,133 @@ ${categoriesHTML}</div>
 </div>
 </div>
 </div>`;
+            }
+
+            generateFlexiblePackageSection(content) {
+                console.log('🎨 FLEXIBLE_PACKAGE_SECTION HTML Generation Debug:');
+                console.log('Input content:', content);
+                
+                // Handle empty content with default packages
+                if (!content || !content.packages || content.packages.length === 0) {
+                    console.log('🚀 RETURNING DEFAULT FLEXIBLE PACKAGE HTML (blank content detected)');
+                    return `<section class="pt80 pb70 bg-color flexible-package">
+<div class="container-xl">
+<h2 class="fonts-40 text-center font-weight-bold mb-2">Our Flexible Packages for Mobile App Maintenance Services</h2>
+<p class="fonts-18 mb-4 text-center mxw-900">Space-O Technologies offers three flexible mobile app maintenance packages to suit businesses of all sizes and app complexities. Each package is designed to meet your needs, ensuring your app remains efficient, secure, and up-to-date.</p>
+<div class="pricing-container">
+<div class="pricing-card standard">
+<h2>Standard</h2>
+<p>Basic Maintenance for Smooth Performance</p>
+<div class="cost"><span class="text-lg font-normanl">Price:</span>$999</div>
+<ul class="features">
+<li>35–40 Hours</li>
+<li>iOS, Android</li>
+<li>Swift, Kotlin, React Native, and Flutter</li>
+<li>XD, Sketch, Figma</li>
+<li>PHP, (JS Frameworks)</li>
+<li>Dedicated Project Manager</li>
+<li>Manual and Automated QA</li>
+<li>Shared Resources</li>
+<li>Email Communication</li>
+<li>Skype and Zoom Support</li>
+<li>Basecamp Project Management</li>
+<li>36 Hours Turnaround Time</li>
+<li>Suited for Minor App Changes and Maintenance</li>
+</ul>
+<div><button class="get-started open-qouteform" type="button" data-medium="Packages_1">Get Started</button></div>
+</div>
+<div class="pricing-card advanced most-popular">
+<h2>Advanced</h2>
+<p>Enhanced Support for Growing Mobile Apps</p>
+<div class="cost"><span class="text-lg font-normanl">Price:</span>$1499</div>
+<ul class="features">
+<li>65–70 Hours</li>
+<li>iOS, Android</li>
+<li>Swift, Kotlin, React Native, and Flutter</li>
+<li>XD, Sketch, Figma</li>
+<li>PHP, RoR, (JS Frameworks)</li>
+<li>Dedicated Project Manager</li>
+<li>Manual and Automated QA</li>
+<li>Shared Resources</li>
+<li>Email Communication</li>
+<li>Skype, Zoom, and WhatsApp Support</li>
+<li>Basecamp Project Management</li>
+<li>36 Hours Turnaround Time</li>
+<li>Best for Advanced App Change Requests</li>
+</ul>
+<div><button class="get-started open-qouteform" type="button" data-medium="Packages_2">Get Started</button></div>
+</div>
+<div class="pricing-card pro">
+<h2>Pro</h2>
+<p>Premium Support with Feature Expansion</p>
+<div class="cost"><span class="text-lg font-normanl">Price:</span>$2499</div>
+<ul class="features">
+<li>100–120 Hours</li>
+<li>iOS, Android</li>
+<li>Swift, Kotlin, React Native, and Flutter</li>
+<li>XD, Sketch, Figma</li>
+<li>PHP, Golang, Laravel, RoR and (JS Frameworks)</li>
+<li>Dedicated Project Manager</li>
+<li>Manual and Automated QA</li>
+<li>Shared Resources</li>
+<li>Email Communication</li>
+<li>Skype, Zoom, WhatsApp, and Phone Support</li>
+<li>Basecamp Project Management</li>
+<li>24 Hours Turnaround Time</li>
+<li>Ideal for Continuous Maintenance and New Feature Development</li>
+</ul>
+<div><button class="get-started open-qouteform" type="button" data-medium="Packages_3">Get Started</button></div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+                
+                // Generate dynamic HTML from parsed content
+                console.log('✅ Using DYNAMIC package HTML from document content');
+                console.log('Packages to process:', content.packages);
+                
+                let packagesHTML = '';
+                content.packages.forEach((pkg, index) => {
+                    console.log(`Processing package ${index + 1}:`, pkg);
+                    
+                    let featuresHTML = '';
+                    if (pkg.features && pkg.features.length > 0) {
+                        pkg.features.forEach(feature => {
+                            featuresHTML += `<li>${feature}</li>\n`;
+                        });
+                    }
+                    
+                    // Add appropriate CSS class
+                    let cssClass = pkg.name.toLowerCase();
+                    if (pkg.name.toLowerCase() === 'advanced') {
+                        cssClass += ' most-popular';
+                    }
+                    
+                    packagesHTML += `<div class="pricing-card ${cssClass}">
+<h2>${pkg.name}</h2>
+<p>${pkg.description}</p>
+<div class="cost"><span class="text-lg font-normanl">Price:</span>${pkg.price}</div>
+<ul class="features">
+${featuresHTML}</ul>
+<div><button class="get-started open-qouteform" type="button" data-medium="Packages_${index + 1}">Get Started</button></div>
+</div>
+`;
+                });
+                
+                console.log('Generated DYNAMIC packagesHTML:', packagesHTML);
+                
+                const finalHTML = `<section class="pt80 pb70 bg-color flexible-package">
+<div class="container-xl">
+<h2 class="fonts-40 text-center font-weight-bold mb-2">${content.main_heading || 'Our Flexible Packages'}</h2>
+<p class="fonts-18 mb-4 text-center mxw-900">${content.description || 'Choose the package that best fits your needs.'}</p>
+<div class="pricing-container">
+${packagesHTML}</div>
+</div>
+</section>`;
+                
+                console.log('Final DYNAMIC package HTML:', finalHTML);
+                return finalHTML;
             }
 
             generateIndustriesSection(content) {
@@ -6018,6 +6283,211 @@ ${portfolioItems}
 .technology-stack .technology-inner .row .col-md-10{padding-left:0px;}
 }
 /******* TECHNOLOGY_STACK_SECTION END ********/`,
+
+            'FLEXIBLE_PACKAGE_SECTION': `
+/******* FLEXIBLE_PACKAGE_SECTION ********/
+.pricing-container {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+    margin: 0 auto;
+}
+
+.pricing-card {
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    flex: 1;
+    padding: 24px 24px 90px;
+    text-align: left;
+    position: relative;
+    margin-top: 20px;
+    transition: all .2s ease-in-out;
+}
+
+.pricing-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .05);
+}
+
+.pricing-card.most-popular {
+    border-color: #000;
+}
+
+.pricing-card.most-popular::before {
+    content: 'Most Popular';
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    color: #000;
+    padding: 5px 25px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 500;
+    border: solid 1px #000;
+}
+
+.pricing-card h2 {
+    font-size: 24px;
+    color: #000;
+    margin: 0;
+}
+
+.pricing-card p {
+    margin: 8px 0 0px;
+    color: #000;
+    font-size: 16px;
+    min-height: 50px;
+}
+
+.cost {
+    font-size: 24px;
+    font-weight: 500;
+    color: #000;
+    margin: 15px 0;
+    padding: 15px 0;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.cost span {
+    font-size: 20px;
+}
+
+.features {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.features li {
+    color: #000;
+    position: relative;
+    margin-top: 0;
+    margin-bottom: 8px;
+    padding-left: 30px;
+    font-size: 15px;
+}
+
+.features li::before {
+    content: "";
+    background-image: url(https://www.spaceotechnologies.com/wp-content/uploads/2023/09/check-icon.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 0;
+    top: 4px;
+}
+
+.get-started {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 90%;
+    font-size: 16px;
+    border: solid 1px #000;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all .2s ease-in-out;
+}
+
+.get-started:hover {
+    background: #000;
+    color: #fff;
+}
+
+@media screen and (max-width: 1199px) {
+    .pricing-container {
+        gap: 15px;
+        padding: 0 15px;
+    }
+    
+    .pricing-card h2 {
+        font-size: 22px;
+    }
+    
+    .cost {
+        font-size: 22px;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .pricing-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .pricing-card {
+        padding: 20px 20px 70px;
+        margin-top: 15px;
+    }
+    
+    .pricing-card.most-popular::before {
+        top: -12px;
+        font-size: 12px;
+        padding: 3px 20px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .pricing-container {
+        gap: 20px;
+        padding: 0 10px;
+    }
+    
+    .pricing-card {
+        padding: 16px 16px 60px;
+    }
+    
+    .pricing-card h2 {
+        font-size: 20px;
+    }
+    
+    .pricing-card p {
+        font-size: 14px;
+        min-height: 40px;
+    }
+    
+    .cost {
+        font-size: 20px;
+        margin: 10px 0;
+        padding: 10px 0;
+    }
+    
+    .cost span {
+        font-size: 18px;
+    }
+    
+    .features li {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+    
+    .get-started {
+        bottom: 20px;
+        font-size: 14px;
+        padding: 8px;
+    }
+}
+/******* FLEXIBLE_PACKAGE_SECTION END ********/`,
 
             'TESTIMONIAL_SECTION': `
 /******* TESTIMONIAL_SECTION ********/

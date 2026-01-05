@@ -13,14 +13,14 @@ This project contains a web-based IDE for converting structured documents with s
 - **Document Processing**: Converts documents with descriptive section markers
 - **AI Integration**: Uses Groq API for intelligent content parsing (fallback to rule-based parsing)
 - **Default Content Generation**: All sections generate professional static HTML when content is empty
-- **Multiple Section Types**: Supports 14 different section types with smart parsing
+- **Multiple Section Types**: Supports 18 different section types with smart parsing
 - **File Upload**: Supports both Word documents (.docx) and text files
 - **Live Preview**: Real-time HTML preview with Bootstrap styling
 - **Image Fallback System**: Comprehensive broken image handling with static HTML images
 - **Technology Stack Parsing**: Advanced category-based technology parsing
 - **Descriptive Section Names**: All sections use clear, descriptive naming conventions
 
-## Section Types Supported (15 Total)
+## Section Types Supported (18 Total)
 
 ### Updated Section Names (v3.5+):
 - **HERO_BANNER_SECTION**: Main landing section with title, description, bullet points, and contact form
@@ -28,9 +28,10 @@ This project contains a web-based IDE for converting structured documents with s
 - **CTA_SIMPLE_SECTION**: Simple call-to-action sections with buttons
 - **CTA_WITH_LIST_SECTION**: Advanced CTA with statistics and dual buttons
 - **SERVICES_GRID_SECTION**: Grid layout of services with images and descriptions
+- **SERVICES_GRID_SECTION_CENTER**: Centered grid layout for services
 - **SERVICES_ACCORDION_SECTION**: Collapsible accordion for services (single/multiple sections)
 - **BENEFITS_SECTION**: Standard benefits listing with icons and descriptions
-- **BENEFITS_TWO**: Benefits section with title/description pairs (unchanged)
+- **BENEFITS_TWO**: Benefits section with title/description pairs
 - **CONTENT_WITH_FORM_SECTION**: Contact forms with customizable fields
 - **PORTFOLIO_SECTION**: Project showcase with technology stacks
 - **TESTIMONIAL_SECTION**: Customer testimonials with author attribution
@@ -39,6 +40,7 @@ This project contains a web-based IDE for converting structured documents with s
 - **PROCESS_SECTION**: Development process steps
 - **FEATURED_IN_SECTION**: Brand recognition section with media logos
 - **FLEXIBLE_PACKAGE_SECTION**: Pricing packages with features, costs, and call-to-action buttons
+- **WHY_CHOOSE_BOX**: Why choose us section with key benefits
 
 ## Document Format
 Documents should use the new descriptive section markers:
@@ -313,46 +315,29 @@ netstat -ano | findstr :9000
 - **Technology Section Issues**: Ensure categories end with ':' (colon)
 - **Server Issues**: Try different ports (8000, 8001, 9000) if port conflicts occur
 
-## Supported Section List (New Names)
+## Supported Section List (All 18 Sections)
 ```
-HERO_BANNER_SECTION, FAQ_SECTION, CTA_SIMPLE_SECTION, CTA_WITH_LIST_SECTION, 
-TECHNOLOGY_STACK_SECTION, INDUSTRIES_WE_SERVE_SECTION, SERVICES_GRID_SECTION, 
-SERVICES_ACCORDION_SECTION, PORTFOLIO_SECTION, TESTIMONIAL_SECTION, 
-BENEFITS_SECTION, BENEFITS_TWO, CONTENT_WITH_FORM_SECTION, PROCESS_SECTION, 
-FEATURED_IN_SECTION, FLEXIBLE_PACKAGE_SECTION
+HERO_BANNER_SECTION, FAQ_SECTION, CTA_SIMPLE_SECTION, CTA_WITH_LIST_SECTION,
+TECHNOLOGY_STACK_SECTION, INDUSTRIES_WE_SERVE_SECTION, SERVICES_GRID_SECTION,
+SERVICES_GRID_SECTION_CENTER, SERVICES_ACCORDION_SECTION, PORTFOLIO_SECTION,
+TESTIMONIAL_SECTION, BENEFITS_SECTION, BENEFITS_TWO, CONTENT_WITH_FORM_SECTION,
+PROCESS_SECTION, FEATURED_IN_SECTION, FLEXIBLE_PACKAGE_SECTION, WHY_CHOOSE_BOX
 ```
 
 ## Project Structure
 ```
 Doc-to-HTML/
-├── web_ide_final.html          # Original application (v3.9)
-├── mcb_web_ide.html            # MonoCubed version (v1.0)
-├── CLAUDE.md                   # Original tool documentation
-├── MCB_CLAUDE.md               # MonoCubed tool documentation
-├── server.py                   # Python development server
-├── docx_content_tool.py        # Document processing backend
-├── package.json                # Node.js dependencies
+├── web_ide_final.html          # Main application (v3.9) - All-in-one HTML file with embedded JavaScript
+├── CLAUDE.md                   # Project documentation and instructions
+├── README.md                   # User-facing documentation with quick start guide
+├── package.json                # Node.js dependencies and scripts
 ├── package-lock.json           # Dependency lock file
-├── run_ide.sh                  # Server startup script
-├── test_content.txt            # Sample content for testing
-├── mcb_sample_content.txt      # MonoCubed sample content
-└── sections/                   # Extracted section generation functions
-  ├── faq/faq.js
-  ├── cta_simple/cta_simple.js
-  ├── cta_with_list/cta_with_list.js
-  ├── technology_stack/technology_stack.js
-  ├── industries_we_serve/industries_we_serve.js
-  ├── services_grid/services_grid.js
-  ├── services_accordion/services_accordion.js
-  ├── portfolio/portfolio.js
-  ├── testimonial/testimonial.js
-  ├── benefits/benefits.js
-  ├── benefits_two/benefits_two.js
-  ├── content_with_form/content_with_form.js
-  ├── process/process.js
-  ├── featured_in/featured_in.js
-  └── hero_banner/hero_banner.js
+├── vercel.json                 # Vercel deployment configuration
+├── test_hero_with_links.txt    # Test file for hero section with hyperlinks
+└── test_multiple_paragraphs.txt # Test file for multiple paragraph parsing
 ```
+
+**Note**: This is a monolithic architecture where all parsing logic, section generators, and UI code are embedded within the single `web_ide_final.html` file (6850+ lines). All 18 section types are implemented as methods within the `RealDocumentProcessor` class.
 
 ## Version History
 - **v3.9**: Added FLEXIBLE_PACKAGE_SECTION with pricing cards, package parsing, responsive design, and call-to-action buttons

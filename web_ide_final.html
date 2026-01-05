@@ -875,7 +875,7 @@
             }
         }
 
-        // Enhanced Content Processing Engine with AI Support - DATA URI IMAGES v3.8
+        // Enhanced Content Processing Engine with AI Support - DATA URI IMAGES v3.9
         class RealDocumentProcessor {
             constructor() {
                 this.useAI = true; // Enable AI processing
@@ -945,10 +945,10 @@
                     // ... other templates
                 };
 
-                this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION'];
-                
-                // Debug: Verify FEATURED_IN is in supported sections at startup
-                console.log('🚀 Web IDE v3.4 SECTION NAMES UPDATED - All sections now use descriptive names:', this.supportedSections.includes('FEATURED_IN_SECTION') && this.supportedSections.includes('INDUSTRIES_WE_SERVE_SECTION'));
+                this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION', 'FLEXIBLE_PACKAGE_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO'];
+
+                // Debug: Verify all sections are supported at startup
+                console.log('🚀 Web IDE v3.9 - All 18 section types supported:', this.supportedSections.length, 'sections');
             }
 
             // Smart document parsing for real Word docs
@@ -1133,15 +1133,15 @@
                         
                         if (isIntroTitle) {
                             // Treat as bullet intro title
-                            description = descriptionLines.slice(0, -1).join(' ');
+                            description = descriptionLines.slice(0, -1).map(line => `<p class="fonts-18 mb-3">${this.convertBoldMarkersAndLinks(line.trim())}</p>`).join('\n');
                             bullet_intro = lastLine;
                         } else {
-                            // All lines are part of description
-                            description = descriptionLines.join(' ');
+                            // All lines are part of description - preserve as separate paragraphs
+                            description = descriptionLines.map(line => `<p class="fonts-18 mb-3">${this.convertBoldMarkersAndLinks(line.trim())}</p>`).join('\n');
                         }
                     } else if (descriptionLines.length === 1) {
                         // Only one line before bullets, it's the description
-                        description = descriptionLines[0];
+                        description = `<p class="fonts-18 mb-3">${this.convertBoldMarkersAndLinks(descriptionLines[0].trim())}</p>`;
                     } else {
                         description = '';
                     }
@@ -1169,7 +1169,7 @@
                     // No explicit bullets found - treat all remaining content as description
                     // DO NOT try to automatically create bullets from regular text
                     const descriptionLines = nonEmptyLines.slice(currentIndex);
-                    description = descriptionLines.join(' ');
+                    description = descriptionLines.map(line => `<p class="fonts-18 mb-3">${this.convertBoldMarkersAndLinks(line.trim())}</p>`).join('\n');
                     
                     // Only look for bullet intro if there's a clear pattern
                     // Check for a line that ends with dash/colon followed by empty space in original
@@ -1203,10 +1203,10 @@
                 });
 
                 return {
-                    main_heading: this.convertBoldMarkers(main_heading || "Service Title"),
-                    description: this.convertBoldMarkers(description || "Service description"),
-                    bullet_points: bullet_points.map(point => this.convertBoldMarkers(point)),
-                    bullet_intro: this.convertBoldMarkers(bullet_intro),
+                    main_heading: this.convertBoldMarkersAndLinks(main_heading || "Service Title"),
+                    description: description, // Already has HTML from parsing with links preserved
+                    bullet_points: bullet_points.map(point => this.convertBoldMarkersAndLinks(point)),
+                    bullet_intro: this.convertBoldMarkersAndLinks(bullet_intro),
                     additional_content: additional_content,
                     form_heading: "Dream It, We Build It",
                     form_button_text: "Book Your Free Consultation"
@@ -1656,7 +1656,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     if (trimmedLine.match(/^[●\-\*•‑]\s*/)) {
                         // Add any regular text before bullets
                         if (regularText.length > 0) {
-                            result += '<p>' + regularText.join(' ') + '</p>';
+                            result += '<p class="fonts-18 text-center mxw-900 mb-4">' + regularText.join(' ') + '</p>';
                             regularText = [];
                         }
                         // Collect bullet point
@@ -1677,7 +1677,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 
                 // Add remaining content
                 if (regularText.length > 0) {
-                    result += '<p>' + regularText.join(' ') + '</p>';
+                    result += '<p class="fonts-18 text-center mxw-900 mb-4">' + regularText.join(' ') + '</p>';
                 }
                 if (bulletPoints.length > 0) {
                     result += '<ul class="bullet">';
@@ -1718,7 +1718,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             listItems = [];
                             inList = false;
                         } else if (currentContent.length > 0) {
-                            result += '<p>' + currentContent.map(c => this.convertBoldMarkers(c)).join(' ') + '</p>\n';
+                            result += '<p class="fonts-18 text-center mxw-900 mb-4">' + currentContent.map(c => this.convertBoldMarkers(c)).join(' ') + '</p>\n';
                             currentContent = [];
                         }
                         
@@ -1727,7 +1727,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     } else if (trimmedLine.match(/^[●\-\*•‑]\s*/) || trimmedLine.match(/^\d+[\.\)]\s+/)) {
                         // List item
                         if (currentContent.length > 0) {
-                            result += '<p>' + currentContent.map(c => this.convertBoldMarkers(c)).join(' ') + '</p>\n';
+                            result += '<p class="fonts-18 text-center mxw-900 mb-4">' + currentContent.map(c => this.convertBoldMarkers(c)).join(' ') + '</p>\n';
                             currentContent = [];
                         }
                         
@@ -1758,7 +1758,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     });
                     result += '</ul>\n';
                 } else if (currentContent.length > 0) {
-                    result += '<p>' + currentContent.map(c => this.convertBoldMarkers(c)).join(' ') + '</p>\n';
+                    result += '<p class="fonts-18 text-center mxw-900 mb-4">' + currentContent.map(c => this.convertBoldMarkers(c)).join(' ') + '</p>\n';
                 }
                 
                 return result.trim();
@@ -2137,8 +2137,11 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     if (currentMode === 'description' && !description && 
                         trimmedLine.length > 50 && !this.looksLikeServiceTitle(trimmedLine, lines, i)) {
                         description = trimmedLine;
+                        console.log(`🔧 SERVICES_GRID DESCRIPTION SET: "${description}"`);
                         currentMode = 'services';
                         continue;
+                    } else if (currentMode === 'description' && !description) {
+                        console.log(`🔧 SERVICES_GRID Description NOT set for line: "${trimmedLine}" (length: ${trimmedLine.length}, looksLikeServiceTitle: ${this.looksLikeServiceTitle(trimmedLine, lines, i)})`);
                     }
                     
                     // Switch to services mode
@@ -2231,7 +2234,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 
                 return {
                     main_heading: main_heading || "Our Services",
-                    description: description || "Services we provide",
+                    description: description || "",
                     services: services
                 };
             }
@@ -3155,7 +3158,7 @@ ${bulletPoints}
 <div class="col-lg-7 col-md-12 banner-text">
 <nav aria-label="breadcrumbs" class="rank-math-breadcrumb mb-3 mt-3"><p><a href="/" class="local" style="text-decoration: unset;">Home</a><span class="separator"> &gt; </span><a href="/services/" class="local" style="text-decoration: unset;">Services</a><span class="separator"> &gt; </span><span class="last">{breadcrumb_title}</span></p></nav>
 <h1 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h1>
-<p class="fonts-18 mb-3">{description}</p>
+{description}
 {bullet_intro_html}
 {bullet_section}
 <div class="rating-section d-flex"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
@@ -3213,7 +3216,7 @@ ${bulletPoints}
                 return template
                     .replace('{breadcrumb_title}', content.main_heading || 'Service')
                     .replace('{main_heading}', content.main_heading || 'Service Title')
-                    .replace('{description}', content.description || 'Service description')
+                    .replace('{description}', content.description || '<p class="fonts-18 mb-3">Service description</p>')
                     .replace('{bullet_intro_html}', bulletIntroHtml)
                     .replace('{bullet_section}', bulletSection)
                     .replace('{additional_content_html}', additionalContentHtml)
@@ -3407,7 +3410,8 @@ ${techList}</ul>
 <div class="container-xl">
 <div class="row">
 <div class="col-md-12">
-<h2 class="fonts-40 text-center font-weight-bold mb-5">${content.main_heading || 'Technology Stack'}</h2>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">${content.main_heading || 'Technology Stack'}</h2>
+${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : ''}
 </div>
 </div>
 <div class="technology-inner">
@@ -3453,7 +3457,8 @@ ${techList}</ul>
 <div class="container-xl">
 <div class="row">
 <div class="col-md-12">
-<h2 class="fonts-40 text-center font-weight-bold mb-5">${content.main_heading || 'Technology Stack'}</h2>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">${content.main_heading || 'Technology Stack'}</h2>
+${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : ''}
 </div>
 </div>
 <div class="technology-inner">
@@ -3471,8 +3476,8 @@ ${categoriesHTML}</div>
 <div class="container-xl">
 <div class="row">
 <div class="col-md-12">
-<h2 class="fonts-40 text-center font-weight-bold mb-5">Technology Stack</h2>
-<p class="text-center">No technology stack content provided in document.</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Technology Stack</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">No technology stack content provided in document.</p>
 </div>
 </div>
 </div>
@@ -3488,12 +3493,12 @@ ${categoriesHTML}</div>
                     console.log('🚀 RETURNING DEFAULT FLEXIBLE PACKAGE HTML (blank content detected)');
                     return `<section class="pt80 pb70 bg-color flexible-package">
 <div class="container-xl">
-<h2 class="fonts-40 text-center font-weight-bold mb-2">Our Flexible Packages for Mobile App Maintenance Services</h2>
-<p class="fonts-18 mb-4 text-center mxw-900">Space-O Technologies offers three flexible mobile app maintenance packages to suit businesses of all sizes and app complexities. Each package is designed to meet your needs, ensuring your app remains efficient, secure, and up-to-date.</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Our Flexible Packages for Mobile App Maintenance Services</h2>
+${content.description ? '<p class="fonts-18 mb-4 text-center mxw-900">' + content.description + '</p>' : ''}
 <div class="pricing-container">
 <div class="pricing-card standard">
-<h2>Standard</h2>
-<p>Basic Maintenance for Smooth Performance</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2">Standard</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">Basic Maintenance for Smooth Performance</p>
 <div class="cost"><span class="text-lg font-normanl">Price:</span>$999</div>
 <ul class="features">
 <li>35–40 Hours</li>
@@ -3513,8 +3518,8 @@ ${categoriesHTML}</div>
 <div><button class="get-started open-qouteform" type="button" data-medium="Packages_1">Get Started</button></div>
 </div>
 <div class="pricing-card advanced most-popular">
-<h2>Advanced</h2>
-<p>Enhanced Support for Growing Mobile Apps</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2">Advanced</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">Enhanced Support for Growing Mobile Apps</p>
 <div class="cost"><span class="text-lg font-normanl">Price:</span>$1499</div>
 <ul class="features">
 <li>65–70 Hours</li>
@@ -3534,8 +3539,8 @@ ${categoriesHTML}</div>
 <div><button class="get-started open-qouteform" type="button" data-medium="Packages_2">Get Started</button></div>
 </div>
 <div class="pricing-card pro">
-<h2>Pro</h2>
-<p>Premium Support with Feature Expansion</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2">Pro</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">Premium Support with Feature Expansion</p>
 <div class="cost"><span class="text-lg font-normanl">Price:</span>$2499</div>
 <ul class="features">
 <li>100–120 Hours</li>
@@ -3581,8 +3586,8 @@ ${categoriesHTML}</div>
                     }
                     
                     packagesHTML += `<div class="pricing-card ${cssClass}">
-<h2>${pkg.name}</h2>
-<p>${pkg.description}</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2">${pkg.name}</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">${pkg.description}</p>
 <div class="cost"><span class="text-lg font-normanl">Price:</span>${pkg.price}</div>
 <ul class="features">
 ${featuresHTML}</ul>
@@ -3615,8 +3620,8 @@ ${packagesHTML}</div>
 <div class="row">
 <div class="col-lg-4 col-md-12">
 <div class="industries-desc">
-<h2 class="fonts-40 font-weight-bold font-weight-bold mb-2">Industries We Serve</h2>
-<p>Whether you operate in healthcare, finance, eCommerce, or any other domain, we develop and integrate mobile innovations that enhance workflows, address industry regulations, and deliver optimal digital experiences for your customers and stakeholders.</p>
+<h2 class="fonts-40 font-weight-bold mb-2">Industries We Serve</h2>
+${content.description ? '<p>' + content.description + '</p>' : ''}
 </div>
 </div>
 <div class="col-lg-8 col-md-12 industries-category">
@@ -3707,7 +3712,7 @@ ${packagesHTML}</div>
 <div class="col-lg-4 col-md-12">
 <div class="industries-desc">
 <h2 class="fonts-40 font-weight-bold font-weight-bold mb-2">{main_heading}</h2>
-<p>{description}</p>
+<p class="fonts-18 text-center mxw-900 mb-4">{description}</p>
 </div>
 </div>
 <div class="col-lg-8 col-md-12 industries-category">
@@ -3730,8 +3735,8 @@ ${packagesHTML}</div>
                 if (!content || !content.services || content.services.length === 0) {
                     return `<section class="pt80 pb50 services-section bg-color section-services-grid">
 <div class="container-xl">
-<h2 class="fonts-40 text-center font-weight-bold mb-3 mxw-1000">Our Comprehensive Development Services</h2>
-<p class="fonts-18 text-center mxw-1000 mb-4">Professional development solutions tailored to your business needs</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-1000">Our Comprehensive Development Services</h2>
+${content.description ? '<p class="fonts-18 text-center mxw-1000 mb-4">' + content.description + '</p>' : ''}
 <div class="row">
 <div class="col-lg-4 col-md-6">
 <div class="mad_service_box">
@@ -3798,7 +3803,7 @@ ${bulletHtml}
 
                 const template = `<section class="pt80 pb50 services-section bg-color section-services-grid">
 <div class="container-xl">
-<h2 class="fonts-40 text-center font-weight-bold mb-3 mxw-1000">{main_heading}</h2>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-1000">{main_heading}</h2>
 <p class="fonts-18 text-center mxw-1000 mb-4">{description}</p>
 <div class="row">
 ${servicesGrid}
@@ -3808,15 +3813,16 @@ ${servicesGrid}
 
                 return template
                     .replace('{main_heading}', content.main_heading || 'Our Services')
-                    .replace('{description}', content.description || 'Services we provide');
+                    .replace('{description}', content.description || '');
             }
 
             generateServicesGridSectionCenter(content) {
                 // Handle empty content with default static HTML
-                if (!content || !content.services || content.services.length === 0) {
+                if (!content || (!content.services || content.services.length === 0) && (!content.main_heading && !content.description)) {
                     return `<section class="pt80 pb50 services-section bg-color">
 <div class="container-xl">
-<h2 class="fonts-40 text-center font-weight-bold">Explore Our Range of <br>Mobile App Development Services</h2>
+<h2 class="fonts-40 text-center font-weight-bold mb-2">Explore Our Range of <br>Mobile App Development Services</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">Professional development services tailored to your business needs and goals.</p>
 <div class="row justify-content-center">
 <div class="col-lg-4 col-md-6">
 <div class="mad_service_box text-center" onclick="location.href='https://www.spaceotechnologies.com/services/app-development-consulting/';">
@@ -3900,18 +3906,26 @@ ${servicesGrid}
 </div>`;
                 }
                 
+                // Conditional template building based on description presence
+                const hasDescription = content.description && content.description.trim().length > 0;
+                const h2Classes = hasDescription ? 
+                    "fonts-40 text-center font-weight-bold mb-2" : 
+                    "fonts-40 text-center font-weight-bold mb-4";
+                
+                const descriptionHtml = hasDescription ? 
+                    `<p class="fonts-18 text-center mxw-900 mb-4">${content.description}</p>` : 
+                    '';
+                
                 const template = `<section class="pt80 pb50 services-section bg-color">
 <div class="container-xl">
-<h2 class="fonts-40 text-center font-weight-bold">{main_heading}</h2>
-<div class="row justify-content-center">
-{services_html}
+<h2 class="${h2Classes}">${content.main_heading || 'Our Services'}</h2>
+${descriptionHtml}<div class="row justify-content-center">
+${servicesHtml}
 </div>
 </div>
 </section>`;
                 
-                return template
-                    .replace('{main_heading}', content.main_heading || 'Our Services')
-                    .replace('{services_html}', servicesHtml);
+                return template;
             }
 
             generateServicesAccordionSection(content) {
@@ -4159,7 +4173,7 @@ ${accordionItems}
 <div class="row">
 <div class="col-lg-12">
 <h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Proven Results: Real Projects That Drive Business Growth</h2>
-<p class="fonts-18 text-center mb-3 mxw-900">See how we've transformed complex business challenges into measurable success stories.</p>
+${content.description ? '<p class="fonts-18 text-center mb-3 mxw-900">' + content.description + '</p>' : ''}
 </div>
 <div class="slider_projects order-1">
 <div class="row vcenter-parent">
@@ -4333,8 +4347,8 @@ ${portfolioItems}
                 if (!content || !content.benefits || content.benefits.length === 0) {
                     return `<section class="pt80 pb50 services-section practices-we-follow section-benefits-two">
 <div class="container-xl">
-<h2 class="fonts-40 font-weight-bold text-center mb-3">Why Choose Our Development Services</h2>
-<p class="fonts-18 text-center mxw-900 mb-4">Professional development solutions that deliver measurable results for your business</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Why Choose Our Development Services</h2>
+${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : ''}
 <div class="row">
 <div class="col-lg-4 col-md-6">
 <div class="mad_service_box">
@@ -4379,7 +4393,7 @@ ${portfolioItems}
                 
                 const template = `<section class="pt80 pb50 services-section practices-we-follow section-benefits-two">
 <div class="container-xl">
-<h2 class="fonts-40 font-weight-bold text-center mb-3">{main_heading}</h2>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">{main_heading}</h2>
 <p class="fonts-18 text-center mxw-900 mb-4">{description}</p>
 <div class="row">
 {benefits_items}
@@ -4458,6 +4472,7 @@ ${portfolioItems}
                 const lines = content.split('\n').filter(line => line.trim());
                 
                 let main_heading = '';
+                let description = '';
                 let processes = [];
                 let currentProcess = null;
                 let isCollectingDescription = false;
@@ -4482,6 +4497,16 @@ ${portfolioItems}
                                         !line.includes('It ');
                     
                     const isStepTitle = isNumberedStep || isShortTitle;
+                    
+                    // If no processes started yet and this isn't a step title, it's the description
+                    if (processes.length === 0 && !isStepTitle && !currentProcess) {
+                        if (description) {
+                            description += ' ' + line;
+                        } else {
+                            description = line;
+                        }
+                        continue;
+                    }
                     
                     if (isStepTitle) {
                         // Save previous process if exists
@@ -4513,6 +4538,7 @@ ${portfolioItems}
                 
                 return {
                     main_heading: main_heading || 'Our Development Process',
+                    description: description || '',
                     processes: processes
                 };
             }
@@ -4526,12 +4552,14 @@ ${portfolioItems}
                 console.log('🔍 Lines count:', lines.length);
                 
                 let main_heading = '';
+                let description = '';
                 let brands = [];
                 
                 // Handle empty content or content with only section markers
                 if (lines.length === 0 || (lines.length === 1 && lines[0].includes('[FEATURED_IN'))) {
                     return {
                         main_heading: 'Our Solutions Recognized & Featured In',
+                        description: '',
                         brands: [] // Empty brands array will trigger default brands in generate function
                     };
                 }
@@ -4541,6 +4569,7 @@ ${portfolioItems}
                     const potentialHeading = lines.find(line => !line.includes('[FEATURED_IN') && line.length > 10);
                     return {
                         main_heading: potentialHeading || 'Our Solutions Recognized & Featured In',
+                        description: '',
                         brands: [] // Empty brands array will trigger default brands in generate function
                     };
                 }
@@ -4559,6 +4588,20 @@ ${portfolioItems}
                         continue;
                     }
                     
+                    // Check if this might be description content (longer lines that come before brand list)
+                    const mightBeDescription = line.length > 20 && 
+                                             brands.length === 0 &&
+                                             !line.includes('.jpg') && !line.includes('.png') && !line.includes('.svg') && !line.includes('image');
+                    
+                    if (mightBeDescription) {
+                        if (description) {
+                            description += ' ' + line;
+                        } else {
+                            description = line;
+                        }
+                        continue;
+                    }
+                    
                     // Each subsequent line is a brand name (ignore very short lines and image references)
                     if (line.length > 2 && !line.includes('.jpg') && !line.includes('.png') && !line.includes('.svg') && !line.includes('image')) {
                         brands.push(line);
@@ -4570,12 +4613,14 @@ ${portfolioItems}
                     console.log('🔍 NO VALID BRANDS FOUND - will trigger default static HTML');
                     return {
                         main_heading: main_heading || 'Our Solutions Recognized & Featured In',
+                        description: description || '',
                         brands: [] // Empty brands array will trigger default static HTML in generate function
                     };
                 }
                 
                 return {
                     main_heading: main_heading || 'Our Solutions Recognized & Featured In',
+                    description: description || '',
                     brands: brands
                 };
             }
@@ -4587,8 +4632,8 @@ ${portfolioItems}
 <div class="container-xl">
 <div class="row">
 <div class="col-lg-7 col-md-12 col-sm-12">
-<h2 class="fonts-40 font-weight-bold text-left mb-4">Ready to Start Your Project?</h2>
-<p>Let's discuss your requirements and build something amazing together. Our team is ready to help you achieve your development goals with cutting-edge solutions.</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Ready to Start Your Project?</h2>
+${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : ''}
 <strong>Why Choose Our Services:</strong>
 <ul class="bullet fonts-14 mb-3">
 <li>Expert team with proven track record</li>
@@ -4635,8 +4680,8 @@ ${portfolioItems}
 <div class="container-xl">
 <div class="row">
 <div class="col-lg-7 col-md-12 col-sm-12">
-<h2 class="fonts-40 font-weight-bold text-left mb-4">{main_heading}</h2>
-<p>{description}</p>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">{main_heading}</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">{description}</p>
 {bullet_html}
 </div>
 <div class="col-lg-5 col-md-12 col-sm-12 text-center">
@@ -4773,7 +4818,8 @@ ${portfolioItems}
                     console.log('🚀 RETURNING DEFAULT PROCESS HTML (blank content detected)');
                     return `<section class="pt80 pb50 process-sec bg-color">
 <div class="container-xl">
-<h2 class="fonts-40 font-weight-bold text-center">Our Development Process</h2>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Our Development Process</h2>
+${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : ''}
 <div class="row">
 <div class="col-lg-4 col-md-6">
 <div class="instalikeapp">
@@ -4839,7 +4885,8 @@ ${portfolioItems}
 
                 const template = `<section class="pt80 pb50 process-sec bg-color">
 <div class="container-xl">
-<h2 class="fonts-40 font-weight-bold text-center">{main_heading}</h2>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">{main_heading}</h2>
+{description}
 <div class="row">
 {process_items}
 </div>
@@ -4848,6 +4895,7 @@ ${portfolioItems}
 
                 return template
                     .replace('{main_heading}', content.main_heading || 'Our Development Process')
+                    .replace('{description}', content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : '')
                     .replace('{process_items}', processItems);
             }
 
@@ -4914,7 +4962,8 @@ ${portfolioItems}
 
                 const template = `<section class="featured-in pt80 pb80 bg-color">
 <div class="container-xl">
-<h2 class="fonts-40 font-weight-bold text-center mb-5">{main_heading}</h2>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">{main_heading}</h2>
+{description}
 <div class="brand-listing">
 {brand_items}
 </div>
@@ -4923,6 +4972,7 @@ ${portfolioItems}
 
                 return template
                     .replace('{main_heading}', content.main_heading || 'Our Solutions Recognized & Featured In')
+                    .replace('{description}', content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : '')
                     .replace('{brand_items}', brandItems);
             }
 
@@ -4949,7 +4999,30 @@ ${portfolioItems}
                 
                 // Standalone numbers with + (like "350+" in statistics)
                 text = text.replace(/\b(\d+\+)\b(?=\s|$)/g, '<strong>$1</strong>');
-                
+
+                return text;
+            }
+
+            convertBoldMarkersAndLinks(text) {
+                if (!text) return text;
+
+                console.log('🔗 Converting bold markers and links in text:', text);
+
+                // First, extract and convert links to HTML
+                const links = this.extractLinksFromText(text);
+
+                if (links.length > 0) {
+                    // Process each link found
+                    links.forEach(link => {
+                        const htmlLink = `<a href="${link.url}" target="_blank" rel="noopener">${link.text}</a>`;
+                        text = text.replace(link.originalText, htmlLink);
+                        console.log('🔗 Converted link:', link.originalText, '->', htmlLink);
+                    });
+                }
+
+                // Then apply bold markers
+                text = this.convertBoldMarkers(text);
+
                 return text;
             }
 

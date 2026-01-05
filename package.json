@@ -1,6 +1,6 @@
 {
   "name": "document-to-html-converter",
-  "version": "3.7.0",
+  "version": "3.9.0",
   "description": "AI-powered web IDE for converting structured documents with section markers into professional HTML sections",
   "main": "web_ide_final.html",
   "homepage": ".",
@@ -18,17 +18,17 @@
     "groq-api",
     "section-parser"
   ],
-  "author": "Your Name",
+  "author": "Space-O Technologies",
   "license": "MIT",
   "dependencies": {
     "http-server": "^14.1.1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/document-to-html-converter.git"
+    "url": "git+https://github.com/space-o-technologies/document-to-html-converter.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/document-to-html-converter/issues"
+    "url": "https://github.com/space-o-technologies/document-to-html-converter/issues"
   },
   "engines": {
     "node": ">=14.0.0"

@@ -13,14 +13,14 @@ This project contains a web-based IDE for converting structured documents with s
 - **Document Processing**: Converts documents with descriptive section markers
 - **AI Integration**: Uses Groq API for intelligent content parsing (fallback to rule-based parsing)
 - **Default Content Generation**: All sections generate professional static HTML when content is empty
-- **Multiple Section Types**: Supports 18 different section types with smart parsing
+- **Multiple Section Types**: Supports 19 different section types with smart parsing
 - **File Upload**: Supports both Word documents (.docx) and text files
 - **Live Preview**: Real-time HTML preview with Bootstrap styling
 - **Image Fallback System**: Comprehensive broken image handling with static HTML images
 - **Technology Stack Parsing**: Advanced category-based technology parsing
 - **Descriptive Section Names**: All sections use clear, descriptive naming conventions
 
-## Section Types Supported (18 Total)
+## Section Types Supported (19 Total)
 
 ### Updated Section Names (v3.5+):
 - **HERO_BANNER_SECTION**: Main landing section with title, description, bullet points, and contact form
@@ -30,8 +30,6 @@ This project contains a web-based IDE for converting structured documents with s
 - **SERVICES_GRID_SECTION**: Grid layout of services with images and descriptions
 - **SERVICES_GRID_SECTION_CENTER**: Centered grid layout for services
 - **SERVICES_ACCORDION_SECTION**: Collapsible accordion for services (single/multiple sections)
-- **BENEFITS_SECTION**: Standard benefits listing with icons and descriptions
-- **BENEFITS_TWO**: Benefits section with title/description pairs
 - **CONTENT_WITH_FORM_SECTION**: Contact forms with customizable fields
 - **PORTFOLIO_SECTION**: Project showcase with technology stacks
 - **TESTIMONIAL_SECTION**: Customer testimonials with author attribution
@@ -41,6 +39,10 @@ This project contains a web-based IDE for converting structured documents with s
 - **FEATURED_IN_SECTION**: Brand recognition section with media logos
 - **FLEXIBLE_PACKAGE_SECTION**: Pricing packages with features, costs, and call-to-action buttons
 - **WHY_CHOOSE_BOX**: Why choose us section with key benefits
+- **GUARANTEED_SECTION**: Company differentiators and guarantees section
+- **AWARDS_SECTION**: Awards and recognition showcase section
+- **FLEXIBLE_PACKAGES_WRAPPER**: Alternative pricing packages layout with three-tier structure
+- **TESTIMONIAL_SECTION_CLUTCH**: Clutch-style testimonials with project summaries
 
 ## Document Format
 Documents should use the new descriptive section markers:
@@ -315,13 +317,14 @@ netstat -ano | findstr :9000
 - **Technology Section Issues**: Ensure categories end with ':' (colon)
 - **Server Issues**: Try different ports (8000, 8001, 9000) if port conflicts occur
 
-## Supported Section List (All 18 Sections)
+## Supported Section List (All 19 Sections)
 ```
 HERO_BANNER_SECTION, FAQ_SECTION, CTA_SIMPLE_SECTION, CTA_WITH_LIST_SECTION,
 TECHNOLOGY_STACK_SECTION, INDUSTRIES_WE_SERVE_SECTION, SERVICES_GRID_SECTION,
 SERVICES_GRID_SECTION_CENTER, SERVICES_ACCORDION_SECTION, PORTFOLIO_SECTION,
-TESTIMONIAL_SECTION, BENEFITS_SECTION, BENEFITS_TWO, CONTENT_WITH_FORM_SECTION,
-PROCESS_SECTION, FEATURED_IN_SECTION, FLEXIBLE_PACKAGE_SECTION, WHY_CHOOSE_BOX
+TESTIMONIAL_SECTION, CONTENT_WITH_FORM_SECTION, PROCESS_SECTION, FEATURED_IN_SECTION,
+FLEXIBLE_PACKAGE_SECTION, WHY_CHOOSE_BOX, GUARANTEED_SECTION, AWARDS_SECTION,
+FLEXIBLE_PACKAGES_WRAPPER, TESTIMONIAL_SECTION_CLUTCH
 ```
 
 ## Project Structure

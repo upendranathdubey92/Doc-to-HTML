@@ -551,6 +551,737 @@
             text-align: center;
             margin-bottom: 10px;
         }
+
+        /* ========== CSS for New 4 Sections ========== */
+
+        /* GUARANTEED_SECTION CSS */
+        .guaranteed_txt ul li { padding: 0 0 20px 40px; position: relative; color: #000;}
+        .guaranteed_txt ul li:before {position: absolute;left: 0;top: 5px;content: "";width: 24px;height: 24px;background: url(https://www.spaceotechnologies.com/wp-content/uploads/2024/01/arrow-ne.svg) no-repeat;}
+        .guaranteed_img img{ border-radius:10px; }
+        @media(max-width: 991px) {
+            .guaranteed_txt { margin: 20px 0 0 0;}
+            .guaranteed_img { text-align: center;}
+        }
+
+        /* AWARDS_SECTION CSS */
+        .awards-section .section-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 30px;
+        }
+
+        .awards-section .section-title {
+            flex: 1;
+            max-width: 33.33%;
+        }
+
+        .awards-section .section-title h2 {
+            font-size: clamp(26px, 4vw, 44px);
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1.2;
+        }
+
+        .awards-section .section-content {
+            flex: 2;
+            max-width: 66.66%;
+        }
+
+        .awards-section .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0;
+        }
+
+        .awards-section .award-card {
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 15px;
+        }
+
+        .awards-section .award-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .awards-section .award-card::after {
+            content: "";
+            position: absolute;
+            margin: auto;
+            right: 0px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            height: 100%;
+            background: #CAD6E7;
+        }
+
+        .awards-section .award-card:last-child::after {
+            display: none;
+        }
+
+        .awards-section .award-card img {
+            max-width: 200px;
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+
+        .awards-section .award-card h3 {
+            font-size: 14px;
+            color: #555;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .awards-section .top-border {
+            border-top: 2px solid #ddd;
+            padding-top: 50px;
+        }
+
+        .awards-section .review-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .awards-section .review-card {
+            transition: all 0.3s ease;
+        }
+
+        .awards-section .review-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .awards-section .review-card img {
+            width: 200px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        @media (max-width: 768px) {
+            .awards-section .section-row {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .awards-section .section-title,
+            .awards-section .section-content {
+                max-width: 100%;
+                flex: none;
+            }
+
+            .awards-section .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .awards-section .review-cards-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .awards-section .award-card,
+            .awards-section .review-card {
+                padding: 20px 15px;
+                background: #fff;
+            }
+
+            .awards-section .award-card::after {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .awards-section .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* WHY_CHOOSE_BOX CSS */
+        .why-choose-section {
+            background: #f8f9fa;
+        }
+        .why-choose-section .benefit-box {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        .why-choose-section .benefit-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        .why-choose-section .benefit-box h3 {
+            color: #1a73e8;
+            margin-bottom: 12px;
+        }
+        .why-choose-section .benefit-box p {
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+        }
+        @media (max-width: 768px) {
+            .why-choose-section .benefit-box {
+                padding: 20px;
+            }
+        }
+
+        /* FLEXIBLE_PACKAGES_WRAPPER CSS */
+        .pricing-container {
+            display: flex; gap: 20px; width: 100%; max-width: 1200px; padding: 0 20px;
+        }
+        .pricing-card {
+            background-color: #fff; border: 1px solid #e5e7eb; border-radius: 24px; flex: 1; padding: 24px 24px 90px; text-align: left; position: relative; margin-top: 20px; transition: all .2s ease-in-out;
+        }
+        .pricing-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(0, 0, 0, .05);
+        }
+        .pricing-card.most-popular {
+            border-color: #000;
+        }
+        .pricing-card.most-popular::before {
+            content: 'Most Popular'; position: absolute; top: -18px; left: 50%;transform: translateX(-50%); background-color: #fff; color: #000; padding: 5px 25px; border-radius: 40px; font-size: 13px; font-weight: 500; border: solid 1px #000;
+        }
+        .pricing-card h2 {
+            font-size: 24px; color: #000; margin: 0;
+        }
+        .pricing-card p {
+            margin: 8px 0 0px; color: #000; font-size: 16px; min-height: 50px;
+        }
+        .cost {
+            font-size: 24px;
+            font-weight: 500;
+            color: #000;
+            margin: 15px 0;
+            padding: 15px 0;
+            border-top: 1px solid #e5e5e5;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .cost span{
+            font-size: 20px;
+        }
+        .features {
+            list-style-type: none; padding: 0; margin: 0;
+        }
+        .features li {
+            color: #000;
+            position: relative;
+            margin-top: 0;
+            margin-bottom: 8px;
+            padding-left: 30px;
+            font-size: 15px;
+        }
+        .features li::before {
+            content: "";
+            background-image: url(https://www.spaceotechnologies.com/wp-content/uploads/2023/09/check-icon.svg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            left: 0;
+            top: 4px;
+        }
+        .get-started {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+            max-width: 90%;
+            font-size: 16px;
+            border: solid 1px #000;
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            align-items: baseline;
+            padding: 10px;
+            border-radius: 8px;
+            background: #fff;
+            color:#000;
+        }
+        .advanced .get-started {
+            background-color: #000;
+            color: #fff;
+        }
+        @media (max-width: 768px) {
+            .pricing-container {
+                flex-direction: column;
+            }
+        }
+
+        /* TESTIMONIAL_SECTION_CLUTCH CSS */
+        .testimonial-wrapper {
+            width: 100%;
+        }
+        .testimonial-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            gap: 0;
+            border-radius: 0;
+            position: relative;
+        }
+        @media (min-width: 576px) {
+            .testimonial-container {
+                max-width: 540px;
+                border-radius: 8px;
+            }
+        }
+        @media (min-width: 768px) {
+            .testimonial-container {
+                max-width: 720px;
+            }
+        }
+        @media (min-width: 992px) {
+            .testimonial-container {
+                max-width: 960px;
+            }
+        }
+        @media (min-width: 1200px) {
+            .testimonial-container {
+                max-width: 1140px;
+            }
+        }
+        @media (min-width: 1400px) {
+            .testimonial-container {
+                max-width: 1320px;
+            }
+        }
+        .left-panel-container {
+            width: 100%;
+            background: #f8f9fb;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        @media (min-width: 992px) {
+            .left-panel-container {
+                width: 380px;
+                min-height: auto;
+            }
+        }
+        @media (min-width: 1200px) {
+            .left-panel-container {
+                width: 420px;
+            }
+        }
+        .left-panel {
+            width: 100%;
+            padding: 10px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        }
+        .left-panel.active {
+            opacity: 1;
+            visibility: visible;
+            position: relative;
+        }
+        @media (min-width: 1200px) {
+            .left-panel {
+                padding: 40px 35px;
+            }
+        }
+        .clucth-logo {
+            margin-bottom: 15px;
+        }
+        .project-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        @media (min-width: 768px) {
+            .project-title {
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+        }
+        .category {
+            display: inline-block;
+            padding: 6px 14px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        @media (min-width: 768px) {
+            .category {
+                padding: 7px 15px;
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+        }
+        .project-heading {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.3;
+            margin-bottom: 10px;
+        }
+        @media (min-width: 768px) {
+            .project-heading {
+                font-size: 20px;
+            }
+        }
+        @media (min-width: 1200px) {
+            .project-heading {
+                font-size: 24px;
+            }
+        }
+        .project-description {
+            font-size: 14px;
+            line-height: 1.55;
+            color: #4a4a4a;
+            margin-bottom: 15px;
+        }
+        @media (min-width: 768px) {
+            .project-description {
+                font-size: 15px;
+                line-height: 1.6;
+            }
+        }
+        .view-all {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #e31e24;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: gap 0.3s ease;
+        }
+        @media (min-width: 768px) {
+            .view-all {
+                font-size: 16px;
+            }
+        }
+        .view-all:hover {
+            gap: 12px;
+        }
+        .arrow {
+            font-size: 18px;
+        }
+        @media (min-width: 768px) {
+            .arrow {
+                font-size: 20px;
+            }
+        }
+        .slider-container {
+            flex: 1;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .slider-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            height: 100%;
+        }
+        .slide {
+            min-width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            background: #d9e5f5;
+            padding: 30px;
+            height: fit-content;
+        }
+        .slide.active {
+            opacity: 1;
+        }
+        @media (min-width: 576px) {
+            .slide {
+                gap: 30px;
+            }
+        }
+        @media (min-width: 992px) {
+            .slide {
+                flex-direction: row;
+                gap: 30px;
+            }
+        }
+        @media (min-width: 1200px) {
+            .slide {
+                gap: 35px;
+            }
+        }
+        .slide-content {
+            flex: 1;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+        @media screen and (max-width:1200px){
+            .slide-content{
+                padding: 0;
+            }
+        }
+        .slide-content * {
+            pointer-events: auto;
+        }
+        .quote-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            line-height: 1.35;
+            margin-bottom: 20px;
+        }
+        @media (min-width: 992px) {
+            .quote-text {
+                font-size: 22px;
+            }
+        }
+        @media (min-width: 1199px) {
+            .quote-text {
+                font-size: 24px;
+            }
+        }
+        @media (min-width: 1400px) {
+            .quote-text {
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+        }
+        .solution-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2a2a2a;
+            margin-bottom: 25px;
+        }
+        @media (min-width: 768px) {
+            .solution-text {
+                font-size: 15px;
+            }
+        }
+        @media (min-width: 992px) {
+            .solution-text {
+                font-size: 15px;
+                line-height: 1.65;
+            }
+        }
+        .reviewer-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+        @media (min-width: 768px) {
+            .reviewer-name {
+                font-size: 17px;
+            }
+        }
+        @media (min-width: 1400px) {
+            .reviewer-name {
+                font-size: 18px;
+            }
+        }
+        .reviewer-title {
+            font-size: 14px;
+            color: #2a2a2a;
+            margin-bottom: 3px;
+            line-height: 1.4;
+        }
+        @media (min-width: 768px) {
+            .reviewer-title {
+                font-size: 15px;
+            }
+        }
+        .reviewer-location {
+            font-size: 13px;
+            color: #4a4a4a;
+        }
+        @media (min-width: 768px) {
+            .reviewer-location {
+                font-size: 14px;
+            }
+        }
+        .rating-panel {
+            width: 100%;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            background: white;
+            align-content: center;
+            justify-content: end;
+            height: fit-content;
+        }
+        @media (min-width: 576px) {
+            .rating-panel {
+                padding: 32px 22px;
+            }
+        }
+        @media (min-width: 992px) {
+            .rating-panel {
+                width: 230px;
+                padding: 35px 25px;
+            }
+        }
+        @media (min-width: 1200px) {
+            .rating-panel {
+                width: 250px;
+                padding: 35px 28px;
+            }
+        }
+        .overall-rating {
+            font-size: 58px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+        @media (min-width: 576px) {
+            .overall-rating {
+                font-size: 64px;
+                margin-bottom: 12px;
+            }
+        }
+        @media (min-width: 992px) {
+            .overall-rating {
+                font-size: 68px;
+            }
+        }
+        .stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 30px;
+        }
+        @media (min-width: 576px) {
+            .stars {
+                gap: 6px;
+                margin-bottom: 32px;
+            }
+        }
+        @media (min-width: 992px) {
+            .stars {
+                gap: 6px;
+                margin-bottom: 35px;
+            }
+        }
+        .star {
+            font-size: 22px;
+            color: #ffc107;
+        }
+        @media (min-width: 576px) {
+            .star {
+                font-size: 24px;
+            }
+        }
+        @media (min-width: 992px) {
+            .star {
+                font-size: 25px;
+            }
+        }
+        .rating-details {
+            width: 100%;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 15px;
+        }
+        .rating-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+        .rating-label {
+            font-size: 14px;
+            color: #4a4a4a;
+        }
+        @media (min-width: 768px) {
+            .rating-label {
+                font-size: 15px;
+            }
+        }
+        .rating-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        @media (min-width: 768px) {
+            .rating-value {
+                font-size: 16px;
+            }
+        }
+        .slider-controls {
+            position: absolute;
+            top: -20px;
+            z-index: 1;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 1;
+        }
+        @media (min-width: 992px) {
+            .slider-controls {
+                top: -50px;
+                right: 30px;
+            }
+        }
+        .control-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: #e31e24;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (min-width: 768px) {
+            .control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 22px;
+            }
+        }
+        @media (min-width: 992px) {
+            .control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 24px;
+            }
+        }
+        .control-btn:hover {
+            background: #c01a1f;
+        }
+        .prev-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .prev-btn:hover {
+            background: #e0e0e0;
+        }
+        @media (max-width: 991px) {
+            .testimonial-container {
+                flex-direction: column;
+            }
+        }
+        /* ========== End of New 4 Sections CSS ========== */
+
     </style>
     
     <!-- Quill Rich Text Editor -->
@@ -691,7 +1422,7 @@
     <div class="ide-container">
         <div class="header">
             <div class="logo">📄 Page Content Update IDE</div>
-            <div class="version">Production Ready</div>
+            <div class="version">v3.10 - Production Ready</div>
         </div>
 
         <div class="sidebar">
@@ -780,19 +1511,27 @@
             </div>
 
             <div class="supported-sections">
-                <h5>📋 Supported Sections</h5>
+                <h5>📋 Supported Sections (19 Total)</h5>
                 <div class="supported-list">
                     <span class="supported-item">HERO_BANNER_SECTION</span>
-                    <span class="supported-item">SERVICES_GRID_SECTION</span>
+                    <span class="supported-item">SERVICES_GRID_SECTION_CENTER</span>
                     <span class="supported-item">SERVICES_ACCORDION_SECTION</span>
-                    <span class="supported-item">FAQ_SECTION</span>
                     <span class="supported-item">CTA_SIMPLE_SECTION</span>
+                    <span class="supported-item">SERVICES_GRID_SECTION</span>
+                    <span class="supported-item">PORTFOLIO_SECTION</span>
+                    <span class="supported-item">TESTIMONIAL_SECTION</span>
                     <span class="supported-item">PROCESS_SECTION</span>
                     <span class="supported-item">FEATURED_IN_SECTION</span>
                     <span class="supported-item">TECHNOLOGY_STACK_SECTION</span>
+                    <span class="supported-item">WHY_CHOOSE_BOX</span>
                     <span class="supported-item">INDUSTRIES_WE_SERVE_SECTION</span>
-                    <span class="supported-item">PORTFOLIO_SECTION</span>
-                    <span class="supported-item">TESTIMONIAL_SECTION</span>
+                    <span class="supported-item">CTA_WITH_LIST_SECTION</span>
+                    <span class="supported-item">CONTENT_WITH_FORM_SECTION</span>
+                    <span class="supported-item">FAQ_SECTION</span>
+                    <span class="supported-item">GUARANTEED_SECTION</span>
+                    <span class="supported-item">AWARDS_SECTION</span>
+                    <span class="supported-item">FLEXIBLE_PACKAGES_WRAPPER</span>
+                    <span class="supported-item">TESTIMONIAL_SECTION_CLUTCH</span>
                 </div>
             </div>
         </div>
@@ -875,7 +1614,7 @@
             }
         }
 
-        // Enhanced Content Processing Engine with AI Support - DATA URI IMAGES v3.9
+        // Enhanced Content Processing Engine with AI Support - DATA URI IMAGES v3.10
         class RealDocumentProcessor {
             constructor() {
                 this.useAI = true; // Enable AI processing
@@ -945,7 +1684,7 @@
                     // ... other templates
                 };
 
-                this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION', 'FLEXIBLE_PACKAGE_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO'];
+                this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION', 'GUARANTEED_SECTION', 'AWARDS_SECTION', 'FLEXIBLE_PACKAGES_WRAPPER', 'TESTIMONIAL_SECTION_CLUTCH'];
             }
 
             // Utility method to clean reference markers like [a], [b], [c], etc. from Word documents
@@ -1070,6 +1809,14 @@
                         return this.parseFeaturedInSection(content);
                     case 'FLEXIBLE_PACKAGE_SECTION':
                         return this.parseFlexiblePackageSection(content);
+                    case 'GUARANTEED_SECTION':
+                        return this.parseGuaranteedSection(content);
+                    case 'AWARDS_SECTION':
+                        return this.parseAwardsSection(content);
+                    case 'FLEXIBLE_PACKAGES_WRAPPER':
+                        return this.parseFlexiblePackagesWrapperSection(content);
+                    case 'TESTIMONIAL_SECTION_CLUTCH':
+                        return this.parseTestimonialClutchSection(content);
                     default:
                         return { raw_content: content };
                 }
@@ -2032,6 +2779,51 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 return result;
             }
 
+            parseGuaranteedSection(content) {
+                // Simple parser - returns empty object for fallback HTML
+                const lines = content.split('\n').filter(line => line.trim());
+                return {
+                    main_heading: lines[0] || "How We Stand Apart as an App Development Company",
+                    items: lines.slice(1) || []
+                };
+            }
+
+            parseAwardsSection(content) {
+                // Simple parser - returns empty object for fallback HTML
+                const lines = content.split('\n').filter(line => {
+                    const trimmed = line.trim();
+                    // Filter out empty lines and image tags
+                    return trimmed && !trimmed.startsWith('<img') && !trimmed.includes('data:image');
+                });
+
+                // If no real content (just screenshot), return empty for fallback
+                if (lines.length === 0) {
+                    return {
+                        main_heading: "",
+                        awards: []
+                    };
+                }
+
+                return {
+                    main_heading: lines[0] || "",
+                    awards: []
+                };
+            }
+
+            parseFlexiblePackagesWrapperSection(content) {
+                // Use same parser as FLEXIBLE_PACKAGE_SECTION
+                return this.parseFlexiblePackageSection(content);
+            }
+
+            parseTestimonialClutchSection(content) {
+                // Simple parser - returns empty object for fallback HTML
+                const lines = content.split('\n').filter(line => line.trim());
+                return {
+                    main_heading: lines[0] || "Clients Love Space-O Technologies",
+                    testimonials: []
+                };
+            }
+
             async parseServicesGridSection(content) {
                 if (this.useAI) {
                     try {
@@ -2158,7 +2950,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 const isReasonableLength = line.length > 5 && line.length < 80;
                 const startsWithCapitalOrNumber = /^[A-Z0-9]/.test(line); // Allow numbers like "24/7"
                 const notBullet = !line.match(/^[●\-\*•‑]\s*/);
-                const hasKeywords = /\b(development|consulting|portal|service|solution|platform|integration|migration|design|custom|b2b|api|support|maintenance|ui|ux|monitoring|optimization|configuration|customization|health|security|reporting|analytics)\b/i.test(line);
+                const hasKeywords = /\b(development|consulting|portal|service|solution|platform|integration|migration|design|custom|b2b|api|support|maintenance|ui|ux|monitoring|optimization|configuration|customization|health|security|reporting|analytics|software|system|systems|application|applications|management|scheduling|appointment|billing|revenue|cycle|electronic|health|records|ehr|emr|telehealth|patient|clinical|practice|upgrades|enhancement|performance)\b/i.test(line);
 
                 // Check if this line is separated from previous content
                 const prevLine = currentIndex > 0 ? allLines[currentIndex - 1] : '';
@@ -2404,11 +3196,19 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     // Detect if this line is likely a project title
                     // SIMPLE RULE: Titles start with specific action words or patterns
                     const isTitlePattern = line.match(/^(Developed|Built|Created|Designed|An?\s+(Advanced|Online|AI|Mobile|Web|Enterprise|Custom|Comprehensive))/i);
-                    const isDescriptionPattern = line.match(/^(We |Space-O Technologies|Managing |The platform|The system|Its |With |Our )/i);
+                    const isDescriptionPattern = line.match(/^(We |Space-O Technologies|Managing |The platform|The system|Its |With |Our |Built using|Currently serving|Key features)/i);
+
+                    // Check for "ProjectName: Description" format (e.g., "MedCall WorkComp: On-Demand Doctor App")
+                    const isColonTitleFormat = (
+                        line.includes(':') &&
+                        line.length < 150 &&
+                        line.match(/:\s*(On-Demand|Cloud-Based|Healthcare|eCommerce|AI|Mobile|Web|Platform|App|Software|System|Solution|Service|Management)/i) &&
+                        !isDescriptionPattern
+                    );
 
                     const isLikelyTitle = (
                         line.length < 200 && // Titles are reasonably short
-                        isTitlePattern && // Must start with title pattern
+                        (isTitlePattern || isColonTitleFormat) && // Must start with title pattern OR match colon format
                         !isDescriptionPattern && // Must NOT start with description pattern
                         line.match(/\b(Solution|Software|Platform|App|Application|System|Tool|Service|Management|Development)\b/i) // Contains product/service words
                     );
@@ -2792,59 +3592,110 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
 
             parseContentFormSection(content) {
                 const lines = content.split('\n').filter(line => line.trim());
-                
+
                 let main_heading = '';
                 let description = '';
                 let bullet_points = [];
                 let bullet_intro = '';
+                let closing_text = '';
                 let currentIndex = 0;
-                
+
                 // First line is heading
                 if (lines.length > 0) {
                     main_heading = lines[0].trim();
                     currentIndex = 1;
                 }
-                
-                // Look for description and bullet points
-                let foundBulletIntro = false;
-                let processingBullets = false;
-                
+
+                // Helper function to check if a line looks like a bullet point (has "Title: Description" format)
+                const isBulletFormat = (line) => {
+                    const colonIndex = line.indexOf(':');
+                    if (colonIndex === -1) return false;
+                    // Check if there's text before and after the colon
+                    const beforeColon = line.substring(0, colonIndex).trim();
+                    const afterColon = line.substring(colonIndex + 1).trim();
+                    return beforeColon.length > 0 && afterColon.length > 0 && beforeColon.length < 100;
+                };
+
+                // First pass: identify where bullets start and end
+                let bulletStartIndex = -1;
+                let bulletEndIndex = -1;
                 for (let i = currentIndex; i < lines.length; i++) {
                     const line = lines[i].trim();
-                    
-                    if (line.startsWith('●')) {
-                        // This is a bullet point
-                        processingBullets = true;
-                        const bulletText = line.replace('●', '').trim();
-                        const parts = bulletText.split(':', 2);
-                        if (parts.length === 2) {
-                            bullet_points.push(`<strong>${parts[0]}:</strong> ${parts[1]}`);
-                        } else {
-                            bullet_points.push(bulletText);
-                        }
-                    } else if (!processingBullets && line.endsWith(':') && (line.includes('Help') || line.includes('Address') || line.includes('Challenge') || line.includes('How') || line.includes('What'))) {
-                        // This is the bullet intro line (only if we haven't started processing bullets yet)
-                        bullet_intro = line;
-                        foundBulletIntro = true;
-                    } else if (!foundBulletIntro && !processingBullets && line.length > 10) {
-                        // This is likely part of the description (before bullets)
-                        description += (description ? ' ' : '') + line;
-                    } else if (!processingBullets && !foundBulletIntro) {
-                        // Could be description or bullet intro
-                        if (line.endsWith(':')) {
-                            bullet_intro = line;
-                            foundBulletIntro = true;
-                        } else {
-                            description += (description ? ' ' : '') + line;
-                        }
+                    if (bulletStartIndex === -1 && (line.startsWith('●') || isBulletFormat(line))) {
+                        bulletStartIndex = i;
+                    } else if (bulletStartIndex !== -1 && !line.startsWith('●') && !isBulletFormat(line)) {
+                        bulletEndIndex = i;
+                        break;
                     }
                 }
-                
+
+                // If bullets were found but no end index, bullets go to the end
+                if (bulletStartIndex !== -1 && bulletEndIndex === -1) {
+                    bulletEndIndex = lines.length;
+                }
+
+                // If we found bullets, parse description, bullet intro, bullets, and closing text
+                if (bulletStartIndex > currentIndex) {
+                    // Look for bullet intro (the line immediately before bullets that's not too long)
+                    const potentialIntroIndex = bulletStartIndex - 1;
+                    if (potentialIntroIndex >= currentIndex) {
+                        const potentialIntro = lines[potentialIntroIndex].trim();
+                        // If this line is substantial but not a bullet itself, it's the intro
+                        if (potentialIntro.length > 20 && !isBulletFormat(potentialIntro)) {
+                            bullet_intro = potentialIntro;
+                            // Description is everything between heading and bullet intro
+                            for (let i = currentIndex; i < potentialIntroIndex; i++) {
+                                description += (description ? ' ' : '') + lines[i].trim();
+                            }
+                        } else {
+                            // No bullet intro, everything before bullets is description
+                            for (let i = currentIndex; i < bulletStartIndex; i++) {
+                                description += (description ? ' ' : '') + lines[i].trim();
+                            }
+                        }
+                    }
+
+                    // Process bullet points
+                    for (let i = bulletStartIndex; i < bulletEndIndex; i++) {
+                        const line = lines[i].trim();
+
+                        if (line.startsWith('●')) {
+                            // Standard bullet with ● symbol
+                            const bulletText = line.replace('●', '').trim();
+                            const parts = bulletText.split(':', 2);
+                            if (parts.length === 2) {
+                                bullet_points.push(`<strong>${parts[0]}:</strong> ${parts[1]}`);
+                            } else {
+                                bullet_points.push(bulletText);
+                            }
+                        } else if (isBulletFormat(line)) {
+                            // Bullet in "Title: Description" format without ● symbol
+                            const colonIndex = line.indexOf(':');
+                            const title = line.substring(0, colonIndex).trim();
+                            const desc = line.substring(colonIndex + 1).trim();
+                            bullet_points.push(`<strong>${title}:</strong> ${desc}`);
+                        }
+                    }
+
+                    // Capture closing text (everything after bullets)
+                    if (bulletEndIndex < lines.length) {
+                        for (let i = bulletEndIndex; i < lines.length; i++) {
+                            closing_text += (closing_text ? ' ' : '') + lines[i].trim();
+                        }
+                    }
+                } else {
+                    // No bullets found, everything is description
+                    for (let i = currentIndex; i < lines.length; i++) {
+                        description += (description ? ' ' : '') + lines[i].trim();
+                    }
+                }
+
                 return {
                     main_heading: main_heading || "Contact Us",
                     description: description || "Get in touch with our team",
                     bullet_points: bullet_points,
-                    bullet_intro: bullet_intro
+                    bullet_intro: bullet_intro,
+                    closing_text: closing_text
                 };
             }
 
@@ -2964,16 +3815,22 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     return this.generatePortfolioSection(content);
                 } else if (baseSectionType.includes('TESTIMONIAL_SECTION')) {
                     return this.generateTestimonialSection(content);
-                } else if (baseSectionType.includes('WHY_CHOOSE_BOX')) {
-                    return this.generateBenefitsTwoSection(content);
                 } else if (baseSectionType.includes('CONTENT_WITH_FORM_SECTION')) {
                     return this.generateContentFormSection(content);
                 } else if (baseSectionType.includes('PROCESS_SECTION')) {
                     return this.generateProcessSection(content);
                 } else if (baseSectionType.includes('FEATURED_IN_SECTION')) {
                     return this.generateFeaturedInSection(content);
-                } else if (baseSectionType.includes('FLEXIBLE_PACKAGE_SECTION')) {
-                    return this.generateFlexiblePackageSection(content);
+                } else if (baseSectionType.includes('GUARANTEED_SECTION')) {
+                    return this.generateGuaranteedSection(content);
+                } else if (baseSectionType.includes('AWARDS_SECTION')) {
+                    return this.generateAwardsSection(content);
+                } else if (baseSectionType.includes('FLEXIBLE_PACKAGES_WRAPPER')) {
+                    return this.generateFlexiblePackagesWrapperSection(content);
+                } else if (baseSectionType.includes('TESTIMONIAL_SECTION_CLUTCH')) {
+                    return this.generateTestimonialClutchSection(content);
+                } else if (baseSectionType.includes('WHY_CHOOSE_BOX')) {
+                    return this.generateWhyChooseBoxSection(content);
                 }
                 return `<div><!-- ${sectionType} section not implemented yet --></div>`;
             }
@@ -3379,18 +4236,70 @@ ${categoriesHTML}</div>
 </div>`;
             }
 
-            generateFlexiblePackageSection(content) {
-                
-                // Handle empty content with default packages
+            generateGuaranteedSection(content) {
+                // Generate guaranteed section with fallback HTML
+                return `<div class="guaranteed_section pt80 pb60">
+   <div class="container-xl">
+      <div class="row align-items-center">
+         <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <div class="guaranteed_txt">
+               <h2 class="fonts-40 font-weight-bold mb-4">${content.main_heading || 'How We Stand Apart as an App Development Company'}</h2>
+               <ul>
+                  <li>We are an <strong>ISO 9001</strong> and <strong>ISO 27001</strong> certified custom mobile application development company, audited for quality and security processes.</li>
+                  <li>We offer complete visibility into each project stage - <strong>no hidden costs</strong> or surprise add-ons.</li>
+                  <li>Our <strong>98% project success</strong> ratio proves our ability to exceed expectations and deliver successful apps.</li>
+                  <li>With a <strong>200+ in-house team</strong> of designers, developers, and QA experts, we scale to meet project needs.</li>
+                  <li>Our <strong>Scrum-certified Project Managers</strong> ensure efficient execution and delivery</li>
+               </ul>
+            </div>
+         </div>
+         <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <div class="guaranteed_img">
+               <img src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/We-Stand-Apart.jpg" alt="How We Stand Apart as a Web App Development Company" width="630" height="440">
+            </div>
+         </div>
+      </div>
+   </div>
+</div>`;
+            }
+
+            generateAwardsSection(content) {
+                // Generate awards section with fallback HTML
+                return `<section class="awards-section bg-color pt80 pb50">
+<div class="container-xl">
+<h2 class="fonts-40 text-center font-weight-bold">${content.main_heading || 'Our Software Development Capabilities &amp; Recognition'}</h2>
+<div class="cards-grid">
+<div class="award-card">
+                <img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2025/09/clutch-top-company-development.svg" alt="Clutch Top Company Development">
+            </div>
+<div class="award-card">
+                <img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2025/09/clutch-top-company-design-production.svg" alt="Clutch Top Company Design Production">
+            </div>
+<div class="award-card">
+                <img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2025/09/clutch-review1.png" alt="Clutch Review">
+            </div>
+<div class="award-card">
+                <img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2025/09/clutch-review2.png" alt="Clutch Review">
+            </div>
+<div class="award-card">
+                <img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2025/09/clutch-review3.png" alt="Clutch Review">
+            </div>
+</div>
+</div>
+</section>`;
+            }
+
+            generateFlexiblePackagesWrapperSection(content) {
+                // Generate flexible packages wrapper section (alternative pricing layout)
                 if (!content || !content.packages || content.packages.length === 0) {
-                    return `<section class="pt80 pb70 bg-color flexible-package">
+                    return `<section class="pt80 pb70 bg-color flexible-packages-wrapper">
 <div class="container-xl">
 <h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Our Flexible Packages for Mobile App Maintenance Services</h2>
-${content.description ? '<p class="fonts-18 mb-4 text-center mxw-900">' + content.description + '</p>' : ''}
+<p class="fonts-18 mb-4 text-center mxw-900">Space-O Technologies offers three flexible app maintenance service packages with transparent pricing and contract options. As a trusted mobile app maintenance company, we provide 6, 12, and 24-month agreements with clear setup costs, ensuring your app remains efficient, secure, and up-to-date.</p>
 <div class="pricing-container">
 <div class="pricing-card standard">
-<h2 class="fonts-40 text-center font-weight-bold mb-2">Standard</h2>
-<p class="fonts-18 text-center mxw-900 mb-4">Basic Maintenance for Smooth Performance</p>
+<h2>Standard</h2>
+<p>Basic Maintenance for Smooth Performance</p>
 <div class="cost"><span class="text-lg font-normanl">Price:</span>$999</div>
 <ul class="features">
 <li>35–40 Hours</li>
@@ -3410,8 +4319,8 @@ ${content.description ? '<p class="fonts-18 mb-4 text-center mxw-900">' + conten
 <div><button class="get-started open-qouteform" type="button" data-medium="Packages_1">Get Started</button></div>
 </div>
 <div class="pricing-card advanced most-popular">
-<h2 class="fonts-40 text-center font-weight-bold mb-2">Advanced</h2>
-<p class="fonts-18 text-center mxw-900 mb-4">Enhanced Support for Growing Mobile Apps</p>
+<h2>Advanced</h2>
+<p>Enhanced Support for Growing Mobile Apps</p>
 <div class="cost"><span class="text-lg font-normanl">Price:</span>$1499</div>
 <ul class="features">
 <li>65–70 Hours</li>
@@ -3431,8 +4340,8 @@ ${content.description ? '<p class="fonts-18 mb-4 text-center mxw-900">' + conten
 <div><button class="get-started open-qouteform" type="button" data-medium="Packages_2">Get Started</button></div>
 </div>
 <div class="pricing-card pro">
-<h2 class="fonts-40 text-center font-weight-bold mb-2">Pro</h2>
-<p class="fonts-18 text-center mxw-900 mb-4">Premium Support with Feature Expansion</p>
+<h2>Pro</h2>
+<p>Premium Support with Feature Expansion</p>
 <div class="cost"><span class="text-lg font-normanl">Price:</span>$2499</div>
 <ul class="features">
 <li>100–120 Hours</li>
@@ -3455,28 +4364,25 @@ ${content.description ? '<p class="fonts-18 mb-4 text-center mxw-900">' + conten
 </div>
 </section>`;
                 }
-                
-                // Generate dynamic HTML from parsed content
-                
+
+                // Dynamic content generation (if user provides content)
                 let packagesHTML = '';
                 content.packages.forEach((pkg, index) => {
-                    
                     let featuresHTML = '';
                     if (pkg.features && pkg.features.length > 0) {
                         pkg.features.forEach(feature => {
                             featuresHTML += `<li>${feature}</li>\n`;
                         });
                     }
-                    
-                    // Add appropriate CSS class
+
                     let cssClass = pkg.name.toLowerCase();
                     if (pkg.name.toLowerCase() === 'advanced') {
                         cssClass += ' most-popular';
                     }
-                    
+
                     packagesHTML += `<div class="pricing-card ${cssClass}">
-<h2 class="fonts-40 text-center font-weight-bold mb-2">${pkg.name}</h2>
-<p class="fonts-18 text-center mxw-900 mb-4">${pkg.description}</p>
+<h2>${pkg.name}</h2>
+<p>${pkg.description}</p>
 <div class="cost"><span class="text-lg font-normanl">Price:</span>${pkg.price}</div>
 <ul class="features">
 ${featuresHTML}</ul>
@@ -3484,18 +4390,438 @@ ${featuresHTML}</ul>
 </div>
 `;
                 });
-                
-                
-                const finalHTML = `<section class="pt80 pb70 bg-color flexible-package">
+
+                return `<section class="pt80 pb70 bg-color flexible-packages-wrapper">
 <div class="container-xl">
-<h2 class="fonts-40 text-center font-weight-bold mb-2">${content.main_heading || 'Our Flexible Packages'}</h2>
+<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">${content.main_heading || 'Our Flexible Packages'}</h2>
 <p class="fonts-18 mb-4 text-center mxw-900">${content.description || 'Choose the package that best fits your needs.'}</p>
 <div class="pricing-container">
 ${packagesHTML}</div>
 </div>
 </section>`;
-                
-                return finalHTML;
+            }
+
+            generateTestimonialClutchSection(content) {
+                // Generate Clutch testimonial section with fallback HTML
+                return `<div class="testimonial-wrapper bg-color pt70 pb70">
+    <h2 class="fonts-40 font-weight-bold mb-5 text-center">${content.main_heading || 'Clients Love Space-O Technologies'}</h2>
+    <div class="testimonial-container">
+        <!-- Left Panel Container -->
+        <div class="left-panel-container">
+            <!-- Left Panel 1 - Software Company -->
+            <div class="left-panel active" data-slide="0">
+                <div class="clucth-logo">
+                    <img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/10/clutch-1.svg" width="" height="" alt="clutch">
+                </div>
+
+                <p class="project-title">Project Summary</p>
+
+                <div class="category">Software</div>
+
+                <h3 class="project-heading">Mobile App Dev for Software Company</h3>
+
+                <p class="project-description">
+                    Space-O Technologies has provided mobile app development services for a software company. The team has developed a social networking mobile app for the client.
+                </p>
+
+                <a href="https://www.spaceotechnologies.com/company/client-testimonials/" class="view-all">View All <span class="arrow">→</span></a>
+            </div>
+
+            <!-- Left Panel 2 - Mobile App Firm -->
+            <div class="left-panel" data-slide="1">
+                <div class="clucth-logo">
+                    <img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/10/clutch-1.svg" width="" height="" alt="clutch">
+                </div>
+
+                <p class="project-title">Project Summary</p>
+
+                <div class="category">Arts, entertainment & music</div>
+
+                <h3 class="project-heading">Augmented Mobile App Dev for Mobile App Firm</h3>
+
+                <p class="project-description">
+                    Space-O Technologies augments the in-house dev team's work. They're given design and technical background, and the team executes exactly what's asked of them, resulting in a continued partnership.
+                </p>
+
+                <a href="https://www.spaceotechnologies.com/company/client-testimonials/" class="view-all">View All <span class="arrow">→</span></a>
+            </div>
+
+            <!-- Left Panel 3 - Water Conservation Program -->
+            <div class="left-panel" data-slide="2">
+               <div class="clucth-logo">
+                    <img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/10/clutch-1.svg" width="" height="" alt="clutch">
+                </div>
+
+                <p class="project-title">Project Summary</p>
+
+                <div class="category">Government</div>
+
+                <h3 class="project-heading">Mobile App Dev for Water Conservation Program</h3>
+
+                <p class="project-description">
+                    Space-O Technologies developed a mobile app for a water conservation specialist. The product streamlines irrigation system audits, offering a tool that builds custom watering schedules.
+                </p>
+
+                <a href="https://www.spaceotechnologies.com/company/client-testimonials/" class="view-all">View All <span class="arrow">→</span></a>
+            </div>
+
+            <!-- Left Panel 4 - Personal Video Nonprofit -->
+            <div class="left-panel" data-slide="3">
+               <div class="clucth-logo">
+                    <img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/10/clutch-1.svg" width="" height="" alt="clutch">
+                </div>
+
+                <p class="project-title">Project Summary</p>
+
+                <div class="category">Nonprofit</div>
+
+                <h3 class="project-heading">Mobile Platform Dev for Personal Video Nonprofit</h3>
+
+                <p class="project-description">
+                    Space-O Technologies developed a full mobile platform for a personal video nonprofit.
+                </p>
+
+                <a href="https://www.spaceotechnologies.com/company/client-testimonials/" class="view-all">View All <span class="arrow">→</span></a>
+            </div>
+
+            <!-- Left Panel 5 - Event Management Company -->
+            <div class="left-panel" data-slide="4">
+               <div class="clucth-logo">
+                    <img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/10/clutch-1.svg" width="" height="" alt="clutch">
+                </div>
+
+                <p class="project-title">Project Summary</p>
+
+                <div class="category">Business services</div>
+
+                <h3 class="project-heading">Custom App Development for Event Management Company</h3>
+
+                <p class="project-description">
+                    Space-O Technologies has been hired by an event management company to fix and optimize their app. The team is also responsible for creating an admin panel that would make it easier to handle customer requests.
+                </p>
+
+                <a href="https://www.spaceotechnologies.com/company/client-testimonials/" class="view-all">View All <span class="arrow">→</span></a>
+            </div>
+        </div>
+
+        <!-- Right Slider Container -->
+        <div class="slider-container">
+            <div class="slider-wrapper">
+                <!-- Slide 1 - Software Company -->
+                <div class="slide active">
+                    <div class="slide-content">
+                        <div class="quote-text">
+                            "Space-O Technologies is excellent in every respect."
+                        </div>
+
+                        <p class="solution-text">
+                            Space-O Technologies has successfully delivered the app within schedule. The team has demonstrated stellar project management and communicated effectively via email and virtual meetings. Their responsiveness, skill set, reliability, and quality work are key elements of their work.
+                        </p>
+
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Anonymous</div>
+                            <div class="reviewer-title">Product Manager, Software Company</div>
+                            <div class="reviewer-location">Australia</div>
+                        </div>
+                    </div>
+
+                    <div class="rating-panel">
+                        <div class="overall-rating">5.0</div>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+
+                        <div class="rating-details">
+                            <div class="rating-item">
+                                <span class="rating-label">Quality</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Schedule</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Cost</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Willing to Refer</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 - Mobile App Firm -->
+                <div class="slide">
+                    <div class="slide-content">
+                        <div class="quote-text">
+                            "They understand project details and our clients' needs better than any other company we work with."
+                        </div>
+
+                        <p class="solution-text">
+                            Because of their excellent work and project management, Space-O has become a trusted and reliable partner. They consistently receive projects and finish them on time and in budget. The whole team is accessible and they're experts in their field.
+                        </p>
+
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Anonymous</div>
+                            <div class="reviewer-title">CTO, Mobile App Firm</div>
+                            <div class="reviewer-location">Los Angeles, California</div>
+                        </div>
+                    </div>
+
+                    <div class="rating-panel">
+                        <div class="overall-rating">5.0</div>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+
+                        <div class="rating-details">
+                            <div class="rating-item">
+                                <span class="rating-label">Quality</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Schedule</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Cost</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Willing to Refer</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 - Water Conservation Program -->
+                <div class="slide">
+                    <div class="slide-content">
+                        <div class="quote-text">
+                            "They did everything I asked of them and provided the exact product I was looking for."
+                        </div>
+
+                        <p class="solution-text">
+                            The client achieves higher levels of efficiency while using the app. Despite having no familiarity with irrigation audits before the project, Space-O Technologies delivered an excellent product. The team offered an innovative approach to mitigate communication barriers.
+                        </p>
+
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Kevin Hartley</div>
+                            <div class="reviewer-title">Water Conservation Specialist, City of Greeley</div>
+                            <div class="reviewer-location">Greeley, Colorado</div>
+                        </div>
+                    </div>
+
+                    <div class="rating-panel">
+                        <div class="overall-rating">5.0</div>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+
+                        <div class="rating-details">
+                            <div class="rating-item">
+                                <span class="rating-label">Quality</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Schedule</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Cost</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Willing to Refer</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4 - Personal Video Nonprofit -->
+                <div class="slide">
+                    <div class="slide-content">
+                        <div class="quote-text">
+                            "The overall professionalism and final product exceeded all expectations!"
+                        </div>
+
+                        <p class="solution-text">
+                            Space-O Technologies' solution is of incredible value and has satisfied the client. Their communication was very effective and they provided timely feedback.
+                        </p>
+
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Frank Boyce</div>
+                            <div class="reviewer-title">Executive Director, Personal Video Nonprofit</div>
+                            <div class="reviewer-location">Minneapolis, Minnesota</div>
+                        </div>
+                    </div>
+
+                    <div class="rating-panel">
+                        <div class="overall-rating">5.0</div>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+
+                        <div class="rating-details">
+                            <div class="rating-item">
+                                <span class="rating-label">Quality</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Schedule</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Cost</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Willing to Refer</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 5 - Event Management Company -->
+                <div class="slide">
+                    <div class="slide-content">
+                        <div class="quote-text">
+                            "They're flexible and go above and beyond to make everything work."
+                        </div>
+
+                        <p class="solution-text">
+                            Space-O Technologies has done a great job of resolving all the issues and bugs within the app — its key components are now working properly. The team establishes a smooth workflow through their collaborative approach and communication skills. They're also dedicated, hardworking, and adaptive.
+                        </p>
+
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Tarneem Barayyan</div>
+                            <div class="reviewer-title">CEO, Event Management Company</div>
+                            <div class="reviewer-location">Saudi Arabia</div>
+                        </div>
+                    </div>
+
+                    <div class="rating-panel">
+                        <div class="overall-rating">5.0</div>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+
+                        <div class="rating-details">
+                            <div class="rating-item">
+                                <span class="rating-label">Quality</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Schedule</span>
+                                <span class="rating-value">4.5</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Cost</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Willing to Refer</span>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slider-controls">
+                <button class="control-btn prev-btn" aria-label="Previous slide">←</button>
+                <button class="control-btn next-btn" aria-label="Next slide">→</button>
+            </div>
+        </div>
+    </div>
+</div>`;
+            }
+
+            generateWhyChooseBoxSection(content) {
+                // Generate why choose box section with fallback HTML
+                if (!content || !content.benefits || content.benefits.length === 0) {
+                    return `<section class="pt80 pb60 why-choose-section">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold mb-4 text-center">${content.main_heading || 'Why Choose Us for Your Project'}</h2>
+${content.description ? '<p class="fonts-18 mb-4 text-center mxw-900">' + content.description + '</p>' : ''}
+<div class="row">
+<div class="col-lg-6 col-md-6 mb-4">
+<div class="benefit-box">
+<h3 class="fonts-24 font-weight-bold mb-2">Proven Track Record</h3>
+<p class="fonts-16">With over 350+ successful projects delivered, we bring extensive experience and expertise to every engagement.</p>
+</div>
+</div>
+<div class="col-lg-6 col-md-6 mb-4">
+<div class="benefit-box">
+<h3 class="fonts-24 font-weight-bold mb-2">Expert Team</h3>
+<p class="fonts-16">Our 200+ in-house developers, designers, and QA specialists ensure top-quality deliverables.</p>
+</div>
+</div>
+<div class="col-lg-6 col-md-6 mb-4">
+<div class="benefit-box">
+<h3 class="fonts-24 font-weight-bold mb-2">Transparent Communication</h3>
+<p class="fonts-16">We maintain complete transparency with regular updates, no hidden costs, and clear project visibility.</p>
+</div>
+</div>
+<div class="col-lg-6 col-md-6 mb-4">
+<div class="benefit-box">
+<h3 class="fonts-24 font-weight-bold mb-2">Quality Assurance</h3>
+<p class="fonts-16">ISO 9001 and ISO 27001 certified processes ensure the highest standards of quality and security.</p>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+
+                // Dynamic content generation when user provides content
+                let benefitsHTML = '';
+                if (content.benefits && content.benefits.length > 0) {
+                    content.benefits.forEach(benefit => {
+                        benefitsHTML += `<div class="col-lg-6 col-md-6 mb-4">
+<div class="benefit-box">
+<h3 class="fonts-24 font-weight-bold mb-2">${benefit.title || ''}</h3>
+<p class="fonts-16">${benefit.description || ''}</p>
+</div>
+</div>
+`;
+                    });
+                }
+
+                return `<section class="pt80 pb60 why-choose-section">
+<div class="container-xl">
+<h2 class="fonts-40 font-weight-bold mb-4 text-center">${content.main_heading || 'Why Choose Us for Your Project'}</h2>
+${content.description ? '<p class="fonts-18 mb-4 text-center mxw-900">' + content.description + '</p>' : ''}
+<div class="row">
+${benefitsHTML}
+</div>
+</div>
+</section>`;
             }
 
             generateIndustriesSection(content) {
@@ -4099,14 +5425,11 @@ ${accordionItems}
             generatePortfolioSection(content) {
                 // Handle empty content with default static HTML
                 if (!content || !content.projects || content.projects.length === 0) {
-                    return `<section class="pt80 pb50 our-work">
+                    return `<section class="our-work pt80 pb80 bg-color" id="portfolio">
 <div class="container-xl">
-<div class="row">
-<div class="col-lg-12">
-<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Proven Results: Real Projects That Drive Business Growth</h2>
-${content.description ? '<p class="fonts-18 text-center mb-3 mxw-900">' + content.description + '</p>' : ''}
-</div>
-<div class="slider_projects order-1">
+<h2 class="fonts-40 font-weight-bold text-center mb-2">Proven Results: Real Projects That Drive Business Growth</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">See how we've transformed complex business challenges into measurable success stories.</p>
+<div class="slider_projects order-1 bg-01">
 <div class="row vcenter-parent">
 <div class="col-lg-6 col-12">
 <div class="left_text">
@@ -4116,15 +5439,15 @@ ${content.description ? '<p class="fonts-18 text-center mb-3 mxw-900">' + conten
 </div>
 </div>
 <p class="mb-3">A scalable e-commerce solution built with modern technologies, featuring advanced inventory management and seamless payment integration.</p>
-<div class="keep-reading ml-2"><a class="btn-link-arrow btn-link-arrow-right" href="#"><span class="btn__label-wrapper">See Project Details</span></a></div>
+<div class="keep-reading"><a class="btn-link-arrow btn-link-arrow-right" href="#"><span class="btn__label-wrapper">See Project Details</span></a></div>
 </div>
 </div>
 <div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="E-Commerce Platform" width="600" height="459" onerror="handleImageError(this)">
+<img decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="E-Commerce Platform" width="648" height="492">
 </div>
 </div>
 </div>
-<div class="slider_projects order-2">
+<div class="slider_projects order-2 bg-02">
 <div class="row vcenter-parent">
 <div class="col-lg-6 col-12">
 <div class="left_text">
@@ -4134,27 +5457,27 @@ ${content.description ? '<p class="fonts-18 text-center mb-3 mxw-900">' + conten
 </div>
 </div>
 <p class="mb-3">Comprehensive business management solution with real-time analytics and automated workflow management capabilities.</p>
-<div class="keep-reading ml-2"><a class="btn-link-arrow btn-link-arrow-right" href="#"><span class="btn__label-wrapper">See Project Details</span></a></div>
+<div class="keep-reading"><a class="btn-link-arrow btn-link-arrow-right" href="#"><span class="btn__label-wrapper">See Project Details</span></a></div>
 </div>
 </div>
 <div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="Business Management App" width="600" height="459" onerror="handleImageError(this)">
+<img decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="Business Management App" width="648" height="492">
 </div>
 </div>
 </div>
 </div>
-</div>`;
+</section>`;
                 }
                 
                 let portfolioItems = '';
                 if (content.projects && content.projects.length > 0) {
                     content.projects.forEach((project, index) => {
                         const orderClass = index % 2 === 0 ? 'order-1' : 'order-2';
+                        const bgClass = `bg-${String(index + 1).padStart(2, '0')}`;
                         const isEven = index % 2 === 0;
-                        
-                        if (isEven) {
-                            // Even index: Text left, Image right
-                            portfolioItems += `<div class="slider_projects ${orderClass}">
+
+                        // Always use same layout: Text left, Image right
+                        portfolioItems += `<div class="slider_projects ${orderClass} ${bgClass}">
 <div class="row vcenter-parent">
 <div class="col-lg-6 col-12">
 <div class="left_text">
@@ -4164,48 +5487,22 @@ ${content.description ? '<p class="fonts-18 text-center mb-3 mxw-900">' + conten
 </div>
 </div>
 <p class="mb-3">${project.description}</p>
-<div class="keep-reading ml-2"><a class="btn-link-arrow btn-link-arrow-right" href="${project.link || '#'}"><span class="btn__label-wrapper">${project.buttonText || 'See Project Details'}</span></a></div>
+<div class="keep-reading"><a class="btn-link-arrow btn-link-arrow-right" href="${project.link || '#'}"><span class="btn__label-wrapper">${project.buttonText || 'See Project Details'}</span></a></div>
 </div>
 </div>
 <div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="${project.title}" width="600" height="459" onerror="handleImageError(this)">
+<img decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="${project.title}" width="648" height="492">
 </div>
 </div>
 </div>
 `;
-                        } else {
-                            // Odd index: Text left, Image right (same as even for consistency)
-                            portfolioItems += `<div class="slider_projects ${orderClass}">
-<div class="row vcenter-parent">
-<div class="col-lg-6 col-12">
-<div class="left_text">
-<div class="slider-app-name">
-<div class="top-heading">
-<h3 class="fonts-26 mb-2 font-weight-bold"><a href="${project.link || '#'}">${project.title}</a></h3>
-</div>
-</div>
-<p class="mb-3">${project.description}</p>
-<div class="keep-reading ml-2"><a class="btn-link-arrow btn-link-arrow-right" href="${project.link || '#'}"><span class="btn__label-wrapper">${project.buttonText || 'See Project Details'}</span></a></div>
-</div>
-</div>
-<div class="col-lg-6 col-12">
-<img loading="lazy" decoding="async" class="project-img" src="https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Hybrid-App-Development.png" alt="${project.title}" width="600" height="459" onerror="handleImageError(this)">
-</div>
-</div>
-</div>
-`;
-                        }
                     });
                 }
                 
-                return `<section class="pt80 pb50 our-work">
+                return `<section class="our-work pt80 pb80 bg-color" id="portfolio">
 <div class="container-xl">
-<div class="row">
-<div class="col-lg-12">
-<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">${content.main_heading || 'Proven Results: Real Projects That Drive Business Growth'}</h2>
-<p class="fonts-18 text-center mb-3 mxw-900">${content.description || 'See how we\'ve transformed complex business challenges into measurable success stories.'}</p>
-</div>
-</div>
+<h2 class="fonts-40 font-weight-bold text-center mb-2">${content.main_heading || 'Proven Results: Real Projects That Drive Business Growth'}</h2>
+<p class="fonts-18 text-center mxw-900 mb-4">${content.description || 'See how we\'ve transformed complex business challenges into measurable success stories.'}</p>
 ${portfolioItems}
 </div>
 </section>`;
@@ -4270,85 +5567,6 @@ ${portfolioItems}
                     .replace(/{client_name}/g, content.client_name || 'Client Name')
                     .replace('{client_title}', content.client_title || 'Client Title')
                     .replace('{button_text}', content.button_text || 'View all Testimonials');
-            }
-
-
-            generateBenefitsTwoSection(content) {
-                // Handle empty content with default static HTML
-                if (!content || !content.benefits || content.benefits.length === 0) {
-                    return `<section class="pt80 pb50 services-section practices-we-follow section-benefits-two">
-<div class="container-xl">
-<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Why Choose Our Development Services</h2>
-${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : ''}
-<div class="row">
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box">
-<h3 class="fonts-18 font-weight-semibold">Expert Development Team</h3>
-<p>Our experienced developers use the latest technologies and best practices to build robust, scalable solutions.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box">
-<h3 class="fonts-18 font-weight-semibold">Agile Methodology</h3>
-<p>We follow agile development practices for faster delivery and better collaboration throughout the project lifecycle.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box">
-<h3 class="fonts-18 font-weight-semibold">Quality Assurance</h3>
-<p>Comprehensive testing and quality assurance processes ensure your application performs flawlessly.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box">
-<h3 class="fonts-18 font-weight-semibold">Ongoing Support</h3>
-<p>Dedicated support and maintenance services to keep your applications running smoothly after deployment.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box">
-<h3 class="fonts-18 font-weight-semibold">Scalable Solutions</h3>
-<p>Build applications that grow with your business using scalable architectures and modern technologies.</p>
-</div>
-</div>
-<div class="col-lg-4 col-md-6">
-<div class="mad_service_box">
-<h3 class="fonts-18 font-weight-semibold">Cost-Effective</h3>
-<p>Get maximum value for your investment with efficient development processes and competitive pricing.</p>
-</div>
-</div>
-</div>
-</div>
-</section>`;
-                }
-                
-                const template = `<section class="pt80 pb50 services-section practices-we-follow section-benefits-two">
-<div class="container-xl">
-<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">{main_heading}</h2>
-<p class="fonts-18 text-center mxw-900 mb-4">{description}</p>
-<div class="row">
-{benefits_items}
-</div>
-</div>
-</section>`;
-
-                let benefitsItems = '';
-                if (content.benefits) {
-                    content.benefits.slice(0, 6).forEach(benefit => {
-                        benefitsItems += `    <div class="col-lg-4 col-md-6">
-        <div class="mad_service_box">
-            <h3 class="fonts-18 font-weight-semibold">${benefit.title}</h3>
-            ${benefit.description}
-        </div>
-    </div>
-`;
-                    });
-                }
-
-                return template
-                    .replace('{main_heading}', content.main_heading || 'Why Choose Space-O Technologies')
-                    .replace('{description}', content.description || 'Partner with us for expert web development consulting.')
-                    .replace('{benefits_items}', benefitsItems);
             }
 
             parseCtaTwoSection(content) {
@@ -4554,79 +5772,37 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
             generateContentFormSection(content) {
                 // Handle empty content with default static HTML
                 if (!content || (!content.main_heading && !content.description)) {
-                    return `<section class="pt80 pb80 text-form-section bg-color section-content-form">
+                    return `<section class="pt80 pb80 text-form-section">
 <div class="container-xl">
-<div class="row">
-<div class="col-lg-7 col-md-12 col-sm-12">
-<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Ready to Start Your Project?</h2>
-${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : ''}
+<div class="row align-items-center">
+<div class="col-lg-7 col-md-6">
+<h2 class="fonts-40 text-left font-weight-bold">Ready to Start Your Project?</h2>
+<p>Get in touch with our team to discuss your requirements and explore how we can help transform your business with custom solutions.</p>
 <strong>Why Choose Our Services:</strong>
-<ul class="bullet fonts-14 mb-3">
+<ul class="bullet">
 <li>Expert team with proven track record</li>
 <li>Modern technologies and best practices</li>
 <li>Transparent communication throughout</li>
 <li>Timely delivery and ongoing support</li>
 </ul>
 </div>
-<div class="col-lg-5 col-md-12 col-sm-12">
-<div class="form-box-out">
-<div class="container">
-<div class="row">
-<div class="col-lg-12">
-<div class="form-box section-form-box bg-white">
-<h3 class="fonts-20 mb-3 font-weight-bold text-center">Get Free Consultation</h3>
-<form>
-<input type="text" class="form-control" placeholder="Full Name" required>
-<input type="email" class="form-control" placeholder="Email Address" required>
-<input type="tel" class="form-control" placeholder="Phone Number" required>
-<textarea class="form-control" rows="4" placeholder="Project Details" required></textarea>
-<button type="submit" class="btn btn-primary w-100">Send Message</button>
-</form>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>`;
-                }
-                
-                let bulletHtml = '';
-                if (content.bullet_points && content.bullet_points.length > 0) {
-                    bulletHtml = `<strong>${content.bullet_intro || 'Key Points:'}</strong>\n<ul class="bullet fonts-14 mb-3">\n`;
-                    for (let bullet of content.bullet_points) {
-                        bulletHtml += `<li>${bullet}</li>\n`;
-                    }
-                    bulletHtml += '</ul>';
-                }
-
-                const template = `<section class="pt80 pb80 text-form-section bg-color section-content-form">
-<div class="container-xl">
-<div class="row">
-<div class="col-lg-7 col-md-12 col-sm-12">
-<h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">{main_heading}</h2>
-<p class="fonts-18 text-center mxw-900 mb-4">{description}</p>
-{bullet_html}
-</div>
-<div class="col-lg-5 col-md-12 col-sm-12 text-center">
-<div class="homen_form">
-<p class="fonts-24 font-weight-bold mt-0 mb-3 text-center line-height-1 pb-0">Talk to Our Experts Now</p>
-<form id="other-form2" class="footer_form append-form blur-form" action="" method="post" name="popup-form" novalidate="">
+<div class="col-lg-5 col-md-6 col-sm-12 text-center">
+<div class="homen_form" style="background: #fff;">
+<p class="fonts-30 font-weight-bold mt-0 mb-2 text-center line-height-1"><span class="font-weight-bold fonts-24">Talk to Our Experts Now</span></p>
+<form id="other-form2" class="footer_form all-form blur-form" action="" method="post" name="popup-form" novalidate="">
 <div class="row">
 <div class="form-group col-md-12 input_cover mb-0 text-left">
-<p class="mb-2"><i class="fa fa-user"></i><input id="name" class="form-control" name="name" required="" size="40" type="text" value="" placeholder="Name*" data-name="Please enter your name" /><small class="error"></small></p>
+<p class="mb-2"><i class="fa fa-user"></i><input id="name" class="form-control" name="name" required="" size="40" type="text" value="" placeholder="Name*" data-name="Please enter your name"><small class="error"></small></p>
 <div class="clearfix"></div>
 </div>
 <div class="form-group col-md-12 input_cover mb-0 text-left">
-<p class="mb-2"><i class="fa fa-envelope"></i><input id="email" class="form-control" name="email" required="" size="40" type="email" value="" placeholder="Email*" data-name="Please enter your email" /><small class="error"></small></p>
+<p class="mb-2"><i class="fa fa-envelope"></i><input id="email" class="form-control" name="email" required="" size="40" type="email" value="" placeholder="Email*" data-name="Please enter your email"><small class="error"></small></p>
 <div class="clearfix"></div>
 </div>
 </div>
 <div class="row">
 <div class="form-group col-md-12 input_cover mb-0 text-left">
-<p class="mb-2"><i class="fa fa-phone"></i><input id="number" class="form-control" name="number" required="" size="15" type="tel" value="" placeholder="Phone*" data-name="Please enter your number" /><small class="error"></small><span id="error-msg" class="d-none"></span></p>
+<p class="mb-2"><i class="fa fa-phone"></i><input id="number" class="form-control" name="number" required="" size="15" type="tel" value="" placeholder="Phone*" data-name="Please enter your number"><small class="error"></small><span id="error-msg" class="d-none"></span></p>
 <div class="clearfix"></div>
 </div>
 </div>
@@ -4636,14 +5812,89 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
 <div class="row">
 <div class="form-group col-md-12">
 <div class="footer_txt_block mt-2">
-<input id="form_type" name="form_type" type="hidden" value="footer_form" />
-[spaceo_get_permalink][spaceo_get_referal]
-<div id="loadingmessage" class="loader"><img src="/wp-content/uploads/2021/04/ajax-loader.gif" alt="Ajax loader" width="30" height="30" /></div>
-<input id="submit" class="btn btn-pop mb0" name="submit" type="submit" value="Book Your Consultation Now" data-medium="S_2" />
-</div>
+<input id="form_type" name="form_type" type="hidden" value="footer_form">
+<input id="url" type="hidden" value="https://www.spaceotechnologies.com/" name="url"><input id="referral_url" value="https://www.spaceotechnologies.com/" name="referral_url" type="hidden"><input id="u_source" name="u_source" type="hidden" value="direct"><input id="session_url" name="session_url" type="hidden" value="https://www.spaceotechnologies.com/"><input id="u_referring_domain" name="u_referring_domain" type="hidden" value=""><input id="u_medium" name="u_medium" type="hidden" value="">
+<input id="u_medium" name="u_medium" type="hidden" value="S_2">
+<div id="loadingmessage" class="loader" style="width: auto; text-align: right; float: right;display:none;"><img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2021/04/ajax-loader.gif" alt="Ajax loader" style="width: 30px;" width="30" height="30"></div>
+<p><input id="submit" class="btn btn-pop mb0" name="submit" type="submit" value="Book Your Consultation Now" data-medium="S_2" style="width: 100%;">
+<span class="error form_error"></span>
+</p></div>
 </div>
 </div>
 </form>
+</div>
+</div>
+</div>
+</div>
+</section>`;
+                }
+
+                let bulletHtml = '';
+                if (content.bullet_points && content.bullet_points.length > 0) {
+                    if (content.bullet_intro) {
+                        bulletHtml = `<strong>${content.bullet_intro}</strong>\n`;
+                    }
+                    bulletHtml += `<ul class="bullet">\n`;
+                    for (let bullet of content.bullet_points) {
+                        bulletHtml += `    <li>${bullet}</li>\n`;
+                    }
+                    bulletHtml += '</ul>\n';
+                }
+
+                let closingTextHtml = '';
+                if (content.closing_text) {
+                    closingTextHtml = `\n<p>${content.closing_text}</p>`;
+                }
+
+                const template = `<section class="pt80 pb80 text-form-section">
+<div class="container-xl">
+<div class="row align-items-center">
+<div class="col-lg-7 col-md-6">
+<h2 class="fonts-40 text-left font-weight-bold">{main_heading}</h2>
+<p>{description}</p>
+{bullet_html}{closing_text}
+</div>
+<div class="col-lg-5 col-md-6 col-sm-12 text-center">
+<div class="homen_form" style="background: #fff;">
+<p class="fonts-30 font-weight-bold mt-0 mb-2 text-center line-height-1"><span class="font-weight-bold fonts-24">Talk to Our Experts Now</span></p>
+<form id="other-form2" class="footer_form all-form blur-form" action="" method="post" name="popup-form" novalidate="">
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-user"></i><input id="name" class="form-control" name="name" required="" size="40" type="text" value="" placeholder="Name*" data-name="Please enter your name"><small class="error"></small></p>
+<div class="clearfix"></div>
+</div>
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-envelope"></i><input id="email" class="form-control" name="email" required="" size="40" type="email" value="" placeholder="Email*" data-name="Please enter your email"><small class="error"></small></p>
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 input_cover mb-0 text-left">
+<p class="mb-2"><i class="fa fa-phone"></i><input id="number" class="form-control" name="number" required="" size="15" type="tel" value="" placeholder="Phone*" data-name="Please enter your number"><small class="error"></small><span id="error-msg" class="d-none"></span></p>
+<div class="clearfix"></div>
+</div>
+</div>
+<div class="row">
+<div class="form-group col-md-12 mb-0 text-left"><textarea id="Comment" class="form-control" cols="40" name="comment" required="" rows="3" placeholder="Write your message.*" data-name="Please enter your description"></textarea><small class="error"></small></div>
+</div>
+<div class="row">
+<div class="form-group col-md-12">
+<div class="footer_txt_block mt-2">
+<input id="form_type" name="form_type" type="hidden" value="footer_form">
+<input id="url" type="hidden" value="https://www.spaceotechnologies.com/" name="url"><input id="referral_url" value="https://www.spaceotechnologies.com/" name="referral_url" type="hidden"><input id="u_source" name="u_source" type="hidden" value="direct"><input id="session_url" name="session_url" type="hidden" value="https://www.spaceotechnologies.com/"><input id="u_referring_domain" name="u_referring_domain" type="hidden" value=""><input id="u_medium" name="u_medium" type="hidden" value="">
+<input id="u_medium" name="u_medium" type="hidden" value="S_2">
+<div id="loadingmessage" class="loader" style="width: auto; text-align: right; float: right;display:none;"><img decoding="async" src="https://www.spaceotechnologies.com/wp-content/uploads/2021/04/ajax-loader.gif" alt="Ajax loader" style="width: 30px;" width="30" height="30"></div>
+<p><input id="submit" class="btn btn-pop mb0" name="submit" type="submit" value="Book Your Consultation Now" data-medium="S_2" style="width: 100%;">
+<span class="error form_error"></span>
+</p></div>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -4653,7 +5904,8 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 return template
                     .replace('{main_heading}', content.main_heading || 'Contact Us')
                     .replace('{description}', content.description || 'Get in touch')
-                    .replace('{bullet_html}', bulletHtml);
+                    .replace('{bullet_html}', bulletHtml)
+                    .replace('{closing_text}', closingTextHtml);
             }
 
             generateCtaTwoSection(content) {
@@ -5456,7 +6708,7 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 
                 // Safety check: ensure supportedSections is defined
                 if (!this.supportedSections || !Array.isArray(this.supportedSections)) {
-                    this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION'];
+                    this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION', 'GUARANTEED_SECTION', 'AWARDS_SECTION', 'FLEXIBLE_PACKAGES_WRAPPER', 'TESTIMONIAL_SECTION_CLUTCH'];
                 }
                 
                 // First pass: Find all sections with explicit END markers
@@ -5481,7 +6733,7 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 if (sectionsFound.length === 0) {
                     // Double-check supportedSections is still defined
                     if (!this.supportedSections || !Array.isArray(this.supportedSections)) {
-                        this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION'];
+                        this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION', 'GUARANTEED_SECTION', 'AWARDS_SECTION', 'FLEXIBLE_PACKAGES_WRAPPER', 'TESTIMONIAL_SECTION_CLUTCH'];
                     }
                     this.supportedSections.forEach(sectionType => {
                         const simpleSectionPattern = new RegExp(
@@ -6534,6 +7786,144 @@ color: var(--black); position: relative; cursor: pointer; box-shadow: 0px 4px 16
 .process-sec .instalikeapp{margin-bottom: 20px; height: calc(100% - 20px);}
 }
 /***** PROCESS_SECTION END *****/`,
+
+            'AWARDS_SECTION': `
+/********* AWARDS_SECTION CSS **********/
+.awards-section .section-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 30px;
+}
+
+.awards-section .section-title {
+    flex: 1;
+    max-width: 33.33%;
+}
+
+.awards-section .section-title h2 {
+    font-size: clamp(26px, 4vw, 44px);
+    font-weight: 700;
+    color: #2c3e50;
+    line-height: 1.2;
+}
+
+.awards-section .section-content {
+    flex: 2;
+    max-width: 66.66%;
+}
+
+.awards-section .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+}
+
+.awards-section .award-card {
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 15px;
+}
+
+.awards-section .award-card:hover {
+    transform: translateY(-5px);
+}
+
+.awards-section .award-card::after {
+    content: "";
+    position: absolute;
+    margin: auto;
+    right: 0px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    height: 100%;
+    background: #CAD6E7;
+}
+
+.awards-section .award-card:last-child::after {
+    display: none;
+}
+
+.awards-section .award-card img {
+    max-width: 200px;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+
+.awards-section .award-card h3 {
+    font-size: 14px;
+    color: #555;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.awards-section .top-border {
+    border-top: 2px solid #ddd;
+    padding-top: 50px;
+}
+
+.awards-section .review-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.awards-section .review-card {
+    transition: all 0.3s ease;
+}
+
+.awards-section .review-card:hover {
+    transform: translateY(-3px);
+}
+
+.awards-section .review-card img {
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+}
+
+@media (max-width: 768px) {
+    .awards-section .section-row {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .awards-section .section-title,
+    .awards-section .section-content {
+        max-width: 100%;
+        flex: none;
+    }
+
+    .awards-section .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .awards-section .review-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .awards-section .award-card,
+    .awards-section .review-card {
+        padding: 20px 15px;
+        background: #fff;
+    }
+
+    .awards-section .award-card::after {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .awards-section .cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/***** AWARDS_SECTION END *****/`,
 
             'COMMON': `
 /********* Add This CSS Before Banner  **********/

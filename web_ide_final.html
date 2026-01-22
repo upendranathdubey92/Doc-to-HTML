@@ -887,11 +887,11 @@
 <nav aria-label="breadcrumbs" class="rank-math-breadcrumb mb-3 mt-3"><p><a href="/" class="local" style="text-decoration: unset;">Home</a><span class="separator"> &gt; </span><a href="/services/" class="local" style="text-decoration: unset;">Services</a><span class="separator"> &gt; </span><span class="last">{breadcrumb_title}</span></p></nav>
 <h1 class="fonts-45 mb-3 font-weight-bold">{main_heading}</h1>
 <p class="fonts-18 mb-3">{description} <strong>The result?</strong></p>
-<ul class="bullet mb-5 fonts-18">
+<ul class="bullet mb-3 fonts-18">
 {bullet_points}
 </ul>
 
-<div class="rating-section d-flex"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
+<div class="rating-section d-flex mt-4"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
 <a href="https://clutch.co/profile/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/clutch-rating.svg" alt="Clutch" width="99" height="56" /></a>
 <a href="https://www.goodfirms.co/company/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/goodfirm-rating.svg" alt="GoodFirms" width="135" height="56" /></a></div>
 </div>
@@ -946,9 +946,13 @@
                 };
 
                 this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION', 'FLEXIBLE_PACKAGE_SECTION', 'BENEFITS_SECTION', 'BENEFITS_TWO'];
+            }
 
-                // Debug: Verify all sections are supported at startup
-                console.log('🚀 Web IDE v3.9 - All 18 section types supported:', this.supportedSections.length, 'sections');
+            // Utility method to clean reference markers like [a], [b], [c], etc. from Word documents
+            cleanReferenceMarkers(text) {
+                if (!text) return text;
+                // Remove reference markers [a], [b], [c], [d], etc. and [1], [2], [3], etc.
+                return text.replace(/\[[a-z]\]|\[[0-9]+\]/gi, '').trim();
             }
 
             // Smart document parsing for real Word docs
@@ -986,9 +990,7 @@
                             if (currentSection || currentContent.length > 0) {
                                 const contentText = currentContent.join('\n').trim();
                                 const sectionKey = this.generateUniqueSectionKey(currentSection, sectionCounters);
-                                console.log(`🔍 PROCESSING SECTION: ${currentSection}, Content Length: ${currentContent.length}, Content: "${contentText}"`);
                                 sections[sectionKey] = await this.parseSection(currentSection, contentText);
-                                console.log(`✅ SECTION PROCESSED: ${sectionKey}`);
                             }
                         }
                         currentSection = null;
@@ -1006,9 +1008,7 @@
                     if (currentSection || currentContent.length > 0) {
                         const contentText = currentContent.join('\n').trim();
                         const sectionKey = this.generateUniqueSectionKey(currentSection, sectionCounters);
-                        console.log(`🔍 PROCESSING FINAL SECTION: ${currentSection}, Content Length: ${currentContent.length}, Content: "${contentText}"`);
                         sections[sectionKey] = await this.parseSection(currentSection, contentText);
-                        console.log(`✅ FINAL SECTION PROCESSED: ${sectionKey}`);
                     }
                 }
                 
@@ -1080,7 +1080,6 @@
                     try {
                         return await this.parseWithAI(content, 'HERO');
                     } catch (error) {
-                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
                     }
                 }
                 
@@ -1175,11 +1174,11 @@
                     // Check for a line that ends with dash/colon followed by empty space in original
                     for (let i = 0; i < descriptionLines.length - 1; i++) {
                         const line = descriptionLines[i].trim();
-                        if (line.length < 50 && 
+                        if (line.length < 50 &&
                             (line.endsWith('-') || line.endsWith(':')) &&
                             this.hasEmptyLineAfterInOriginal(line, allLines)) {
                             // This looks like a genuine bullet intro with spacing
-                            description = descriptionLines.slice(0, i).join(' ');
+                            description = descriptionLines.slice(0, i).map(line => `<p class="fonts-18 mb-3">${this.convertBoldMarkersAndLinks(line.trim())}</p>`).join('\n');
                             bullet_intro = line;
                             // Rest is additional content, not bullets
                             if (i + 1 < descriptionLines.length) {
@@ -1192,15 +1191,6 @@
                         }
                     }
                 }
-                
-                // Debug logging to see what's being parsed
-                console.log('HERO PARSING RESULT:', {
-                    main_heading,
-                    description,
-                    bullet_points,
-                    bullet_intro,
-                    additional_content
-                });
 
                 return {
                     main_heading: this.convertBoldMarkersAndLinks(main_heading || "Service Title"),
@@ -1270,7 +1260,6 @@
                 
                 // If no explicit bullets in original content, return empty array
                 if (!hasExplicitBullets) {
-                    console.log('VALIDATION: No explicit bullets found in content, returning empty array');
                     return [];
                 }
                 
@@ -1283,8 +1272,7 @@
                         return withoutMarker.includes(bullet) && trimmed.match(/^[●\-\*•‑]\s+|^\d+[\.\)]\s+/);
                     });
                 });
-                
-                console.log('VALIDATION: Original bullets:', aiBullets.length, 'Valid bullets:', validBullets.length);
+
                 return validBullets;
             }
 
@@ -1509,7 +1497,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     try {
                         return await this.parseWithAI(content, 'FAQ');
                     } catch (error) {
-                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
                     }
                 }
                 
@@ -1802,74 +1789,51 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
 
 
             parseTechnologySection(content) {
-                console.log('🔧 TECHNOLOGY_STACK_SECTION DYNAMIC Parsing Debug:');
-                console.log('Raw content:', content);
-                console.log('Raw content length:', content.length);
-                
                 const lines = content.split('\n').filter(line => line.trim());
-                console.log('Filtered lines:', lines);
-                console.log('Number of filtered lines:', lines.length);
-                
+
                 let main_heading = "Technology Stack";
                 let description = "Technologies we use";
                 let categories = [];
-                
+
                 // Check for custom main heading (first line if descriptive)
                 if (lines.length > 0 && lines[0].length > 10 && !lines[0].includes(':') && !lines[0].includes('|')) {
-                    main_heading = lines[0].trim();
+                    main_heading = this.cleanCitationMarkers(lines[0].trim());
                     lines.shift(); // Remove heading from lines
-                    console.log('Found DYNAMIC main_heading:', main_heading);
-                    console.log('Remaining lines after heading removal:', lines);
                 }
-                
+
                 // Check for description (second line if descriptive and no colon or pipe)
                 if (lines.length > 0 && lines[0].length > 20 && !lines[0].includes(':') && !lines[0].includes('|')) {
-                    description = lines[0].trim();
+                    description = this.cleanCitationMarkers(lines[0].trim());
                     lines.shift(); // Remove description from lines
-                    console.log('Found DYNAMIC description:', description);
-                    console.log('Remaining lines after description removal:', lines);
                 }
-                
-                console.log('Starting DYNAMIC category parsing with lines:', lines);
                 
                 // Process each line for pipe-separated format (Category | Tech1 | Tech2 | Tech3)
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
-                    
-                    console.log(`Processing line ${i}: "${line}"`);
-                    
+
                     // Check if this line contains pipe separators (table format)
                     if (line.includes('|')) {
-                        console.log(`Found TABLE FORMAT line with pipe separator: "${line}"`);
-                        
                         // Split by pipe - first part is category, rest are individual technologies
                         const parts = line.split('|').map(part => part.trim()).filter(part => part.length > 0);
-                        
+
                         if (parts.length >= 2) {
                             const categoryName = parts[0];
                             // Each remaining part is a separate technology
                             const techs = parts.slice(1);
-                            
-                            console.log(`TABLE FORMAT - Category: "${categoryName}", Individual Technologies:`, techs);
-                            
+
                             if (categoryName && techs.length > 0) {
                                 categories.push({
                                     name: categoryName,
                                     technologies: techs
                                 });
-                                console.log(`✅ Added TABLE FORMAT category: ${categoryName} with ${techs.length} individual technologies`);
                             }
-                        } else {
-                            console.log(`⚠️ TABLE FORMAT line has insufficient parts:`, parts);
                         }
                         continue;
                     }
-                    
+
                     // Handle colon-based category format (Category:)
                     if (line.endsWith(':')) {
-                        console.log(`Found COLON FORMAT category: "${line}"`);
-                        
                         const categoryName = line.replace(':', '').trim();
                         
                         // Look ahead to collect technologies for this category
@@ -1898,19 +1862,15 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                                 name: categoryName,
                                 technologies: categoryTechs
                             });
-                            console.log(`✅ Added COLON FORMAT category: ${categoryName} with technologies:`, categoryTechs);
                         }
-                        
+
                         // Skip the processed lines
                         i = j - 1;
                     }
                 }
-                
-                console.log('Final DYNAMIC categories array:', categories);
-                
+
                 // If no categories found, try to extract individual technologies
                 if (categories.length === 0) {
-                    console.log('⚠️ No categories found, attempting to extract individual technologies from content');
                     const foundTech = [];
                     
                     // Look for technology keywords in the content
@@ -1938,18 +1898,16 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         description,
                         technologies: foundTech.length > 0 ? foundTech : ['React', 'Node.js', 'Python'] // Minimal fallback
                     };
-                    
-                    console.log('DYNAMIC legacy format result with extracted technologies:', result);
+
                     return result;
                 }
-                
+
                 const result = {
                     main_heading,
                     description,
                     categories
                 };
-                
-                console.log('Final DYNAMIC parsed result:', result);
+
                 return result;
             }
 
@@ -1963,28 +1921,22 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
             }
 
             parseFlexiblePackageSection(content) {
-                console.log('🔧 FLEXIBLE_PACKAGE_SECTION Parsing Debug:');
-                console.log('Raw content:', content);
-                
                 const lines = content.split('\n').filter(line => line.trim());
-                console.log('Filtered lines:', lines);
-                
+
                 let main_heading = "Our Flexible Packages for Mobile App Maintenance Services";
                 let description = "Space-O Technologies offers three flexible mobile app maintenance packages to suit businesses of all sizes and app complexities. Each package is designed to meet your needs, ensuring your app remains efficient, secure, and up-to-date.";
                 let packages = [];
-                
+
                 // Check for custom main heading (first line if descriptive)
                 if (lines.length > 0 && lines[0].length > 10 && !lines[0].includes('Package:') && !lines[0].includes('Price:')) {
                     main_heading = lines[0].trim();
                     lines.shift();
-                    console.log('Found custom main_heading:', main_heading);
                 }
-                
+
                 // Check for description (second line if descriptive)
                 if (lines.length > 0 && lines[0].length > 20 && !lines[0].includes('Package:') && !lines[0].includes('Price:')) {
                     description = lines[0].trim();
                     lines.shift();
-                    console.log('Found custom description:', description);
                 }
                 
                 // Parse packages
@@ -1994,16 +1946,13 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
-                    
-                    console.log(`Processing line ${i}: "${line}"`);
-                    
+
                     // Check if this line defines a package (Package: Name format)
                     if (line.toLowerCase().startsWith('package:') || line.toLowerCase().includes('standard') || line.toLowerCase().includes('advanced') || line.toLowerCase().includes('pro')) {
                         // Save previous package if exists
                         if (currentPackage) {
                             currentPackage.features = [...currentFeatures];
                             packages.push(currentPackage);
-                            console.log('Added package:', currentPackage);
                         }
                         
                         // Start new package
@@ -2021,7 +1970,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             features: []
                         };
                         currentFeatures = [];
-                        console.log('Started new package:', packageName);
                     }
                     // Check if this line defines a price
                     else if (line.toLowerCase().includes('price:') || line.includes('$')) {
@@ -2029,35 +1977,30 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             const priceMatch = line.match(/\$[\d,]+/);
                             if (priceMatch) {
                                 currentPackage.price = priceMatch[0];
-                                console.log('Found price:', priceMatch[0]);
                             }
                         }
                     }
                     // Check if this is a description line (after package name, before features)
                     else if (currentPackage && !currentPackage.description && line.length > 10 && !line.startsWith('-') && !line.startsWith('•')) {
                         currentPackage.description = line;
-                        console.log('Found package description:', line);
                     }
                     // Check if this is a feature line
                     else if (currentPackage && (line.startsWith('-') || line.startsWith('•') || line.includes('Hours') || line.includes('iOS') || line.includes('Android') || line.includes('Support'))) {
                         const cleanFeature = line.replace(/^[\-\•]\s*/, '').trim();
                         if (cleanFeature.length > 0) {
                             currentFeatures.push(cleanFeature);
-                            console.log('Added feature:', cleanFeature);
                         }
                     }
                 }
-                
+
                 // Add final package
                 if (currentPackage) {
                     currentPackage.features = [...currentFeatures];
                     packages.push(currentPackage);
-                    console.log('Added final package:', currentPackage);
                 }
-                
+
                 // If no packages found, create default packages
                 if (packages.length === 0) {
-                    console.log('No packages found, creating default packages');
                     packages = [
                         {
                             name: 'Standard',
@@ -2085,8 +2028,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     description,
                     packages
                 };
-                
-                console.log('Final FLEXIBLE_PACKAGE_SECTION parsed result:', result);
+
                 return result;
             }
 
@@ -2095,7 +2037,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     try {
                         return await this.parseWithAI(content, 'SERVICES_GRID');
                     } catch (error) {
-                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
                     }
                 }
                 
@@ -2116,15 +2057,9 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 let currentService = null;
                 let currentMode = 'heading';
                 let serviceContent = [];
-                
-                // Enhanced debug logging
-                console.log('🔧 SERVICES_GRID parsing - Raw content:', content);
-                console.log('🔧 SERVICES_GRID parsing - Lines after number removal:', lines);
-                console.log('🔧 SERVICES_GRID parsing - Total lines count:', lines.length);
-                
+
                 for (let i = 0; i < lines.length; i++) {
                     const trimmedLine = lines[i];
-                    console.log(`🔧 SERVICES_GRID Line ${i}: "${trimmedLine}" (Mode: ${currentMode})`);
                     
                     // First line is main heading
                     if (currentMode === 'heading' && !main_heading) {
@@ -2134,14 +2069,11 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     }
                     
                     // Second line might be main description if it's descriptive
-                    if (currentMode === 'description' && !description && 
+                    if (currentMode === 'description' && !description &&
                         trimmedLine.length > 50 && !this.looksLikeServiceTitle(trimmedLine, lines, i)) {
                         description = trimmedLine;
-                        console.log(`🔧 SERVICES_GRID DESCRIPTION SET: "${description}"`);
                         currentMode = 'services';
                         continue;
-                    } else if (currentMode === 'description' && !description) {
-                        console.log(`🔧 SERVICES_GRID Description NOT set for line: "${trimmedLine}" (length: ${trimmedLine.length}, looksLikeServiceTitle: ${this.looksLikeServiceTitle(trimmedLine, lines, i)})`);
                     }
                     
                     // Switch to services mode
@@ -2153,18 +2085,16 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     if (currentMode === 'services') {
                         // Check if this is a new service title
                         if (this.isNewServiceCard(trimmedLine, lines, i)) {
-                            console.log(`🔧 SERVICES_GRID NEW SERVICE detected: "${trimmedLine}"`);
                             // Save previous service
                             if (currentService) {
                                 // Only set description if it's not already set and we have content
                                 if (!currentService.description && serviceContent.length > 0) {
                                     currentService.description = serviceContent.join(' ');
                                 }
-                                console.log(`🔧 SERVICES_GRID Saving previous service: ${currentService.title} with description: "${currentService.description}" (${currentService.description ? 'HAS DESCRIPTION' : 'NO DESCRIPTION'})`);
                                 services.push(currentService);
                                 serviceContent = [];
                             }
-                            
+
                             // Start new service with link extraction
                             const titleWithLink = this.processTextWithLinks(trimmedLine);
                             currentService = {
@@ -2173,18 +2103,15 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                                 bullets: [], // Will only add if explicit bullets exist
                                 link: titleWithLink.link // Extract link from title
                             };
-                            console.log(`🔧 SERVICES_GRID Started new service: ${currentService.title}`);
                         }
                         // Handle explicit bullets ONLY if they exist
                         else if (trimmedLine.match(/^[●\-\*•‑]\s*/) && currentService) {
                             const bulletText = trimmedLine.replace(/^[●\-\*•‑]\s*/, '').trim();
                             currentService.bullets.push(bulletText);
-                            console.log(`🔧 SERVICES_GRID Added bullet to service "${currentService.title}": "${bulletText}"`);
-                            
+
                             // Finish current content before bullets - assign description if we have content
                             if (serviceContent.length > 0 && !currentService.description) {
                                 currentService.description = serviceContent.join(' ');
-                                console.log(`🔧 SERVICES_GRID Set description for service "${currentService.title}" before bullets: "${currentService.description}"`);
                                 serviceContent = [];
                             }
                         }
@@ -2195,15 +2122,10 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             if (lineWithLink.link && !currentService.link) {
                                 currentService.link = lineWithLink.link;
                             }
-                            
+
                             // Only add to serviceContent if we haven't set the description yet
                             if (!currentService.description) {
                                 serviceContent.push(lineWithLink.text);
-                                console.log(`🔧 SERVICES_GRID Added content to service "${currentService.title}": "${lineWithLink.text}"`);
-                                console.log(`🔧 SERVICES_GRID Current serviceContent array:`, serviceContent);
-                            } else {
-                                // If description is already set, this might be additional content - treat as bullet if it looks like one
-                                console.log(`🔧 SERVICES_GRID Service "${currentService.title}" already has description, treating line as potential additional content: "${lineWithLink.text}"`);
                             }
                         }
                     }
@@ -2216,21 +2138,13 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         const descriptionContent = serviceContent.join(' ');
                         const descWithLink = this.processTextWithLinks(descriptionContent);
                         currentService.description = descWithLink.text;
-                        console.log(`🔧 SERVICES_GRID Final service "${currentService.title}" description: "${currentService.description}"`);
                         // If no link in title, use link from description
                         if (!currentService.link && descWithLink.link) {
                             currentService.link = descWithLink.link;
                         }
-                    } else if (!currentService.description) {
-                        console.log(`🔧 SERVICES_GRID WARNING: Final service "${currentService.title}" has no content!`);
-                    } else {
-                        console.log(`🔧 SERVICES_GRID Final service "${currentService.title}" already has description: "${currentService.description}"`);
                     }
                     services.push(currentService);
                 }
-                
-                console.log('🔧 SERVICES_GRID final result:', { main_heading, description, services });
-                console.log('🔧 SERVICES_GRID final services array:', services.map(s => ({title: s.title, description: s.description})));
                 
                 return {
                     main_heading: main_heading || "Our Services",
@@ -2242,34 +2156,23 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
             isNewServiceCard(line, allLines, currentIndex) {
                 // More accurate detection of service card titles
                 const isReasonableLength = line.length > 5 && line.length < 80;
-                const startsWithCapital = /^[A-Z]/.test(line);
+                const startsWithCapitalOrNumber = /^[A-Z0-9]/.test(line); // Allow numbers like "24/7"
                 const notBullet = !line.match(/^[●\-\*•‑]\s*/);
-                const hasKeywords = /\b(development|consulting|portal|service|solution|platform|integration|migration|design|custom|b2b|api|support|maintenance|ui|ux)\b/i.test(line);
-                
+                const hasKeywords = /\b(development|consulting|portal|service|solution|platform|integration|migration|design|custom|b2b|api|support|maintenance|ui|ux|monitoring|optimization|configuration|customization|health|security|reporting|analytics)\b/i.test(line);
+
                 // Check if this line is separated from previous content
                 const prevLine = currentIndex > 0 ? allLines[currentIndex - 1] : '';
                 const nextLine = currentIndex + 1 < allLines.length ? allLines[currentIndex + 1] : '';
-                
+
                 // Good indicators this is a title:
                 const hasSubstantialNextContent = nextLine && nextLine.length > 20;
                 const followsShortLine = !prevLine || prevLine.length < 40;
-                const isShortAndCapitalized = line.length < 50 && startsWithCapital;
-                
-                // Enhanced detection: if line is short, capitalized, and followed by longer content
-                const looksLikeTitle = isShortAndCapitalized && hasSubstantialNextContent;
-                
-                console.log(`🔧 SERVICES_GRID isNewServiceCard check for "${line}":`, {
-                    isReasonableLength,
-                    startsWithCapital,
-                    notBullet,
-                    hasKeywords,
-                    hasSubstantialNextContent,
-                    followsShortLine,
-                    looksLikeTitle,
-                    result: isReasonableLength && startsWithCapital && notBullet && (hasKeywords || looksLikeTitle || followsShortLine)
-                });
-                
-                return isReasonableLength && startsWithCapital && notBullet && 
+                const isShortAndProperStart = line.length < 50 && startsWithCapitalOrNumber;
+
+                // Enhanced detection: if line is short, starts properly, and followed by longer content
+                const looksLikeTitle = isShortAndProperStart && hasSubstantialNextContent;
+
+                return isReasonableLength && startsWithCapitalOrNumber && notBullet &&
                        (hasKeywords || looksLikeTitle || followsShortLine);
             }
             
@@ -2313,76 +2216,110 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
             }
 
             isLikelyServiceTitle(text, allLines, currentIndex) {
-                if (!text || text.length < 10) return false; // Too short
-                if (text.length > 100) return false; // Too long for a title
+                if (!text || text.length < 5) return false; // Too short
+                if (text.length > 150) return false; // Too long for a title
                 if (text.match(/^[●\-\*•‑]\s*/)) return false; // Is a bullet point
-                
-                // Service title patterns
-                const servicePatterns = [
-                    /\b(development|services?|support|maintenance|customization|extension|migration|consulting|solutions?)\b/i,
-                    /\b(web|mobile|app|application|software|system|platform)\b/i,
-                    /\b(custom|professional|expert|advanced|comprehensive)\b/i
-                ];
-                
-                // Must match at least one service pattern
-                const hasServiceKeyword = servicePatterns.some(pattern => pattern.test(text));
-                
-                // Check if next line looks like description (longer text)
+
+                // Check if next line looks like a long description
                 const nextLine = allLines[currentIndex + 1];
-                const hasDescriptionAfter = nextLine && nextLine.length > 30 && !nextLine.match(/^[●\-\*•‑]\s*/);
-                
-                // Check capitalization (service titles are usually title case)
-                const hasProperCapitalization = /^[A-Z]/.test(text) && (text.includes(' ') ? /[A-Z].*[A-Z]/.test(text) : true);
-                
-                return hasServiceKeyword && hasProperCapitalization && (hasDescriptionAfter || text.includes('&'));
+                const hasLongDescriptionAfter = nextLine && nextLine.length > 50 && !nextLine.match(/^[●\-\*•‑]\s*/);
+
+                // Check if line starts with capital letter
+                const startsWithCapital = /^[A-Z]/.test(text);
+
+                // Check if line doesn't end with sentence-ending punctuation (titles typically don't)
+                // Allow parentheses at end like "(ITSM)" but not periods
+                const noSentenceEnding = !text.match(/\.\s*$/) && !text.match(/\?$/) && !text.match(/!$/);
+
+                // Title should be relatively short compared to description
+                const isReasonablyShort = text.length < 120;
+
+                // Service title patterns (expanded to catch more variations)
+                const servicePatterns = [
+                    /\b(management|operations?|service|delivery|security|governance|compliance|risk)\b/i,
+                    /\b(development|support|maintenance|customization|extension|migration|consulting|solutions?)\b/i,
+                    /\b(web|mobile|app|application|software|system|platform|portal|center|engine|analytics|asset)\b/i,
+                    /\b(custom|professional|expert|advanced|comprehensive|field)\b/i,
+                    /\b(ITSM|ITOM|ITBM|CSM|HRSD|SecOps|GRC|ITAM|FSM)\b/ // Common acronyms
+                ];
+
+                // Check if has at least one service keyword OR has description after
+                const hasServiceKeyword = servicePatterns.some(pattern => pattern.test(text));
+
+                // If it has a long description after and looks like a title, it's probably a title
+                if (hasLongDescriptionAfter && startsWithCapital && noSentenceEnding && isReasonablyShort) {
+                    return true;
+                }
+
+                // Otherwise, must have service keywords
+                return hasServiceKeyword && startsWithCapital && hasLongDescriptionAfter;
             }
 
             async parseServicesAccordionSection(content) {
-                console.log('🔧 SERVICES_ACCORDION_SECTION parseServicesAccordionSection called with content:', content);
-                
                 if (this.useAI) {
                     try {
                         return await this.parseWithAI(content, 'SERVICES_ACCORDION');
                     } catch (error) {
-                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
                     }
                 }
-                
+
                 // Enhanced rule-based parsing for accordion services
                 const lines = content.split('\n').map(line => line.trim()).filter(line => line);
-                console.log('🔧 SERVICES_ACCORDION_SECTION parsed lines:', lines);
                 const services = [];
-                
+                let main_heading = '';
+                let description = '';
+
                 let currentService = null;
-                
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    
-                    // Skip section headers/main headings
-                    if (i === 0 && this.isLikelyMainHeading(line)) {
-                        continue;
+                let startIndex = 0;
+
+                // Check if first line is a main heading
+                // SIMPLE RULE: First line is H2 ONLY if it contains heading-specific words AND is NOT a service title
+                if (lines.length > 0) {
+                    const firstLine = lines[0];
+                    const secondLine = lines.length > 1 ? lines[1] : '';
+
+                    // Strict check: Main headings contain these specific phrases
+                    const headingWords = /\b(platforms?|solutions?|we (offer|provide|support|manage)|portfolio|offerings?|what we)\b/i;
+                    const containsHeadingWords = headingWords.test(firstLine);
+
+                    // Service titles contain these specific patterns with acronyms
+                    const serviceAcronyms = /\(ITSM\)|\(ITOM\)|\(ITBM\)|\(CSM\)|\(HRSD\)|\(SecOps\)|\(GRC\)|\(ITAM\)|\(FSM\)/;
+                    const isServiceTitlePattern = serviceAcronyms.test(firstLine);
+
+                    // First line is H2 if: contains heading words AND is NOT a service title pattern
+                    if (containsHeadingWords && !isServiceTitlePattern) {
+                        main_heading = firstLine;
+                        startIndex = 1;
+
+                        // Check if second line is a description (long paragraph before services start)
+                        if (secondLine.length > 50 && !serviceAcronyms.test(secondLine)) {
+                            description = secondLine;
+                            startIndex = 2;
+                        }
                     }
-                    
+                }
+
+                for (let i = startIndex; i < lines.length; i++) {
+                    const line = lines[i];
+
                     // Check if this line looks like a service title
                     if (this.isLikelyServiceTitle(line, lines, i)) {
                         // Save previous service if exists
                         if (currentService) {
                             services.push(currentService);
                         }
-                        
+
                         // Start new service
                         currentService = {
                             title: line,
                             description: '',
                             bullets: []
                         };
-                        console.log('🔧 Found service title:', line);
                     }
                     // Handle bullets
                     else if (line.match(/^[●\-\*•‑]\s*/) && currentService) {
                         const bulletText = line.replace(/^[●\-\*•‑]\s*/, '').trim();
                         currentService.bullets.push(bulletText);
-                        console.log('🔧 Found bullet for', currentService.title, ':', bulletText);
                     }
                     // Regular content - add to description
                     else if (currentService && line.length > 0) {
@@ -2391,17 +2328,15 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         } else {
                             currentService.description = line;
                         }
-                        console.log('🔧 Added description to', currentService.title);
                     }
                 }
-                
+
                 // Add last service
                 if (currentService) services.push(currentService);
-                
-                console.log('🔧 SERVICES_ACCORDION_SECTION final parsed services:', services);
-                console.log('🔧 SERVICES_ACCORDION_SECTION services count:', services.length);
-                
+
                 return {
+                    main_heading: main_heading || '',
+                    description: description || '',
                     services: services
                 };
             }
@@ -2411,7 +2346,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     try {
                         return await this.parseWithAI(content, 'PORTFOLIO');
                     } catch (error) {
-                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
                     }
                 }
                 
@@ -2420,31 +2354,46 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 const projects = [];
                 let main_heading = '';
                 let description = '';
-                
+
                 // Filter out empty lines for easier processing
                 const nonEmptyLines = lines.filter(line => line.trim());
-                
-                console.log('🔧 PORTFOLIO_SECTION parsing - Raw content:', content);
-                console.log('🔧 PORTFOLIO_SECTION parsing - NonEmpty lines:', nonEmptyLines);
-                
-                if (nonEmptyLines.length >= 2) {
+
+                // Check if we have H2 and optional description
+                let projectStartIndex = 1;
+                if (nonEmptyLines.length >= 1) {
                     main_heading = nonEmptyLines[0];
-                    description = nonEmptyLines[1];
+
+                    // Check if second line looks like a project title or a description
+                    if (nonEmptyLines.length >= 2) {
+                        const secondLine = nonEmptyLines[1];
+
+                        // Check if second line is a project title (starts with action words like "Developed", "Built", "An Advanced", etc.)
+                        const isProjectTitle =
+                            secondLine.match(/^(Developed|Built|Created|Designed|An?\s+Advanced|An?\s+Online|An?\s+AI|An?\s+Mobile|An?\s+Web)/i) ||
+                            secondLine.length < 150; // Short lines are likely titles
+
+                        if (!isProjectTitle && secondLine.length > 100) {
+                            // It's a description paragraph
+                            description = secondLine;
+                            projectStartIndex = 2;
+                        } else {
+                            // It's a project title, no description
+                            projectStartIndex = 1;
+                        }
+                    }
                 }
-                
+
                 // Find project titles and descriptions
-                let projectLines = nonEmptyLines.slice(2); // Skip heading and description
+                let projectLines = nonEmptyLines.slice(projectStartIndex);
                 let currentProject = null;
                 
                 for (let i = 0; i < projectLines.length; i++) {
                     const line = projectLines[i].trim();
-                    console.log(`🔧 PORTFOLIO_SECTION Line ${i}: "${line}"`);
-                    
+
                     // Check if this line is a button text (like "See Project Details")
                     const isButtonText = line.match(/^(See Project Details|Check Project Details|View Project|Learn More|Navigate to Project Details)$/i);
-                    
+
                     if (isButtonText) {
-                        console.log(`🔧 PORTFOLIO_SECTION Button text detected: "${line}"`);
                         // This is button text, add it to current project and don't include in description
                         if (currentProject) {
                             currentProject.buttonText = line;
@@ -2453,28 +2402,20 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     }
                     
                     // Detect if this line is likely a project title
-                    // More flexible title detection - check if it's NOT a description
+                    // SIMPLE RULE: Titles start with specific action words or patterns
+                    const isTitlePattern = line.match(/^(Developed|Built|Created|Designed|An?\s+(Advanced|Online|AI|Mobile|Web|Enterprise|Custom|Comprehensive))/i);
+                    const isDescriptionPattern = line.match(/^(We |Space-O Technologies|Managing |The platform|The system|Its |With |Our )/i);
+
                     const isLikelyTitle = (
-                        line.length < 300 && // Allow longer titles
-                        !line.startsWith('Space-O Technologies') && // Descriptions often start with company name
-                        !line.startsWith('We designed') && // Common description starters
-                        !line.startsWith('At Space-O Technologies') &&
-                        !line.startsWith('The platform features') &&
-                        !line.startsWith('The system includes') &&
-                        !line.startsWith('Managing multiple') && // Avoid description starters
-                        !line.startsWith('With advanced') && // Avoid description starters
-                        !line.startsWith('Our comprehensive') && // Avoid description starters
-                        !line.match(/^(We developed|Built|Created|Designed)\s+a\s+(responsive|comprehensive|sophisticated|advanced|scalable)/i) && // Common description patterns
-                        // More inclusive - if it contains title-like patterns OR if it's the first line after heading/description
-                        (line.includes(':') || line.includes('—') || line.includes(' for ') || line.includes(' - ') || 
-                         line.match(/^[A-Z][a-zA-Z\s&'-]+(\s+(App|Platform|System|Solution|Tool|Lab|Portal|Marketplace|Website|Application|Service))(\s|:|$)/i) ||
-                         line.match(/\b(EdTech|FinTech|HealthTech|PropTech|E-commerce|SaaS|B2B|AI|ML|IoT|AR|VR)\b/i) ||
-                         (currentProject === null && i === 0)) // First project line is likely a title
+                        line.length < 200 && // Titles are reasonably short
+                        isTitlePattern && // Must start with title pattern
+                        !isDescriptionPattern && // Must NOT start with description pattern
+                        line.match(/\b(Solution|Software|Platform|App|Application|System|Tool|Service|Management|Development)\b/i) // Contains product/service words
                     );
-                    
-                    console.log(`🔧 PORTFOLIO_SECTION Title check for "${line}": ${isLikelyTitle}`);
-                    
-                    if (isLikelyTitle || currentProject === null) {
+
+
+                    // Start new project if it's a title, OR if it's the first line (even if not detected as title)
+                    if (isLikelyTitle || (currentProject === null && i === 0)) {
                         // Save previous project if exists
                         if (currentProject && currentProject.description.trim()) {
                             // Final cleanup: remove any remaining button text from description
@@ -2508,7 +2449,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                                 }
                             }
                             
-                            console.log(`🔧 PORTFOLIO_SECTION Saving project: "${finalTitle}" with description length: ${cleanDescription.length}`);
                             
                             projects.push({
                                 title: finalTitle,
@@ -2520,7 +2460,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         }
                         
                         // Start new project
-                        console.log(`🔧 PORTFOLIO_SECTION Starting new project: "${line}"`);
                         currentProject = {
                             title: this.convertBoldMarkers ? this.convertBoldMarkers(line) : line,
                             description: '',
@@ -2561,9 +2500,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             if (!foundButton) {
                                 // No button text found, add entire line to description
                                 currentProject.description += (currentProject.description ? ' ' : '') + (this.convertBoldMarkers ? this.convertBoldMarkers(processedLine) : processedLine);
-                                console.log(`🔧 PORTFOLIO_SECTION Added to description: "${processedLine}"`);
                             } else {
-                                console.log(`🔧 PORTFOLIO_SECTION Found button text, split line: description="${processedLine.split('Navigate to Project Details')[0] || processedLine.split('See Project Details')[0] || processedLine}" button="${currentProject.buttonText}"`);
                             }
                         }
                     }
@@ -2601,7 +2538,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         }
                     }
                     
-                    console.log(`🔧 PORTFOLIO_SECTION Final project: "${finalTitle}" with description length: ${cleanDescription.length}`);
                     
                     projects.push({
                         title: finalTitle,
@@ -2612,8 +2548,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     });
                 }
                 
-                console.log('🔧 PORTFOLIO_SECTION final result:', { main_heading, description, projects });
-                console.log('🔧 PORTFOLIO_SECTION final projects array:', projects.map(p => ({title: p.title, description: p.description.substring(0, 100) + '...'})));
                 
                 return {
                     main_heading: this.convertBoldMarkers ? this.convertBoldMarkers(main_heading || 'Proven Results: Real Projects That Drive Business Growth') : (main_heading || 'Proven Results: Real Projects That Drive Business Growth'),
@@ -2702,7 +2636,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     try {
                         return await this.parseWithAI(content, 'BENEFITS');
                     } catch (error) {
-                        console.warn('AI parsing failed, falling back to rule-based parsing:', error);
                     }
                 }
                 
@@ -2753,7 +2686,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                                          (isShort && hasLongTextAfter) ||
                                          (isShort && isAfterEmptyLine && i > 2);
                     
-                    console.log(`Benefits Line ${i}: "${line.substring(0, 50)}..." -> Title: ${isBenefitTitle} (numbered: ${isNumberedTitle}, short: ${isShort}, afterEmpty: ${isAfterEmptyLine})`);
                     
                     if (isBenefitTitle) {
                         // Save previous benefit if exists
@@ -2917,38 +2849,25 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
             }
 
             detectSections(content) {
-                console.log('🔍 DETECT SECTIONS CALLED');
-                console.log('Content preview:', content.substring(0, 200));
-                console.log('FEATURED_IN in this.supportedSections?', this.supportedSections.includes('FEATURED_IN'));
-                console.log('Current supportedSections:', this.supportedSections);
                 
                 const sectionPattern = /\[([A-Z_\s]+)\]/g;
                 const matches = [...content.matchAll(sectionPattern)];
                 const detected = matches.map(match => match[1].trim());
                 
                 // Debug: Log detection process
-                console.log('Section detection - Content:', content);
-                console.log('Section detection - Matches found:', matches);
-                console.log('Section detection - Detected sections:', detected);
-                console.log('Section detection - Supported sections:', this.supportedSections);
-                console.log('Section detection - FEATURED_IN in supported?', this.supportedSections.includes('FEATURED_IN'));
                 
                 // Filter out END markers and only keep supported sections
-                console.log('Before filtering - sections to filter:', [...new Set(detected)]);
                 const withoutEndMarkers = [...new Set(detected)].filter(section => !section.endsWith(' END'));
-                console.log('After removing END markers:', withoutEndMarkers);
                 
                 const filtered = withoutEndMarkers
                     .filter(section => {
                         // FORCE FEATURED_IN to always pass through
                         if (section === 'FEATURED_IN') {
-                            console.log('🔍 FEATURED_IN FORCED THROUGH FILTER!');
                             return true;
                         }
                         
                         // FORCE PROCESS to always pass through (in case of similar issues)
                         if (section === 'PROCESS') {
-                            console.log('🔍 PROCESS FORCED THROUGH FILTER!');
                             return true;
                         }
                         
@@ -2965,15 +2884,12 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         return isSupported;
                     });
                 
-                console.log('Section detection - Final filtered:', filtered);
                 return filtered;
             }
 
             async processContent(content) {
-                console.log('🚀 PROCESS CONTENT CALLED');
                 try {
                     const detectedSections = this.detectSections(content);
-                    console.log('🎯 Detected sections from detectSections:', detectedSections);
                     
                     if (detectedSections.length === 0) {
                         return {
@@ -2989,7 +2905,6 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     for (let [sectionType, sectionContent] of Object.entries(sections)) {
                         // FORCE FEATURED_IN and PROCESS to always be processed
                         if (sectionType.includes('FEATURED_IN') || sectionType.includes('PROCESS')) {
-                            console.log(`🚀 FORCING ${sectionType} PROCESSING`);
                             const html = this.generateSection(sectionType, sectionContent);
                             generatedHtml.push(html);
                             continue;
@@ -3017,18 +2932,13 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
             }
 
             generateSection(sectionType, content) {
-                console.log('🎯 GENERATE SECTION CALLED:', sectionType);
-                console.log('🎯 Section content:', content);
                 
                 // Extract base section type (remove _2, _3, etc. suffixes for multiple sections)
                 const baseSectionType = sectionType.replace(/_\d+$/, '');
-                console.log('🎯 Base section type:', baseSectionType);
                 
                 // FORCE FEATURED_IN to be handled
                 if (baseSectionType.includes('FEATURED_IN_SECTION')) {
-                    console.log('🚀 GENERATING FEATURED_IN SECTION!');
                     const result = this.generateFeaturedInSection(content);
-                    console.log('🚀 FEATURED_IN HTML generated:', result.substring(0, 100) + '...');
                     return result;
                 }
                 
@@ -3080,14 +2990,14 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
 <h1 class="fonts-45 mb-3 font-weight-bold">Professional Web Development Services</h1>
 <p class="fonts-18 mb-3">Transform your digital presence with our expert web development solutions tailored to your business needs.</p>
 <p class="fonts-18 mb-2 font-weight-bold">Why Choose Our Services-</p>
-<ul class="bullet mb-5 fonts-18">
+<ul class="bullet mb-3 fonts-18">
     <li>Custom web development using modern technologies</li>
     <li>Responsive design for all devices</li>
     <li>SEO-optimized and performance-focused</li>
     <li>Dedicated support and maintenance</li>
 </ul>
 
-<div class="rating-section d-flex"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
+<div class="rating-section d-flex mt-4"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
 <a href="https://clutch.co/profile/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/clutch-rating.svg" alt="Clutch" width="99" height="56" /></a>
 <a href="https://www.goodfirms.co/company/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/goodfirm-rating.svg" alt="GoodFirms" width="135" height="56" /></a></div>
 </div>
@@ -3144,7 +3054,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     for (let bullet of content.bullet_points) {
                         bulletPoints += `    <li>${bullet}</li>\n`;
                     }
-                    bulletSection = `<ul class="bullet mb-5 fonts-18">
+                    bulletSection = `<ul class="bullet mb-3 fonts-18">
 ${bulletPoints}
 </ul>
 
@@ -3161,7 +3071,7 @@ ${bulletPoints}
 {description}
 {bullet_intro_html}
 {bullet_section}
-<div class="rating-section d-flex"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
+<div class="rating-section d-flex mt-4"><a href="https://goo.gl/maps/1JSqiZssNiDHAppx8" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/google-rating.svg" alt="Google" width="97" height="56" /></a>
 <a href="https://clutch.co/profile/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/clutch-rating.svg" alt="Clutch" width="99" height="56" /></a>
 <a href="https://www.goodfirms.co/company/space-o-technologies#reviews" target="_blank" rel="noopener"><img src="/wp-content/uploads/2023/08/goodfirm-rating.svg" alt="GoodFirms" width="135" height="56" /></a></div>
 {additional_content_html}
@@ -3365,23 +3275,15 @@ ${faqItems}
 
 
             generateTechnologySection(content) {
-                console.log('🎨 TECHNOLOGY_STACK_SECTION HTML Generation Debug:');
-                console.log('Input content:', content);
-                console.log('Content type:', typeof content);
-                console.log('Has categories?', content && content.categories);
-                console.log('Categories length:', content && content.categories ? content.categories.length : 'N/A');
                 
                 // ⚠️ IMPORTANT: TECHNOLOGY_STACK_SECTION should ALWAYS be dynamic from DOC content
                 // NO static defaults - only process actual document content
                 
                 // Process dynamic categories from document content
                 if (content && content.categories && content.categories.length > 0) {
-                    console.log('✅ Using DYNAMIC category-based HTML from document content');
-                    console.log('Categories to process:', content.categories);
                     
                     let categoriesHTML = '';
                     content.categories.forEach((category, index) => {
-                        console.log(`Processing category ${index + 1}:`, category);
                         
                         let techList = '';
                         if (category.technologies && category.technologies.length > 0) {
@@ -3404,7 +3306,6 @@ ${techList}</ul>
 `;
                     });
                     
-                    console.log('Generated DYNAMIC categoriesHTML:', categoriesHTML);
                     
                     const finalHTML = `<div class="technology-stack pt80 pb60 bg-color">
 <div class="container-xl">
@@ -3419,17 +3320,13 @@ ${categoriesHTML}</div>
 </div>
 </div>`;
                     
-                    console.log('Final DYNAMIC category-based HTML:', finalHTML);
                     return finalHTML;
                 }
 
                 // ⚠️ FALLBACK: If no categories found, try to create categories from content
-                console.log('⚠️ No categories detected - attempting to create from document content');
-                console.log('Content for processing:', content);
                 
                 // If we have content but no categories, try to parse it manually
                 if (content && (content.technologies || content.main_heading)) {
-                    console.log('Attempting to process content as legacy format or create basic structure');
                     
                     let categoriesHTML = '';
                     
@@ -3466,12 +3363,10 @@ ${categoriesHTML}</div>
 </div>
 </div>`;
                     
-                    console.log('Generated fallback HTML from document content:', fallbackHTML);
                     return fallbackHTML;
                 }
                 
                 // If absolutely no content, return minimal placeholder
-                console.log('⚠️ NO CONTENT PROVIDED - returning minimal placeholder');
                 return `<div class="technology-stack pt80 pb60 bg-color">
 <div class="container-xl">
 <div class="row">
@@ -3485,12 +3380,9 @@ ${categoriesHTML}</div>
             }
 
             generateFlexiblePackageSection(content) {
-                console.log('🎨 FLEXIBLE_PACKAGE_SECTION HTML Generation Debug:');
-                console.log('Input content:', content);
                 
                 // Handle empty content with default packages
                 if (!content || !content.packages || content.packages.length === 0) {
-                    console.log('🚀 RETURNING DEFAULT FLEXIBLE PACKAGE HTML (blank content detected)');
                     return `<section class="pt80 pb70 bg-color flexible-package">
 <div class="container-xl">
 <h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Our Flexible Packages for Mobile App Maintenance Services</h2>
@@ -3565,12 +3457,9 @@ ${content.description ? '<p class="fonts-18 mb-4 text-center mxw-900">' + conten
                 }
                 
                 // Generate dynamic HTML from parsed content
-                console.log('✅ Using DYNAMIC package HTML from document content');
-                console.log('Packages to process:', content.packages);
                 
                 let packagesHTML = '';
                 content.packages.forEach((pkg, index) => {
-                    console.log(`Processing package ${index + 1}:`, pkg);
                     
                     let featuresHTML = '';
                     if (pkg.features && pkg.features.length > 0) {
@@ -3596,7 +3485,6 @@ ${featuresHTML}</ul>
 `;
                 });
                 
-                console.log('Generated DYNAMIC packagesHTML:', packagesHTML);
                 
                 const finalHTML = `<section class="pt80 pb70 bg-color flexible-package">
 <div class="container-xl">
@@ -3607,14 +3495,12 @@ ${packagesHTML}</div>
 </div>
 </section>`;
                 
-                console.log('Final DYNAMIC package HTML:', finalHTML);
                 return finalHTML;
             }
 
             generateIndustriesSection(content) {
                 // ALWAYS return the exact static HTML for blank/empty/image content
                 if (!content.industries || content.industries.length === 0) {
-                    console.log('🚀 RETURNING EXACT STATIC INDUSTRIES HTML (blank content detected)');
                     return `<section class="pt80 pb60 industries-section">
 <div class="container-xl">
 <div class="row">
@@ -3929,15 +3815,11 @@ ${servicesHtml}
             }
 
             generateServicesAccordionSection(content) {
-                console.log('🔧 SERVICES_ACCORDION_SECTION generateServicesAccordionSection called with:', content);
-                console.log('🔧 Content services:', content?.services);
-                console.log('🔧 Services length:', content?.services?.length);
                 
                 // Handle empty content with default static HTML
                 // Check for truly empty content OR content with no meaningful services
                 if (!content || !content.services || content.services.length === 0 || 
                     (content.services.length > 0 && content.services.every(service => !service.title || service.title.trim() === ''))) {
-                    console.log('🚀 SERVICES_ACCORDION_SECTION: Using default static HTML (empty content detected)');
                     return `<section class="techno-stack pb80 bg-color services-tab-new section-services-accordion">
 <div class="container-xl">
 <div class="row">
@@ -3988,22 +3870,17 @@ ${servicesHtml}
                 const services = content.services;
                 const totalServices = services.length;
                 
-                console.log('🔧 SERVICES_ACCORDION_SECTION proceeding to generate dynamic content');
-                console.log('🔧 Services array:', services);
-                console.log('🔧 Total services:', totalServices);
 
                 // If 4 or fewer services, use single section
                 if (totalServices <= 4) {
-                    console.log('🔧 SERVICES_ACCORDION_SECTION using single section (≤4 services)');
-                    return this.generateSingleAccordionSection(services);
+                    return this.generateSingleAccordionSection(services, content.main_heading, content.description);
                 }
 
                 // If more than 4, split into multiple sections with 4 services each
-                console.log('🔧 SERVICES_ACCORDION_SECTION using multiple sections (>4 services, grouped by 4)');
-                return this.generateMultipleAccordionSections(services);
+                return this.generateMultipleAccordionSections(services, content.main_heading, content.description);
             }
 
-            generateSingleAccordionSection(services) {
+            generateSingleAccordionSection(services, mainHeading = '', description = '') {
                 const accordionImages = [
                     '/wp-content/uploads/2025/07/security-compliance-advisory.svg',
                     '/wp-content/uploads/2025/07/cloud-infrastructure-planning.svg',
@@ -4014,6 +3891,10 @@ ${servicesHtml}
                 const collapseIds = ['one', 'two', 'three', 'four'];
                 let accordionItems = '';
 
+                // Clean mainHeading and description from reference markers
+                const cleanMainHeading = this.cleanReferenceMarkers(mainHeading);
+                const cleanDescription = this.cleanReferenceMarkers(description);
+
                 services.forEach((service, index) => {
                     const imageSrc = accordionImages[index] || accordionImages[0];
                     const collapseId = collapseIds[index] || `item_${index}`;
@@ -4021,23 +3902,28 @@ ${servicesHtml}
                     const cardHeaderClass = isFirst ? 'card-header active' : 'card-header';
                     const collapseClass = isFirst ? 'collapse show' : 'collapse';
                     const displayStyle = isFirst ? 'style="display:block;"' : '';
-                    
+
+                    // Clean service title and description from reference markers
+                    const cleanTitle = this.cleanReferenceMarkers(service.title);
+                    const cleanServiceDescription = this.cleanReferenceMarkers(service.description);
+
                     // Generate bullet points if they exist
                     let bulletHtml = '';
                     if (service.bullets && service.bullets.length > 0) {
                         bulletHtml = '<ul class="bullet fonts-14 mb-3">';
                         service.bullets.forEach(bullet => {
-                            bulletHtml += `<li>${bullet}</li>`;
+                            const cleanBullet = this.cleanReferenceMarkers(bullet);
+                            bulletHtml += `<li>${cleanBullet}</li>`;
                         });
                         bulletHtml += '</ul>';
                     }
-                    
+
                     accordionItems += `<div class="card">
 <div class="${cardHeaderClass}" ${displayStyle}>
-<h3 class="card-link" data-toggle="collapse" href="#${collapseId}"><img src="${imageSrc}" width="34" height="34" alt="${service.title}" class="left-icons" loading="lazy" decoding="async">${service.title}</h3>
+<h3 class="card-link" data-toggle="collapse" href="#${collapseId}"><img src="${imageSrc}" width="34" height="34" alt="${cleanTitle}" class="left-icons" loading="lazy" decoding="async">${cleanTitle}</h3>
 <div id="${collapseId}" class="${collapseClass}" data-parent="#accordion">
 <div class="card card-body">
-<p>${service.description}</p>
+<p>${cleanServiceDescription}</p>
 ${bulletHtml}
 </div>
 </div>
@@ -4046,8 +3932,25 @@ ${bulletHtml}
 `;
                 });
 
-                return `<section class="techno-stack pb80 bg-color services-tab-new section-services-accordion">
+                // Conditionally add H2 and paragraph ONLY if H2 (mainHeading) exists - wrap in separate row
+                let headerRowHtml = '';
+                if (cleanMainHeading) {
+                    const headingHtml = `<h2 class="fonts-40 font-weight-bold text-center mb-2">${cleanMainHeading}</h2>`;
+                    const descriptionHtml = cleanDescription ? `<p class="fonts-18 text-center mxw-900 mb-4">${cleanDescription}</p>` : '';
+                    headerRowHtml = `<div class="row">
+${headingHtml}
+${descriptionHtml}
+</div>
+
+`;
+                }
+
+                // Only add pt80 class if mainHeading exists
+                const sectionClass = cleanMainHeading ? 'techno-stack pt80 pb80 bg-color services-tab-new section-services-accordion' : 'techno-stack pb80 bg-color services-tab-new section-services-accordion';
+
+                return `<section class="${sectionClass}">
 <div class="container-xl">
+${headerRowHtml}
 <div class="row">
 <div class="col-lg-6">
 <div class="left-img">
@@ -4064,15 +3967,32 @@ ${accordionItems}
 </section>`;
             }
 
-            generateMultipleAccordionSections(services) {
+            generateMultipleAccordionSections(services, mainHeading = '', description = '') {
                 // Split services into groups of 4
                 const serviceGroups = [];
                 for (let i = 0; i < services.length; i += 4) {
                     serviceGroups.push(services.slice(i, i + 4));
                 }
 
+                // Clean mainHeading and description from reference markers
+                const cleanMainHeading = this.cleanReferenceMarkers(mainHeading);
+                const cleanDescription = this.cleanReferenceMarkers(description);
+
+                // Conditionally add H2 and paragraph ONLY if H2 (mainHeading) exists (only show once before first section) - wrap in separate row
+                let headerRowHtml = '';
+                if (cleanMainHeading) {
+                    const headingHtml = `<h2 class="fonts-40 font-weight-bold text-center mb-2">${cleanMainHeading}</h2>`;
+                    const descriptionHtml = cleanDescription ? `<p class="fonts-18 text-center mxw-900 mb-4">${cleanDescription}</p>` : '';
+                    headerRowHtml = `<div class="row">
+${headingHtml}
+${descriptionHtml}
+</div>
+
+`;
+                }
+
                 let sectionsHtml = '';
-                
+
                 serviceGroups.forEach((group, groupIndex) => {
                     const accordionImages = [
                         '/wp-content/uploads/2025/07/security-compliance-advisory.svg',
@@ -4091,23 +4011,28 @@ ${accordionItems}
                         const cardHeaderClass = isFirst ? 'card-header active' : 'card-header';
                         const collapseClass = isFirst ? 'collapse show' : 'collapse';
                         const displayStyle = isFirst ? 'style="display:block;"' : '';
-                        
+
+                        // Clean service title and description from reference markers
+                        const cleanTitle = this.cleanReferenceMarkers(service.title);
+                        const cleanServiceDescription = this.cleanReferenceMarkers(service.description);
+
                         // Generate bullet points if they exist
                         let bulletHtml = '';
                         if (service.bullets && service.bullets.length > 0) {
                             bulletHtml = '<ul class="bullet fonts-14 mb-3">';
                             service.bullets.forEach(bullet => {
-                                bulletHtml += `<li>${bullet}</li>`;
+                                const cleanBullet = this.cleanReferenceMarkers(bullet);
+                                bulletHtml += `<li>${cleanBullet}</li>`;
                             });
                             bulletHtml += '</ul>';
                         }
-                        
+
                         accordionItems += `<div class="card">
 <div class="${cardHeaderClass}" ${displayStyle}>
-<h3 class="card-link" data-toggle="collapse" href="#${collapseId}"><img src="${imageSrc}" width="34" height="34" alt="${service.title}" class="left-icons" loading="lazy" decoding="async">${service.title}</h3>
+<h3 class="card-link" data-toggle="collapse" href="#${collapseId}"><img src="${imageSrc}" width="34" height="34" alt="${cleanTitle}" class="left-icons" loading="lazy" decoding="async">${cleanTitle}</h3>
 <div id="${collapseId}" class="${collapseClass}" data-parent="#accordion">
 <div class="card card-body">
-<p>${service.description}</p>
+<p>${cleanServiceDescription}</p>
 ${bulletHtml}
 </div>
 </div>
@@ -4118,11 +4043,16 @@ ${bulletHtml}
 
                     // Swap columns for alternating sections (odd sections have swapped layout)
                     const isSwapped = groupIndex % 2 === 1;
-                    
+                    // Only show heading and description in first section
+                    const headerContent = groupIndex === 0 ? headerRowHtml : '';
+                    // Add pt80 class to first section only if mainHeading exists
+                    const sectionClass = (groupIndex === 0 && cleanMainHeading) ? 'techno-stack pt80 pb80 bg-color services-tab-new section-services-accordion' : 'techno-stack pb80 bg-color services-tab-new section-services-accordion';
+
                     if (isSwapped) {
                         // Swapped: Accordion left, Image right
-                        sectionsHtml += `<section class="techno-stack pb80 bg-color services-tab-new section-services-accordion">
+                        sectionsHtml += `<section class="${sectionClass}">
 <div class="container-xl">
+${headerContent}
 <div class="row">
 <div class="col-lg-6">
 <div id="accordion" class="text-left">
@@ -4141,8 +4071,9 @@ ${accordionItems}
 `;
                     } else {
                         // Normal: Image left, Accordion right
-                        sectionsHtml += `<section class="techno-stack pb80 bg-color services-tab-new section-services-accordion">
+                        sectionsHtml += `<section class="${sectionClass}">
 <div class="container-xl">
+${headerContent}
 <div class="row">
 <div class="col-lg-6">
 <div class="left-img">
@@ -4544,12 +4475,8 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
             }
 
             parseFeaturedInSection(content) {
-                console.log('🔍 PARSE FEATURED_IN CALLED');
-                console.log('🔍 Raw content:', content);
                 
                 const lines = content.split('\n').filter(line => line.trim());
-                console.log('🔍 Filtered lines:', lines);
-                console.log('🔍 Lines count:', lines.length);
                 
                 let main_heading = '';
                 let description = '';
@@ -4610,7 +4537,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 
                 // If no valid brands found (empty content, only images, etc.), return empty array to trigger defaults
                 if (brands.length === 0) {
-                    console.log('🔍 NO VALID BRANDS FOUND - will trigger default static HTML');
                     return {
                         main_heading: main_heading || 'Our Solutions Recognized & Featured In',
                         description: description || '',
@@ -4815,7 +4741,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
             generateProcessSection(content) {
                 // If no processes provided or empty content, return default process HTML
                 if (!content.processes || content.processes.length === 0) {
-                    console.log('🚀 RETURNING DEFAULT PROCESS HTML (blank content detected)');
                     return `<section class="pt80 pb50 process-sec bg-color">
 <div class="container-xl">
 <h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Our Development Process</h2>
@@ -4900,14 +4825,9 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
             }
 
             generateFeaturedInSection(content) {
-                console.log('🚀 GENERATE FEATURED_IN CALLED');
-                console.log('🚀 Content received:', content);
-                console.log('🚀 Brands array:', content.brands);
-                console.log('🚀 Brands length:', content.brands ? content.brands.length : 'no brands property');
                 
                 // ALWAYS return the exact static HTML for blank/empty/image content
                 if (!content.brands || content.brands.length === 0) {
-                    console.log('🚀 RETURNING EXACT STATIC HTML (blank content detected)');
                     return `<!-- Featured In Section Start -->
 <section class="featured-in pt80 pb80 bg-color">
 <div class="container-xl">
@@ -5006,7 +4926,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
             convertBoldMarkersAndLinks(text) {
                 if (!text) return text;
 
-                console.log('🔗 Converting bold markers and links in text:', text);
 
                 // First, extract and convert links to HTML
                 const links = this.extractLinksFromText(text);
@@ -5016,7 +4935,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                     links.forEach(link => {
                         const htmlLink = `<a href="${link.url}" target="_blank" rel="noopener">${link.text}</a>`;
                         text = text.replace(link.originalText, htmlLink);
-                        console.log('🔗 Converted link:', link.originalText, '->', htmlLink);
                     });
                 }
 
@@ -5026,9 +4944,16 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 return text;
             }
 
+            cleanCitationMarkers(text) {
+                if (!text) return text;
+
+                // Remove citation markers like [n], [o], [a], [1], [2], etc.
+                // Matches single letters or numbers in square brackets
+                return text.replace(/\[([a-z]|[0-9]{1,2})\]/gi, '').trim();
+            }
+
             extractLinksFromText(text) {
                 const links = [];
-                console.log('🔗 Extracting links from text:', text);
                 
                 // Pattern 1: URLs in text (http://... or https://...)
                 const urlPattern = /(https?:\/\/[^\s\)\]]+)/gi;
@@ -5039,7 +4964,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                         text: match[1],
                         originalText: match[0]
                     });
-                    console.log('🔗 Found URL:', match[1]);
                 }
                 
                 // Pattern 2: Markdown-style links [text](url)
@@ -5050,7 +4974,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                         text: match[1],
                         originalText: match[0]
                     });
-                    console.log('🔗 Found markdown link:', match[1], '->', match[2]);
                 }
                 
                 // Pattern 3: Google Docs style links (text followed by URL in parentheses)
@@ -5063,7 +4986,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                         text: linkText,
                         originalText: match[0]
                     });
-                    console.log('🔗 Found Google Docs style link:', linkText, '->', linkUrl);
                 }
                 
                 // Pattern 4: Common link patterns like "visit our website: URL"
@@ -5074,7 +4996,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                         text: `${match[1]} ${match[2]}`,
                         originalText: match[0]
                     });
-                    console.log('🔗 Found descriptive link:', match[0]);
                 }
                 
                 // Pattern 5: Text with embedded links (Google Docs sometimes exports this way)
@@ -5087,10 +5008,8 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                         text: linkText,
                         originalText: match[0]
                     });
-                    console.log('🔗 Found embedded link:', linkText, '->', linkUrl);
                 }
                 
-                console.log('🔗 Total links found:', links.length);
                 return links;
             }
 
@@ -5151,14 +5070,11 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 this.outputCss = document.getElementById('outputCss');
                 
                 // Debug CSS elements
-                console.log('🎨 CSS textarea element:', this.outputCss);
-                console.log('🎨 CSS textarea found:', !!this.outputCss);
                 
                 // Check for missing elements and warn
                 const requiredElements = ['fileInfo', 'fileName', 'fileSize', 'fileType', 'fileStatus', 'statusText'];
                 requiredElements.forEach(elementName => {
                     if (!this[elementName]) {
-                        console.warn(`⚠️ Element missing: ${elementName}`);
                     }
                 });
                 
@@ -5171,9 +5087,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 this.downloadCssBtn = document.getElementById('downloadCssBtn');
                 
                 // Debug CSS buttons
-                console.log('🎨 CSS copy button:', this.copyCssBtn);
-                console.log('🎨 CSS download button:', this.downloadCssBtn);
-                console.log('🎨 CSS buttons found:', !!this.copyCssBtn && !!this.downloadCssBtn);
                 
                 // Status elements
                 this.statusText = document.getElementById('statusText');
@@ -5467,7 +5380,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                     this.displayFetchedContent(content, url);
                     
                 } catch (error) {
-                    console.error('URL fetch error:', error);
                     if (this.fileStatus) this.fileStatus.textContent = 'Error fetching URL ❌';
                     
                     // Provide specific error guidance based on URL type
@@ -5544,29 +5456,18 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 
                 // Safety check: ensure supportedSections is defined
                 if (!this.supportedSections || !Array.isArray(this.supportedSections)) {
-                    console.warn('⚠️ supportedSections not initialized, using default list');
                     this.supportedSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION'];
                 }
                 
                 // First pass: Find all sections with explicit END markers
                 this.supportedSections.forEach(sectionType => {
                     const sectionPattern = new RegExp(
-                        `\\[${sectionType}\\]([\\s\\S]*?)\\[${sectionType}\\s*END\\]`, 
+                        `\\[${sectionType}\\]([\\s\\S]*?)\\[${sectionType}\\s*END\\]`,
                         'gi'
                     );
-                    
-                    if (sectionType === 'FEATURED_IN_SECTION') {
-                        console.log('FEATURED_IN_SECTION extraction debug:', {
-                            pattern: sectionPattern,
-                            contentSnippet: content.substring(0, 200)
-                        });
-                    }
-                    
+
                     let match;
                     while ((match = sectionPattern.exec(content)) !== null) {
-                        if (sectionType === 'FEATURED_IN') {
-                            console.log('FEATURED_IN section extracted:', match[0]);
-                        }
                         sectionsFound.push({
                             type: sectionType,
                             content: match[0],
@@ -5795,7 +5696,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
             handleContentChange() {
                 const content = this.inputContent.value.trim();
                 const hasContent = content.length > 0;
-                console.log('Content change detected:', {content: content.substring(0, 50), hasContent, buttonDisabled: !hasContent});
                 this.processBtn.disabled = !hasContent;
                 
                 if (hasContent) {
@@ -5912,8 +5812,6 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                     content = this.convertHtmlToMarkedText(html);
                     
                     // Debug: Log the conversion process
-                    console.log('Original HTML:', html);
-                    console.log('Converted content:', content);
                 } else {
                     content = this.inputContent.value.trim();
                 }
@@ -5938,10 +5836,7 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                         this.downloadBtn.disabled = false;
                         
                         // Generate CSS based on detected sections
-                        console.log('🎨 Detected sections for CSS:', result.detectedSections);
                         this.generatedCss = generateCSS(result.detectedSections);
-                        console.log('🎨 Generated CSS length:', this.generatedCss.length);
-                        console.log('🎨 Generated CSS preview:', this.generatedCss.substring(0, 200));
                         this.outputCss.value = this.generatedCss;
                         this.copyCssBtn.disabled = false;
                         this.downloadCssBtn.disabled = false;
@@ -6779,22 +6674,18 @@ border: 1px solid #EAF3FF;box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.28);}
 
         // CSS Generation Function
         function generateCSS(detectedSections) {
-            console.log('🎨 generateCSS called with sections:', detectedSections);
             let generatedCSS = '';
             
             try {
                 // Check if sectionCssMap exists
                 if (!sectionCssMap) {
-                    console.error('🎨 sectionCssMap not found!');
                     return '/* CSS Map not loaded */';
                 }
                 
                 // Always add common CSS
                 if (sectionCssMap['COMMON']) {
                     generatedCSS += sectionCssMap['COMMON'] + '\n\n';
-                    console.log('🎨 Added common CSS, total length:', generatedCSS.length);
                 } else {
-                    console.error('🎨 Common CSS not found!');
                     return '/* Common CSS not found */';
                 }
                 
@@ -6810,24 +6701,18 @@ border: 1px solid #EAF3FF;box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.28);}
                             baseSectionType = 'SERVICES_GRID_SECTION'; // Use same CSS as regular grid
                         }
                         
-                        console.log('🎨 Processing section:', section, 'base type:', baseSectionType);
                         
                         // Only add CSS if we haven't added it already
                         if (!addedCssTypes.has(baseSectionType) && sectionCssMap[baseSectionType]) {
                             generatedCSS += sectionCssMap[baseSectionType] + '\n\n';
                             addedCssTypes.add(baseSectionType);
-                            console.log('🎨 Added CSS for', baseSectionType, ', total length:', generatedCSS.length);
                         } else if (addedCssTypes.has(baseSectionType)) {
-                            console.log('🎨 CSS already added for', baseSectionType, '- skipping duplicate');
                         } else {
-                            console.log('🎨 No CSS found for section:', baseSectionType);
                         }
                     });
                 } else {
-                    console.log('🎨 No detected sections or invalid format:', detectedSections);
                 }
                 
-                console.log('🎨 Final CSS length:', generatedCSS.length);
                 const finalCSS = generatedCSS.trim();
                 
                 // Ensure we always return at least common CSS
@@ -6837,7 +6722,6 @@ border: 1px solid #EAF3FF;box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.28);}
                 
                 return finalCSS;
             } catch (error) {
-                console.error('🎨 Error in generateCSS:', error);
                 return sectionCssMap['COMMON'] || '/* Error generating CSS */';
             }
         }

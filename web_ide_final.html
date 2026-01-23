@@ -2541,7 +2541,16 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     if (!line) continue;
 
                     // Check if this line defines a package (Package: Name format)
-                    if (line.toLowerCase().startsWith('package:') || line.toLowerCase().includes('standard') || line.toLowerCase().includes('advanced') || line.toLowerCase().includes('pro')) {
+                    // STRICT MATCH: Only match if line starts with "Package:" OR is EXACTLY "Standard", "Advanced", or "Pro"
+                    const isPackageLine = line.toLowerCase().startsWith('package:') ||
+                                         line.toLowerCase() === 'standard' ||
+                                         line.toLowerCase() === 'advanced' ||
+                                         line.toLowerCase() === 'pro' ||
+                                         line.toLowerCase() === 'package: standard' ||
+                                         line.toLowerCase() === 'package: advanced' ||
+                                         line.toLowerCase() === 'package: pro';
+
+                    if (isPackageLine) {
                         // Save previous package if exists
                         if (currentPackage) {
                             currentPackage.features = [...currentFeatures];

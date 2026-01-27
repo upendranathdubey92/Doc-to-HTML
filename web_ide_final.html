@@ -3742,10 +3742,29 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     const isButtonText = line.match(/^(See Project Details|Check Project Details|View Project|Learn More|Navigate to Project Details)$/i);
 
                     if (isButtonText) {
-                        // This is button text without link, add it to current project
+                        // This is button text, check if next line has the URL
                         if (currentProject) {
                             currentProject.buttonText = line;
+
+                            // Check if next line is a URL
+                            if (i + 1 < projectLines.length) {
+                                const nextLine = projectLines[i + 1].trim();
+                                const urlMatch = nextLine.match(/^(https?:\/\/\S+)$/);
+                                if (urlMatch) {
+                                    currentProject.link = urlMatch[1];
+                                    // Skip the next line since we've processed it
+                                    i++;
+                                }
+                            }
                         }
+                        continue;
+                    }
+
+                    // Check if this line is just a URL (following button text)
+                    const isJustUrl = line.match(/^(https?:\/\/\S+)$/);
+                    if (isJustUrl && currentProject && currentProject.buttonText) {
+                        // This URL belongs to the button text we just processed
+                        currentProject.link = isJustUrl[1];
                         continue;
                     }
                     
@@ -3825,39 +3844,64 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     } else {
                         // This line is part of the description
                         if (currentProject) {
-                            // Check for various button text patterns at the end of line
+                            // Check for various button text patterns with links at the end of line
                             let processedLine = line;
                             let foundButton = false;
-                            
-                            // More comprehensive button text patterns
-                            const buttonPatterns = [
-                                /^(.*?)\s+Navigate\s+to\s+Project\s+Details\.?$/i,
-                                /^(.*?)\s+See\s+(?:the\s+)?Project\s+Details\.?$/i,
-                                /^(.*?)\s+Check\s+(?:the\s+)?Project\s+Details\.?$/i,
-                                /^(.*?)\s+View\s+Project\.?$/i,
-                                /^(.*?)\s+Learn\s+More\.?$/i
+
+                            // First check for button text WITH link patterns
+                            const buttonWithLinkInLinePatterns = [
+                                // "description text See Project Details (https://...)"
+                                /^(.*?)\s+(Navigate\s+to\s+Project\s+Details|See\s+(?:the\s+)?Project\s+Details|Check\s+(?:the\s+)?Project\s+Details|View\s+Project|Learn\s+More)\s*\((https?:\/\/[^\)]+)\)$/i,
+                                // "description text [See Project Details](https://...)"
+                                /^(.*?)\s+\[(Navigate\s+to\s+Project\s+Details|See\s+(?:the\s+)?Project\s+Details|Check\s+(?:the\s+)?Project\s+Details|View\s+Project|Learn\s+More)\]\((https?:\/\/[^\)]+)\)$/i,
+                                // "description text See Project Details https://..."
+                                /^(.*?)\s+(Navigate\s+to\s+Project\s+Details|See\s+(?:the\s+)?Project\s+Details|Check\s+(?:the\s+)?Project\s+Details|View\s+Project|Learn\s+More)\s+(https?:\/\/\S+)$/i
                             ];
-                            
-                            for (let pattern of buttonPatterns) {
+
+                            for (let pattern of buttonWithLinkInLinePatterns) {
                                 const match = processedLine.match(pattern);
                                 if (match) {
-                                    // Found button text at end of line
+                                    // Found button text with link at end of line
                                     const descriptionPart = match[1].trim();
-                                    const buttonText = processedLine.substring(match[1].length).trim();
-                                    
+                                    const buttonText = match[2].trim();
+                                    const linkUrl = match[3].trim();
+
                                     if (descriptionPart) {
                                         currentProject.description += (currentProject.description ? ' ' : '') + this.convertBoldMarkers(descriptionPart);
                                     }
                                     currentProject.buttonText = buttonText;
+                                    currentProject.link = linkUrl;
                                     foundButton = true;
                                     break;
                                 }
                             }
-                            
+
+                            if (!foundButton) {
+                                // Check for button text WITHOUT link
+                                const buttonPatterns = [
+                                    /^(.*?)\s+(Navigate\s+to\s+Project\s+Details|See\s+(?:the\s+)?Project\s+Details|Check\s+(?:the\s+)?Project\s+Details|View\s+Project|Learn\s+More)\.?$/i
+                                ];
+
+                                for (let pattern of buttonPatterns) {
+                                    const match = processedLine.match(pattern);
+                                    if (match) {
+                                        // Found button text at end of line (no link)
+                                        const descriptionPart = match[1].trim();
+                                        const buttonText = match[2].trim();
+
+                                        if (descriptionPart) {
+                                            currentProject.description += (currentProject.description ? ' ' : '') + this.convertBoldMarkers(descriptionPart);
+                                        }
+                                        currentProject.buttonText = buttonText;
+                                        foundButton = true;
+                                        break;
+                                    }
+                                }
+                            }
+
                             if (!foundButton) {
                                 // No button text found, add entire line to description
                                 currentProject.description += (currentProject.description ? ' ' : '') + (this.convertBoldMarkers ? this.convertBoldMarkers(processedLine) : processedLine);
-                            } else {
                             }
                         }
                     }

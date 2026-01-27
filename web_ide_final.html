@@ -1464,6 +1464,461 @@
         class RealDocumentProcessor {
             constructor() {
                 this.useAI = true; // Enable AI processing
+
+                // Technology Stack Image URLs - Loaded from technologies-stack-images file
+                this.technologyImages = [
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2019/11/google-maps.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2020/12/Razorpay.png.webp",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/01/InVision.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/02/React-Native.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/02/android-studio-1.png.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/02/medicwall-java.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/02/mvc-technology.png.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/04/socketIO.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/08/box-sdk.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/08/dropbox-sdk.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/08/firebase-ml-kit.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/08/firebase-sdk.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/08/google-drive-sdk.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/08/onedrive-sdk.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/10/Laravel.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/10/Objective-C.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2021/12/Theano_logo.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2022/01/React-svg.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2022/01/php.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2022/02/flutter.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2022/06/Trailblazer.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/01/Swift_icn.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/02/BigCommerce.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/02/Expressjs.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/02/Layer-617-copy.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/02/Squarespace-eCommerce.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/02/WooCommerce.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/02/shopify.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/03/React.js.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/AWS-Lambda.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/AWS.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Adobe-XD.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Alamofire-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Alamofire.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Android-NDK.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Android-Studio.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Angular.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Apache.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Auto-Layout.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Azure-Functions.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/C-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/C.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/CSS.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Charts.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/CloudKit.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Core-Data.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/CouchDB.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Crashlytics.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Dagger.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Django.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Docker.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Figma.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Firebase.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Git.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/GitLab.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Google-App-Engine.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Google-Cloud-Functions.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Google-Cloud.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Google-Map.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/GraphQL.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Gson.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/HTML.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Heroku.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Interface-Builder.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Java.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Javascript.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Jenkins.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Kingfisher.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Kitura.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Kotlin.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Kubernetes.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Laravel.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Lighthouse.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Linux.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/MariaDB.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Material-Design.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Microsoft-Azure.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Microsoft_.NET_.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/MongoDB.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/MySQL.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/NET-Core.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Nginx.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Node-NestJs.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Node.js.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/OkHttp.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/OpenStack.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Oracle.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/PHP.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Picasso.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Postgresql_elephant.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/RESTful-APIs.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/ROR.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Realm.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Redis.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Retrofit.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Room.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/SQLite.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Spring.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Storyboards.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Swift.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/SwiftUI-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/TensorFlow.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Terraform.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/TestFlight.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/UIKit.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Vapor.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Vue-JS.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/WebSockets.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Webpack.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Window.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Workbox.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/XML.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/Xamarin.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/bootstrap.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/cocoapods.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/expressjs.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/flutter-logo-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/gRPC.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/glide.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/golang.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/gradle.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/hbase-apache.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/iOS-SDK.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/iOS-Simulator.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/ibm_cloud.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/jQuery-icon.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/objectivec-apple.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/python.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/pytorch.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/ruby-seeklogo.co_.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/08/xcode.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Dart.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Elasticsearch.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/JUnit.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Mocha.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/SVN.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Selenium.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/Sketch.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/WebRTC.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/appium.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/09/jest.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/AWS.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/CircleCI.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/DigitalOcean.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/GitHub.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/Google-Cloud.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/Jira.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/Microsoft-Azure.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/Microsoft-SQL-Server.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/RSpec.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/Trello.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2023/10/travis-ci.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/01/Odoo-ORM.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/AWS-Developer-Tools.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Core-Data.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Coroutine.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Cypress.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Datadog.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/G.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Google-Developer-Tools.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Grafana.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/IntelliJ-IDEA.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/LESS.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Laravel-Dusk-for-browser-testing.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Next.js.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/PHPUnit.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/PyCharm-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/PyCharm.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/QWeb.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/SASS.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/SDWebImage.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Shopify.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Tailwind.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/VS-Code.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Visual-Studio-Code.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/Zapier.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/azure-devops.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/elastic-search.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/jetpack-compose.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/02/koin.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/AWS-Amplify.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Ansible.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Apache-Kafka.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/AsyncStorage.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Axios.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Babel.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/CakePHP.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Chef.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/CodeIgniter.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Codeception.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Drupal.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Enzyme.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Eslint.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Espresso.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Expo-Client.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Firestore.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Formik.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Hanami.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Illustrator.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/JWT.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Joomla.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Magento.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/New-Relic.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/OAuth.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Phalcon.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Photoshop.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/React-Bootstrap.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/React-Icons.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/React-Native-Elements.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/React-Router.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Redux.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/SOAP.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Storybook.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Symfony.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/TYPO3.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/WordPress.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Xdebug.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Yii.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/Zend-Framework.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/apache_spark.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/iOS.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/lodash.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/npm.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/03/typescript.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2024/12/Webflow.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/02/Go.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/02/Power-BI.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Airship.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Android-Profiler.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Bitbucket.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Bitrise.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/BrowserStack.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/BugSnag.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Charles-Proxy.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Crashlytics.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Espresso.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Fastlane.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Firebase-Cloud-Messaging-FCM.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Firebase-Realtime-Database_Standalone-logomark-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Flurry.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/GitHub-Actions.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Google-Analytics.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/I-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Kobiton.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/LeakCanary.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Mixpanel.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Mobile-AppShield.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/OWASP-Mobile-Security.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/OneSignal.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Postman.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/ProGuard.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/S-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/SVN.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/Veracode.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/XCUITest.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/instabug.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/03/sentry.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/AWS-SNS.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Amplitude.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/App-Center.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Apple-App-Store.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Apple-Push-Notification-service.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/AppsFlyer.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Codemagic.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Detox.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Firebase-Analytics.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Firebase-App-Distribution.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Flipper.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Google-Play-Console.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Google-Play-Store.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Kotlin-new.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/NET-MAUI.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/Supabase.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/WatermelonDB.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/04/XCTest-iOS-Native.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/CSS3.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/CodeIgniter.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/HTML5.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/JavaScript.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/Jenkins.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/Magento.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/MicrosoftSQLServer.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/MongoDB.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/Mozilla-Firefox-Developer-Edition.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/Oracle.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/PWABuilder-CLI.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/Parcel-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/PhpStorm.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/PostgreSQL.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/Service-Workers.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/Supertest.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/Web-App-Manifest.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/05/Yii.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/BigCommerce.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Bitbucket-Pipelines.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/C-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Cloudflare.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Consul.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Docker-Compose.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Docker-Swarm.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Google-Cloud-Platform.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/P.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Packer.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Percona.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Puppet.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Rancher.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/SSl.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Shopify.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Squarespace.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Teamcity.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/Wix.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/WooCommerce-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/06/spryker.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/C-2.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/OAuth2.0.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/OpenAPI.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/R-2.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/Svelte-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/adobe-creative-suite.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/airtable.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/bubble.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/framer.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/notion.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/strapi.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/07/vercel.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/08/Contentful.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Apache-Flink.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/DataRobot.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Google-AutoML.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/H2O.ai_.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Julia.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Keras-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Keras.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Matplotlib.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/NLTK.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/OpenCV.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Pillow.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/R.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Scikit-learn-1.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Scikit-learn.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Spacy.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/Stanford-NLP.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/apache_hadoop.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/sci-kit-learn.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/09/tableau.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/A.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/AES-256-Encryption.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Adyen.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Artificial-Intelligence.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Artillery.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Blockchain.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Braintree.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/C.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Cassandra.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Chai.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Chatbot.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Corda.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/D3.js.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/DynamoDB.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/ELK-Stack.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Ethereum.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/FHIR-Fast-Healthcare-Interoperability-Resources.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Fastify.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/First-Databank.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Flask.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/HIPAA-Health-Insurance-Portability-and-Accountability-Act.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Hapi.js.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/HashiCorp-Vault.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Helmet.js.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Hyperledger.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/IoT.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Koa.js.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/M.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Machine-Learning.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/NCPDP-SCRIPT.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/O.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/OpenID-Connect.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/OpenStreetMap.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/PayPal.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/RabbitMQ.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/SAML.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/SAP.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/SSl.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/SendBird.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Sendbird_Logo.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Serverless-Functions.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Socket.io_.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Surescripts.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/VR.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/Winston.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/bcrypt.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/gRPC.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/mapbox_logo_icon.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/plaid.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/stripe.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/twilio-icon-svgrepo-com.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/10/yodlee.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/11/AWS-AI-Services.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/11/Azure-AI.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/11/webhooks.png",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/Blockchain-APIs.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/D.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/Dwolla.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/Interactive-Brokers.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/NLP.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/Plaid.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/Reuters.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/Smart-Contracts.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/Solidity.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/TensorFlow.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/TimescaleDB.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/Web3.js.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/bloomberg.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/pytorch.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2025/12/tradingview.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/A.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Asana.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Draw.io_.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Frame.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/G.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Guru.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/H.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/I.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/LinkedIn-Learning.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/LoadRunner.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Lucidchart.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/MID-Server.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Microsoft-Teams.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Microsoft-Visio.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Miro.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/N.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Performance-Analytics.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Postman.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Power-BI.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Qualys.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/RESTful-APIs.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/S.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/ServiceNow-ATF-Automated-Test-Framework.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/ServiceNow-CMDB.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/ServiceNow-Flow-Designer.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/ServiceNow-ITSM-Analytics.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/ServiceNow-Instance-Scan.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/ServiceNow-Knowledge.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/ServiceNow-SPM-ITBM.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/ServiceNow-Security-Operations.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Slack.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/TestComplete.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Udemy-Business.svg",
+                    "https://www.spaceotechnologies.com/wp-content/uploads/2026/01/Virtual-Agent.svg"
+                ];
+
                 this.sectionTemplates = {
                     'HERO': `<section class="pt70 pb40 hero-section section-hero">
 <div class="container-xl">
@@ -1538,6 +1993,227 @@
                 if (!text) return text;
                 // Remove reference markers [a], [b], [c], [d], etc. and [1], [2], [3], etc.
                 return text.replace(/\[[a-z]\]|\[[0-9]+\]/gi, '').trim();
+            }
+
+            /**
+             * Get the image URL for a technology based on its name
+             * @param {string} techName - The technology name (e.g., "React", "Node.js", "Angular")
+             * @returns {string} - The image URL or fallback React.svg
+             *
+             * Matching Process:
+             * 1. Extract technology names from image URLs (e.g., "React.svg" → "React")
+             * 2. Normalize both tech name and extracted name (lowercase, remove special chars)
+             * 3. Match using exact match, partial match, or common aliases
+             * 4. Return matched image URL or React.svg as fallback
+             */
+            getTechnologyImage(techName) {
+                if (!techName) {
+                    return 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg';
+                }
+
+                // Normalize the technology name for matching
+                const normalizedTechName = techName.toLowerCase().trim()
+                    .replace(/\s+/g, '-')  // Replace spaces with hyphens
+                    .replace(/\./g, '')    // Remove dots
+                    .replace(/\(/g, '')    // Remove parentheses
+                    .replace(/\)/g, '')
+                    .replace(/\+/g, '');   // Remove plus signs
+
+                console.log(`[Tech Image Matcher] Looking for: "${techName}" (normalized: "${normalizedTechName}")`);
+
+                // Enhanced aliases and variations mapping with exact image filename matches
+                const aliasMap = {
+                    // Frontend
+                    'react': 'React.svg',
+                    'reactjs': 'React.svg',
+                    'angular': 'Angular.svg',
+                    'angularjs': 'Angular.svg',
+                    'vuejs': 'Vue-JS.svg',
+                    'vue': 'Vue-JS.svg',
+                    'nextjs': 'Next.js.svg',
+                    'next': 'Next.js.svg',
+                    'javascript': 'Javascript.svg',
+                    'js': 'Javascript.svg',
+                    'typescript': 'typescript.svg',
+                    'ts': 'typescript.svg',
+                    'css': 'CSS.svg',
+                    'css3': 'CSS3.svg',
+                    'html': 'HTML.svg',
+                    'html5': 'HTML5.svg',
+                    'jquery': 'jQuery-icon.svg',
+                    'bootstrap': 'bootstrap.svg',
+                    'tailwind': 'Tailwind.svg',
+                    'sass': 'SASS.svg',
+                    'less': 'LESS.svg',
+
+                    // Backend
+                    'nodejs': 'Node.js.svg',
+                    'node': 'Node.js.svg',
+                    'python': 'python.svg',
+                    'django': 'Django.svg',
+                    'flask': 'Flask.svg',
+                    'php': 'php.svg',
+                    'laravel': 'Laravel.svg',
+                    'java': 'Java.svg',
+                    'net': 'Microsoft_.NET_.svg',
+                    'dotnet': 'Microsoft_.NET_.svg',
+                    'netcore': 'NET-Core.svg',
+                    'go': 'Go.svg',
+                    'golang': 'golang.svg',
+                    'ruby': 'ruby-seeklogo.co_.svg',
+                    'ruby-on-rails': 'R.svg',
+                    'rubyonrails': 'R.svg',
+                    'ror': 'ROR.svg',
+                    'expressjs': 'expressjs.svg',
+                    'express': 'expressjs.svg',
+
+                    // Mobile
+                    'react-native': 'React-Native.png',
+                    'reactnative': 'React-Native.png',
+                    'flutter': 'flutter.png',
+                    'kotlin': 'Kotlin.svg',
+                    'swift': 'Swift.svg',
+                    'swiftui': 'SwiftUI-1.svg',
+                    'xamarin': 'Xamarin.svg',
+                    'ionic': 'I.svg',
+                    'c': 'C.svg',
+                    'c-1': 'C-1.svg',
+                    'c-2': 'C-2.svg',
+                    'cpp': 'C-1.svg',
+                    'c++': 'C-1.svg',
+                    'objective-c': 'Objective-C.svg',
+                    'objectivec': 'Objective-C.svg',
+                    'dart': 'Dart.svg',
+
+                    // Database
+                    'mongodb': 'MongoDB.svg',
+                    'mongo': 'MongoDB.svg',
+                    'mysql': 'MySQL.svg',
+                    'postgresql': 'Postgresql_elephant.svg',
+                    'postgres': 'PostgreSQL.svg',
+                    'redis': 'Redis.svg',
+                    'sqlite': 'SQLite.svg',
+                    'mariadb': 'MariaDB.svg',
+                    'oracle': 'Oracle.svg',
+                    'cassandra': 'Cassandra.svg',
+                    'couchdb': 'CouchDB.svg',
+                    'dynamodb': 'DynamoDB.svg',
+                    'elasticsearch': 'Elasticsearch.svg',
+                    'microsoftsqlserver': 'Microsoft-SQL-Server.svg',
+
+                    // Cloud & DevOps
+                    'aws': 'AWS.svg',
+                    'aws-lambda': 'AWS-Lambda.svg',
+                    'microsoft-azure': 'Microsoft-Azure.svg',
+                    'microsoftazure': 'Microsoft-Azure.svg',
+                    'azure': 'Microsoft-Azure.svg',
+                    'google-cloud': 'Google-Cloud.svg',
+                    'google-cloud-platform': 'Google-Cloud-Platform.svg',
+                    'googlecloud': 'Google-Cloud.svg',
+                    'gcp': 'Google-Cloud-Platform.svg',
+                    'docker': 'Docker.svg',
+                    'kubernetes': 'Kubernetes.svg',
+                    'jenkins': 'Jenkins.svg',
+                    'github-actions': 'GitHub-Actions.svg',
+                    'githubactions': 'GitHub-Actions.svg',
+                    'terraform': 'Terraform.svg',
+                    'ansible': 'Ansible.svg',
+                    'circleci': 'CircleCI.svg',
+                    'travis-ci': 'travis-ci.svg',
+                    'gitlab': 'GitLab.svg',
+                    'github': 'GitHub.svg',
+                    'git': 'Git.svg',
+                    'heroku': 'Heroku.svg',
+                    'digitalocean': 'DigitalOcean.svg',
+                    'nginx': 'Nginx.svg',
+
+                    // AI & Data
+                    'tensorflow': 'TensorFlow.svg',
+                    'pytorch': 'pytorch.svg',
+                    'apache-spark': 'apache_spark.svg',
+                    'apachespark': 'apache_spark.svg',
+                    'power-bi': 'Power-BI.svg',
+                    'powerbi': 'Power-BI.svg',
+                    'tableau': 'tableau.svg',
+
+                    // Other
+                    'graphql': 'GraphQL.svg',
+                    'grpc': 'gRPC.svg',
+                    'restfulapis': 'RESTful-APIs.svg',
+                    'rest-api': 'RESTful-APIs.svg',
+                    'socketio': 'Socket.io_.svg',
+                    'websockets': 'WebSockets.svg',
+                    'firebase': 'Firebase.svg',
+                    'figma': 'Figma.svg',
+                    'adobe-xd': 'Adobe-XD.svg',
+                    'photoshop': 'Photoshop.svg',
+                    'illustrator': 'Illustrator.svg',
+                    'sketch': 'Sketch.svg'
+                };
+
+                // STEP 1: Check direct alias map first (highest priority)
+                if (aliasMap[normalizedTechName]) {
+                    const targetFileName = aliasMap[normalizedTechName];
+                    for (let imageUrl of this.technologyImages) {
+                        const fileName = imageUrl.split('/').pop();
+                        if (fileName === targetFileName) {
+                            console.log(`[Tech Image Matcher] ✓ Direct alias match found: ${fileName}`);
+                            return imageUrl;
+                        }
+                    }
+                }
+
+                // STEP 2: Exact filename match (case-insensitive)
+                for (let imageUrl of this.technologyImages) {
+                    const fileName = imageUrl.split('/').pop();
+                    const fileNameWithoutExt = fileName.replace(/\.(svg|png|webp|jpg|jpeg)$/i, '').toLowerCase()
+                        .replace(/\s+/g, '-')
+                        .replace(/_/g, '-')
+                        .replace(/\./g, '')
+                        .replace(/\+/g, '');
+
+                    if (fileNameWithoutExt === normalizedTechName) {
+                        console.log(`[Tech Image Matcher] ✓ Exact filename match found: ${fileName}`);
+                        return imageUrl;
+                    }
+                }
+
+                // STEP 3: Starts-with match (more specific than contains)
+                for (let imageUrl of this.technologyImages) {
+                    const fileName = imageUrl.split('/').pop();
+                    const fileNameWithoutExt = fileName.replace(/\.(svg|png|webp|jpg|jpeg)$/i, '').toLowerCase()
+                        .replace(/\s+/g, '-')
+                        .replace(/_/g, '-')
+                        .replace(/\./g, '')
+                        .replace(/\+/g, '');
+
+                    // Only match if filename starts with tech name (avoid false positives like React matching React-Native)
+                    if (fileNameWithoutExt.startsWith(normalizedTechName + '-') ||
+                        fileNameWithoutExt.startsWith(normalizedTechName) && fileNameWithoutExt.length === normalizedTechName.length) {
+                        console.log(`[Tech Image Matcher] ✓ Starts-with match found: ${fileName}`);
+                        return imageUrl;
+                    }
+                }
+
+                // STEP 4: Contains match (least priority, most lenient)
+                for (let imageUrl of this.technologyImages) {
+                    const fileName = imageUrl.split('/').pop();
+                    const fileNameWithoutExt = fileName.replace(/\.(svg|png|webp|jpg|jpeg)$/i, '').toLowerCase()
+                        .replace(/\s+/g, '-')
+                        .replace(/_/g, '-')
+                        .replace(/\./g, '')
+                        .replace(/\+/g, '');
+
+                    // Avoid matching very short tech names to prevent false positives
+                    if (normalizedTechName.length >= 3 && fileNameWithoutExt.includes(normalizedTechName)) {
+                        console.log(`[Tech Image Matcher] ✓ Contains match found: ${fileName}`);
+                        return imageUrl;
+                    }
+                }
+
+                // No match found, return fallback
+                console.log(`[Tech Image Matcher] ✗ No match found for "${techName}", using React.svg fallback`);
+                return 'https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg';
             }
 
             // Smart document parsing for real Word docs
@@ -3461,93 +4137,108 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     currentIndex = 1;
                 }
 
-                // Helper function to check if a line looks like a bullet point (has "Title: Description" format)
-                const isBulletFormat = (line) => {
-                    const colonIndex = line.indexOf(':');
-                    if (colonIndex === -1) return false;
-                    // Check if there's text before and after the colon
-                    const beforeColon = line.substring(0, colonIndex).trim();
-                    const afterColon = line.substring(colonIndex + 1).trim();
-                    return beforeColon.length > 0 && afterColon.length > 0 && beforeColon.length < 100;
+                // Helper function to check if a line is a bullet point with symbol
+                const isBulletLine = (line) => {
+                    // Match common bullet formats: ●, -, *, •, ‑, or numbered (1., 2., etc.)
+                    return line.match(/^[●\-\*•‑]\s*/) || line.match(/^\d+[\.\)]\s+/);
                 };
 
-                // First pass: identify where bullets start and end
+                // Helper function to check if a line looks like a bullet without symbol
+                // (short action-oriented line, typically 50-150 chars)
+                const looksLikeBullet = (line, prevLine, nextLine) => {
+                    const len = line.length;
+                    // Must be between 50-150 chars (too short or too long unlikely to be bullet)
+                    if (len < 50 || len > 150) return false;
+
+                    // Typically starts with action verbs or key phrases
+                    const startsWithAction = line.match(/^(Connect|Build|Get|Hire|Access|Achieve|Create|Develop|Implement|Ensure|Provide|Deliver|Manage|Integrate|Streamline|Optimize|Transform|Enhance|Leverage|Enable|Drive|Maximize|Reduce|Improve|Increase|Decrease)/i);
+
+                    // If previous line is much longer (likely description), and this is shorter, it's likely a bullet
+                    const prevMuchLonger = prevLine && prevLine.length > len * 1.5;
+
+                    // If next line is similar length, they're likely bullets together
+                    const nextSimilarLength = nextLine && Math.abs(nextLine.length - len) < 50;
+
+                    return startsWithAction || (prevMuchLonger && nextSimilarLength);
+                };
+
+                // First pass: identify where bullets start
                 let bulletStartIndex = -1;
                 let bulletEndIndex = -1;
+
                 for (let i = currentIndex; i < lines.length; i++) {
                     const line = lines[i].trim();
-                    if (bulletStartIndex === -1 && (line.startsWith('●') || isBulletFormat(line))) {
+                    const prevLine = i > 0 ? lines[i - 1].trim() : null;
+                    const nextLine = i < lines.length - 1 ? lines[i + 1].trim() : null;
+
+                    if (bulletStartIndex === -1 && (isBulletLine(line) || looksLikeBullet(line, prevLine, nextLine))) {
                         bulletStartIndex = i;
-                    } else if (bulletStartIndex !== -1 && !line.startsWith('●') && !isBulletFormat(line)) {
+                    } else if (bulletStartIndex !== -1 && !isBulletLine(line) && !looksLikeBullet(line, prevLine, nextLine)) {
                         bulletEndIndex = i;
                         break;
                     }
                 }
 
-                // If bullets were found but no end index, bullets go to the end
+                // If bullets were found but no end index, bullets go to end (or second-to-last if last line is long)
                 if (bulletStartIndex !== -1 && bulletEndIndex === -1) {
-                    bulletEndIndex = lines.length;
+                    // Check if last line is much longer (likely closing text)
+                    const lastLine = lines[lines.length - 1].trim();
+                    if (lastLine.length > 150 && lines.length > bulletStartIndex + 2) {
+                        bulletEndIndex = lines.length - 1;
+                    } else {
+                        bulletEndIndex = lines.length;
+                    }
                 }
 
-                // If we found bullets, parse description, bullet intro, bullets, and closing text
+                // Parse description, bullets, and closing text
                 if (bulletStartIndex > currentIndex) {
-                    // Look for bullet intro (the line immediately before bullets that's not too long)
-                    const potentialIntroIndex = bulletStartIndex - 1;
-                    if (potentialIntroIndex >= currentIndex) {
-                        const potentialIntro = lines[potentialIntroIndex].trim();
-                        // If this line is substantial but not a bullet itself, it's the intro
-                        if (potentialIntro.length > 20 && !isBulletFormat(potentialIntro)) {
-                            bullet_intro = potentialIntro;
-                            // Description is everything between heading and bullet intro
-                            for (let i = currentIndex; i < potentialIntroIndex; i++) {
-                                description += (description ? ' ' : '') + lines[i].trim();
-                            }
-                        } else {
-                            // No bullet intro, everything before bullets is description
-                            for (let i = currentIndex; i < bulletStartIndex; i++) {
-                                description += (description ? ' ' : '') + lines[i].trim();
-                            }
-                        }
-                    }
+                    // Description is everything before bullets
+                    description = lines.slice(currentIndex, bulletStartIndex).join(' ').trim();
 
                     // Process bullet points
                     for (let i = bulletStartIndex; i < bulletEndIndex; i++) {
                         const line = lines[i].trim();
 
-                        if (line.startsWith('●')) {
-                            // Standard bullet with ● symbol
-                            const bulletText = line.replace('●', '').trim();
-                            const parts = bulletText.split(':', 2);
-                            if (parts.length === 2) {
-                                bullet_points.push(`<strong>${parts[0]}:</strong> ${parts[1]}`);
-                            } else {
-                                bullet_points.push(bulletText);
-                            }
-                        } else if (isBulletFormat(line)) {
-                            // Bullet in "Title: Description" format without ● symbol
-                            const colonIndex = line.indexOf(':');
-                            const title = line.substring(0, colonIndex).trim();
-                            const desc = line.substring(colonIndex + 1).trim();
-                            bullet_points.push(`<strong>${title}:</strong> ${desc}`);
+                        if (isBulletLine(line)) {
+                            // Remove bullet symbols
+                            const bulletText = line.replace(/^[●\-\*•‑]\s*/, '').replace(/^\d+[\.\)]\s+/, '').trim();
+                            bullet_points.push(bulletText);
+                        } else {
+                            // Plain text bullet (no symbol)
+                            bullet_points.push(line);
                         }
                     }
 
                     // Capture closing text (everything after bullets)
                     if (bulletEndIndex < lines.length) {
-                        for (let i = bulletEndIndex; i < lines.length; i++) {
-                            closing_text += (closing_text ? ' ' : '') + lines[i].trim();
+                        closing_text = lines.slice(bulletEndIndex).join(' ').trim();
+                    }
+                } else if (bulletStartIndex === currentIndex) {
+                    // Bullets start immediately after heading (no description)
+                    description = '';
+
+                    // Process bullet points
+                    for (let i = bulletStartIndex; i < bulletEndIndex; i++) {
+                        const line = lines[i].trim();
+                        if (isBulletLine(line)) {
+                            const bulletText = line.replace(/^[●\-\*•‑]\s*/, '').replace(/^\d+[\.\)]\s+/, '').trim();
+                            bullet_points.push(bulletText);
+                        } else {
+                            bullet_points.push(line);
                         }
+                    }
+
+                    if (bulletEndIndex < lines.length) {
+                        closing_text = lines.slice(bulletEndIndex).join(' ').trim();
                     }
                 } else {
                     // No bullets found, everything is description
-                    for (let i = currentIndex; i < lines.length; i++) {
-                        description += (description ? ' ' : '') + lines[i].trim();
-                    }
+                    description = lines.slice(currentIndex).join(' ').trim();
                 }
 
                 return {
-                    main_heading: main_heading || "Contact Us",
-                    description: description || "Get in touch with our team",
+                    main_heading: main_heading,
+                    description: description,
                     bullet_points: bullet_points,
                     bullet_intro: bullet_intro,
                     closing_text: closing_text
@@ -3987,21 +4678,32 @@ ${faqItems}
 
 
             generateTechnologySection(content) {
-                
+
+                console.log('🔧 [TECHNOLOGY_STACK_SECTION] Starting generation...');
+
                 // ⚠️ IMPORTANT: TECHNOLOGY_STACK_SECTION should ALWAYS be dynamic from DOC content
                 // NO static defaults - only process actual document content
-                
+
                 // Process dynamic categories from document content
                 if (content && content.categories && content.categories.length > 0) {
-                    
+
+                    console.log(`📊 [TECHNOLOGY_STACK_SECTION] Found ${content.categories.length} categories`);
+
                     let categoriesHTML = '';
                     content.categories.forEach((category, index) => {
-                        
+
+                        console.log(`\n📂 [Category ${index + 1}] ${category.name}`);
+
                         let techList = '';
                         if (category.technologies && category.technologies.length > 0) {
+                            console.log(`   Technologies count: ${category.technologies.length}`);
+
                             category.technologies.forEach(tech => {
-                                // Use static React icon for all technologies, only update alt tag dynamically
-                                techList += `<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg" alt="${tech}" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> ${tech}</li>
+                                // 🎯 DYNAMIC IMAGE FETCHING: Get technology-specific image
+                                const techImage = this.getTechnologyImage(tech);
+                                console.log(`   → ${tech}: ${techImage.split('/').pop()}`);
+
+                                techList += `<li><img src="${techImage}" alt="${tech}" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> ${tech}</li>
 `;
                             });
                         }
@@ -4036,17 +4738,21 @@ ${categoriesHTML}</div>
                 }
 
                 // ⚠️ FALLBACK: If no categories found, try to create categories from content
-                
+
                 // If we have content but no categories, try to parse it manually
                 if (content && (content.technologies || content.main_heading)) {
-                    
+
+                    console.log('⚠️ [TECHNOLOGY_STACK_SECTION] Using fallback - no categories found');
+
                     let categoriesHTML = '';
-                    
+
                     // Create a single "Technologies" category from the content
                     if (content.technologies && content.technologies.length > 0) {
                         let techList = '';
                         content.technologies.forEach(tech => {
-                            techList += `<li><img src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/React.svg" alt="${tech}" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> ${tech}</li>
+                            // 🎯 DYNAMIC IMAGE FETCHING: Get technology-specific image
+                            const techImage = this.getTechnologyImage(tech);
+                            techList += `<li><img src="${techImage}" alt="${tech}" class="alignnone size-full wp-image-201587" width="24" height="24" onerror="handleImageError(this)"/> ${tech}</li>
 `;
                         });
                         
@@ -6896,23 +7602,23 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 this.detectedSections.style.display = 'block';
                 this.sectionCount.textContent = sections.length;
                 this.sectionTags.innerHTML = '';
-                
-                // Show all supported sections
-                const allSections = ['HERO_BANNER_SECTION', 'SERVICES_GRID_SECTION_CENTER', 'SERVICES_ACCORDION_SECTION', 'CTA_SIMPLE_SECTION', 'SERVICES_GRID_SECTION', 'PORTFOLIO_SECTION', 'TESTIMONIAL_SECTION', 'PROCESS_SECTION', 'FEATURED_IN_SECTION', 'TECHNOLOGY_STACK_SECTION', 'WHY_CHOOSE_BOX', 'INDUSTRIES_WE_SERVE_SECTION', 'CTA_WITH_LIST_SECTION', 'CONTENT_WITH_FORM_SECTION', 'FAQ_SECTION'];
-                
+
+                // Use the supportedSections array from processor to ensure all sections are displayed
+                const allSections = this.processor.supportedSections;
+
                 allSections.forEach(section => {
                     const tag = document.createElement('span');
                     tag.className = 'section-tag';
-                    
+
                     const isFound = sections.includes(section);
                     if (!isFound) {
                         tag.className += ' not-found';
                     }
-                    
+
                     const check = document.createElement('span');
                     check.className = 'check';
                     check.textContent = isFound ? '✓' : '○';
-                    
+
                     tag.appendChild(check);
                     tag.appendChild(document.createTextNode(section));
                     this.sectionTags.appendChild(tag);

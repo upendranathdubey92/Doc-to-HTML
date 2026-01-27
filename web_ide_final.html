@@ -1133,7 +1133,9 @@
     <!-- Quill Rich Text Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    
+    <!-- Mammoth.js for .docx parsing with hyperlink support -->
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+
     <style>
         /* Custom styles for Quill editor */
         .ql-editor {
@@ -7480,9 +7482,9 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 }
             }
 
-            handleFile(file) {
+            async handleFile(file) {
                 this.currentFile = file;
-                
+
                 // Show file info
                 this.fileName.textContent = file.name;
                 this.fileSize.textContent = this.formatFileSize(file.size);
@@ -7490,63 +7492,132 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 this.fileStatus.textContent = 'Processing...';
                 this.fileInfo.style.display = 'block';
 
-                // Read file content
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    let content = e.target.result;
-                    
-                    // Handle Word document content (continuous text)
+                try {
+                    let content = '';
+
+                    // Handle .docx files with mammoth.js to preserve hyperlinks
+                    if (file.name.endsWith('.docx')) {
+                        if (typeof mammoth === 'undefined') {
+                            this.showToast('⚠️ Mammoth.js not loaded. Reading as plain text (hyperlinks will be lost).', 'warning');
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                content = e.target.result;
+                                this.processExtractedContent(content, file);
+                            };
+                            reader.readAsText(file);
+                            return;
+                        }
+
+                        const arrayBuffer = await file.arrayBuffer();
+                        const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+
+                        // Convert HTML to plain text while preserving hyperlinks in markdown format
+                        content = this.convertHtmlToTextWithLinks(result.value);
+
+                        console.log('[DOCX Parser] Extracted content with hyperlinks:', content.substring(0, 500));
+                        this.processExtractedContent(content, file);
+                    }
+                    // Handle .doc files (older format) - fallback to text
+                    else if (file.name.endsWith('.doc')) {
+                        this.showToast('⚠️ .doc format has limited support. For best results, save as .docx', 'warning');
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            content = this.processWordContent(e.target.result);
+                            this.processExtractedContent(content, file);
+                        };
+                        reader.readAsText(file);
+                    }
+                    // Handle plain text files
+                    else {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            content = e.target.result;
+                            this.processExtractedContent(content, file);
+                        };
+                        reader.onerror = () => {
+                            this.fileStatus.textContent = 'Error reading file ❌';
+                            this.showToast('❌ Error reading file', 'error');
+                        };
+                        reader.readAsText(file);
+                    }
+                } catch (error) {
+                    this.fileStatus.textContent = 'Error processing file ❌';
+                    this.showToast(`❌ Error: ${error.message}`, 'error');
+                    console.error('[File Handler] Error:', error);
+                }
+            }
+
+            processExtractedContent(content, file) {
+                // Filter and extract only supported sections
+                const filteredContent = this.extractSupportedSections(content);
+
+                if (filteredContent.sections.length > 0) {
+                    // Found supported sections
+                    this.fileStatus.textContent = `Found ${filteredContent.sections.length} supported sections ✅`;
+                    this.showToast(`🎯 Extracted ${filteredContent.sections.length} supported sections: ${filteredContent.sections.join(', ')}`, 'success');
+
+                    // Set the filtered content
+                    this.inputContent.value = filteredContent.content;
+                    if (this.quill) {
+                        this.quill.setText(filteredContent.content);
+                    }
+                } else if (content.includes('[') && content.includes(']')) {
+                    // Has sections but none are supported
+                    this.fileStatus.textContent = 'No supported sections found ⚠️';
+                    this.showToast('⚠️ File contains sections, but none match our 19 supported types. Using full content.', 'warning');
+
+                    // Set original content
+                    this.inputContent.value = content;
+                    if (this.quill) {
+                        this.quill.setText(content);
+                    }
+                } else {
+                    // Plain text - no sections detected
                     if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
-                        content = this.processWordContent(content);
-                    }
-                    
-                    // Filter and extract only supported sections
-                    const filteredContent = this.extractSupportedSections(content);
-                    
-                    if (filteredContent.sections.length > 0) {
-                        // Found supported sections
-                        this.fileStatus.textContent = `Found ${filteredContent.sections.length} supported sections ✅`;
-                        this.showToast(`🎯 Extracted ${filteredContent.sections.length} supported sections: ${filteredContent.sections.join(', ')}`, 'success');
-                        
-                        // Set the filtered content
-                        this.inputContent.value = filteredContent.content;
-                        if (this.quill) {
-                            this.quill.setText(filteredContent.content);
-                        }
-                    } else if (content.includes('[') && content.includes(']')) {
-                        // Has sections but none are supported
-                        this.fileStatus.textContent = 'No supported sections found ⚠️';
-                        this.showToast('⚠️ File contains sections, but none match our 15 supported types. Using full content.', 'warning');
-                        
-                        // Set original content
-                        this.inputContent.value = content;
-                        if (this.quill) {
-                            this.quill.setText(content);
-                        }
+                        this.fileStatus.textContent = 'Word document processed (no sections) ✅';
+                        this.showToast('📄 Word document processed. Add section markers like [PORTFOLIO_SECTION]...[PORTFOLIO_SECTION END] to structure it.', 'info');
                     } else {
-                        // Plain text - no sections detected
-                        if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
-                            this.fileStatus.textContent = 'Word document processed (no sections) ✅';
-                            this.showToast('📄 Word document processed. Add section markers like [HERO]...[HERO END] to structure it.', 'info');
-                        } else {
-                            this.fileStatus.textContent = 'Text file loaded (no sections) ✅';
-                            this.showToast('📝 Text file loaded. Add section markers like [HERO]...[HERO END] to structure it.', 'info');
-                        }
-                        
-                        // Set original content
-                        this.inputContent.value = content;
-                        if (this.quill) {
-                            this.quill.setText(content);
-                        }
+                        this.fileStatus.textContent = 'Text file loaded (no sections) ✅';
+                        this.showToast('📝 Text file loaded. Add section markers like [PORTFOLIO_SECTION]...[PORTFOLIO_SECTION END] to structure it.', 'info');
                     }
-                    
-                    this.handleContentChange();
-                };
-                reader.onerror = () => {
-                    this.fileStatus.textContent = 'Error reading file ❌';
-                    this.showToast('❌ Error reading file', 'error');
-                };
-                reader.readAsText(file);
+
+                    // Set original content
+                    this.inputContent.value = content;
+                    if (this.quill) {
+                        this.quill.setText(content);
+                    }
+                }
+
+                this.handleContentChange();
+            }
+
+            convertHtmlToTextWithLinks(html) {
+                // Create a temporary div to parse HTML
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+
+                // Extract hyperlinks and convert to format: "text (url)"
+                const links = temp.querySelectorAll('a[href]');
+                links.forEach(link => {
+                    const text = link.textContent.trim();
+                    const href = link.getAttribute('href');
+
+                    // Replace link with format: "text (url)"
+                    link.replaceWith(`${text} (${href})`);
+                });
+
+                // Get plain text content
+                let content = temp.textContent;
+
+                // Clean up formatting
+                content = content
+                    .replace(/\s+/g, ' ') // Normalize whitespace
+                    .replace(/\[([A-Z_\s]+)\]/g, '\n\n[$1]\n') // Format section markers
+                    .replace(/([.!?])\s+([A-Z])/g, '$1\n$2') // Line breaks after sentences
+                    .replace(/\n{3,}/g, '\n\n') // Clean up extra line breaks
+                    .trim();
+
+                return content;
             }
 
             processWordContent(content) {
@@ -7567,7 +7638,7 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                     // Clean up extra whitespace
                     .replace(/\n{3,}/g, '\n\n')
                     .trim();
-                
+
                 // Ensure content starts with a section marker
                 if (!cleanContent.startsWith('[')) {
                     const firstSectionMatch = cleanContent.match(/\[([A-Z_\s]+)\]/);
@@ -7576,7 +7647,7 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                         cleanContent = cleanContent.substring(sectionIndex);
                     }
                 }
-                
+
                 return cleanContent;
             }
 

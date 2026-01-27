@@ -3713,11 +3713,36 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 for (let i = 0; i < projectLines.length; i++) {
                     const line = projectLines[i].trim();
 
-                    // Check if this line is a button text (like "See Project Details")
+                    // Check if this line contains button text with a link
+                    // Patterns: "See Project Details (url)", "[See Project Details](url)", "See Project Details https://..."
+                    const buttonWithLinkPatterns = [
+                        /^(See Project Details|Check Project Details|View Project|Learn More|Navigate to Project Details)\s*\((https?:\/\/[^\)]+)\)$/i,
+                        /^\[(See Project Details|Check Project Details|View Project|Learn More|Navigate to Project Details)\]\((https?:\/\/[^\)]+)\)$/i,
+                        /^(See Project Details|Check Project Details|View Project|Learn More|Navigate to Project Details)\s+(https?:\/\/\S+)$/i
+                    ];
+
+                    let foundButtonWithLink = false;
+                    for (let pattern of buttonWithLinkPatterns) {
+                        const match = line.match(pattern);
+                        if (match) {
+                            if (currentProject) {
+                                currentProject.buttonText = match[1].trim();
+                                currentProject.link = match[2].trim();
+                            }
+                            foundButtonWithLink = true;
+                            break;
+                        }
+                    }
+
+                    if (foundButtonWithLink) {
+                        continue;
+                    }
+
+                    // Check if this line is just button text without link
                     const isButtonText = line.match(/^(See Project Details|Check Project Details|View Project|Learn More|Navigate to Project Details)$/i);
 
                     if (isButtonText) {
-                        // This is button text, add it to current project and don't include in description
+                        // This is button text without link, add it to current project
                         if (currentProject) {
                             currentProject.buttonText = line;
                         }
@@ -3786,7 +3811,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                                 description: cleanDescription,
                                 buttonText: currentProject.buttonText || 'See Project Details',
                                 image: '/wp-content/uploads/2025/06/CCTV-Data-Management-Platform-for-Public-Safety.png',
-                                link: '#'
+                                link: currentProject.link || '#'
                             });
                         }
                         
@@ -3794,7 +3819,8 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         currentProject = {
                             title: this.convertBoldMarkers ? this.convertBoldMarkers(line) : line,
                             description: '',
-                            buttonText: ''
+                            buttonText: '',
+                            link: ''
                         };
                     } else {
                         // This line is part of the description
@@ -3875,7 +3901,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                         description: cleanDescription,
                         buttonText: currentProject.buttonText || 'See Project Details',
                         image: '/wp-content/uploads/2025/06/CCTV-Data-Management-Platform-for-Public-Safety.png',
-                        link: '#'
+                        link: currentProject.link || '#'
                     });
                 }
                 

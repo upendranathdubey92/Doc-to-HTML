@@ -2,7 +2,7 @@
 
 > **A powerful web-based IDE that converts structured documents with section markers into professional, responsive HTML code with CSS styling.**
 
-[![Version](https://img.shields.io/badge/version-3.9-blue.svg)](https://github.com/upendranathdubey92/Doc-to-HTML)
+[![Version](https://img.shields.io/badge/version-3.9.1-blue.svg)](https://github.com/upendranathdubey92/Doc-to-HTML)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://github.com/upendranathdubey92/Doc-to-HTML)
 
@@ -27,6 +27,27 @@ The **Document to HTML Converter** is an all-in-one web application that transfo
 - ✅ AI-powered parsing with rule-based fallback
 - ✅ One-click copy to clipboard
 - ✅ Download as HTML files
+
+---
+
+## 🔷 Two Versions Available
+
+### SOI Tool (Space-O Technologies) - `web_ide_final.html`
+The original tool with 19 sections designed for Space-O Technologies branding and layouts.
+- **Access**: `http://localhost:8001/web_ide_final.html`
+- **Color Scheme**: Green (#28A745)
+- **Sections**: 19 SOI-specific sections
+- **Use For**: Space-O Technologies projects
+
+### MCB Tool (Monocubed) - `web_ide_mcb.html` ✨ NEW
+A completely separate tool with 14 sections designed for Monocubed branding and layouts.
+- **Access**: `http://localhost:8001/web_ide_mcb.html`
+- **Color Scheme**: Blue (#1C72EB)
+- **Sections**: 14 MCB-specific sections
+- **Documentation**: See `MCB_SECTIONS.md` and `MCB-Document-Template.txt`
+- **Use For**: Monocubed projects
+
+**Both tools are independent and can be used simultaneously without conflicts.**
 
 ---
 
@@ -220,6 +241,7 @@ Redis
 - **Rule-Based Fallback**: Automatic fallback when AI is unavailable
 - **Empty Section Handling**: Generates professional default content for empty sections
 - **Multi-Format Support**: Handles pipe-separated tables and list formats
+- **Comment Filtering**: Automatically removes Word document comment markers ([a], [b], [1], [2]) from output
 
 ### 🎯 Professional Output
 
@@ -362,6 +384,11 @@ All styling and behavior is self-contained in `web_ide_final.html`. You can cust
 - **Cause:** Image URLs not accessible
 - **Fix:** Global error handler provides automatic fallbacks
 
+**Issue:** Word document comments appearing in output ([a], [b], [c])
+- **Cause:** Comment markers from Word documents being included in parsed content
+- **Fix:** Fixed in v3.9.1 - all comment markers automatically filtered out
+- **Update:** Refresh browser to get latest version
+
 ### Getting Help
 
 - 📖 **Documentation**: See `CLAUDE.md` for detailed technical docs
@@ -372,7 +399,12 @@ All styling and behavior is self-contained in `web_ide_final.html`. You can cust
 
 ## 📊 Version History
 
-### v3.9 (Current - January 2026)
+### v3.9.1 (Current - January 2026)
+- ✅ Fixed Word document comment markers ([a], [b], [c], [1], [2]) in HTML output
+- ✅ Enhanced .docx parsing to automatically filter comment references
+- ✅ Improved text cleanup with regex-based comment removal
+
+### v3.9 (January 2026)
 - ✅ Added `FLEXIBLE_PACKAGES_WRAPPER` section
 - ✅ Fixed package parser (no more false "Pro" detection)
 - ✅ Added comprehensive pricing card support
@@ -411,9 +443,9 @@ All styling and behavior is self-contained in `web_ide_final.html`. You can cust
 
 ```
 Doc-to-HTML/
-├── web_ide_final.html              # Main application (373KB)
-├── README.md                       # This file
-├── CLAUDE.md                       # Technical documentation (17KB)
+├── web_ide_final.html              # Main application (438KB) - v3.9.1
+├── README.md                       # This file - User documentation
+├── CLAUDE.md                       # Technical documentation (18KB)
 ├── package.json                    # Node.js dependencies
 ├── package-lock.json               # Dependency lock file
 ├── vercel.json                     # Vercel deployment config
@@ -423,9 +455,9 @@ Doc-to-HTML/
 
 ### File Details
 
-- **web_ide_final.html**: Monolithic all-in-one file with embedded CSS, JavaScript, and all parsing logic
-- **CLAUDE.md**: Detailed technical documentation for developers
-- **README.md**: User-facing documentation (this file)
+- **web_ide_final.html**: Monolithic all-in-one file with embedded CSS, JavaScript, and all parsing logic (v3.9.1)
+- **CLAUDE.md**: Detailed technical documentation for developers with version history
+- **README.md**: User-facing documentation with examples and quick start guide (this file)
 - **Templates**: Pre-formatted examples for content writers
 
 ---
@@ -583,10 +615,10 @@ If you find this tool useful, please consider giving it a star on GitHub! ⭐
 
 ## 📈 Statistics
 
-- **Version**: 3.9
+- **Version**: 3.9.1
 - **Total Sections**: 19
-- **File Size**: 373KB (all-in-one)
-- **Lines of Code**: ~7,800
+- **File Size**: 438KB (all-in-one)
+- **Lines of Code**: ~7,850
 - **Browser Support**: Chrome, Firefox, Safari, Edge
 - **Dependencies**: Zero runtime dependencies (self-contained)
 

@@ -4,7 +4,7 @@
 This project contains a web-based IDE for converting structured documents with section markers into HTML code. The main tool processes documents with `[SECTION_NAME]...[SECTION_NAME END]` markers and generates corresponding HTML sections with intelligent fallback content and comprehensive image handling.
 
 ## Key Files
-- `web_ide_final.html` - Main web IDE with AI-powered content parsing (v3.9)
+- `web_ide_final.html` - Main web IDE with AI-powered content parsing (v3.9.1)
 - `CLAUDE.md` - Project documentation and instructions
 - `package.json` & `package-lock.json` - Node.js dependencies
 - `vercel.json` - Deployment configuration
@@ -311,6 +311,7 @@ netstat -ano | findstr :9000
 ## Troubleshooting
 - **AI Parsing Fails**: Check Groq API key in AI Settings
 - **Section Not Detected**: Ensure proper [SECTION_NAME]...[SECTION_NAME END] format using new names
+- **Word Comment Markers in Output**: Fixed in v3.9.1 - comment markers like [a], [b], [c], [1], [2] are now automatically filtered out
 - **Empty Sections Not Generating**: Check version is v3.7 or later
 - **Broken Images in BENEFITS**: Fixed in v3.7 - uses static HTML images
 - **Old Section Names Not Working**: Update to new descriptive names (v3.5+)
@@ -330,7 +331,7 @@ FLEXIBLE_PACKAGES_WRAPPER, TESTIMONIAL_SECTION_CLUTCH
 ## Project Structure
 ```
 Doc-to-HTML/
-├── web_ide_final.html          # Main application (v3.9) - All-in-one HTML file with embedded JavaScript
+├── web_ide_final.html          # Main application (v3.9.1) - All-in-one HTML file with embedded JavaScript
 ├── CLAUDE.md                   # Project documentation and instructions
 ├── README.md                   # User-facing documentation with quick start guide
 ├── package.json                # Node.js dependencies and scripts
@@ -343,7 +344,11 @@ Doc-to-HTML/
 **Note**: This is a monolithic architecture where all parsing logic, section generators, and UI code are embedded within the single `web_ide_final.html` file (6850+ lines). All 18 section types are implemented as methods within the `RealDocumentProcessor` class.
 
 ## Version History
-- **v3.9 (Current)**: Major updates and critical bug fixes
+- **v3.9.1 (Current)**: Bug fix for Word document comment markers
+  - **Critical Fix**: Removed Word document comment markers ([a], [b], [c], [1], [2], etc.) from HTML output
+  - Added regex filtering to strip lowercase letter and numeric comment markers during .docx parsing
+  - Enhanced convertHtmlToTextWithLinks function with comment marker cleanup
+- **v3.9**: Major updates and critical bug fixes
   - Added TESTIMONIAL_SECTION_CLUTCH with Clutch-style testimonials, slider functionality, and ratings
   - Added FLEXIBLE_PACKAGES_WRAPPER section with 3-tier pricing card layout
   - **Critical Fix**: Fixed FLEXIBLE_PACKAGES_WRAPPER parser preventing false "Pro" detection in feature text
@@ -386,10 +391,11 @@ If upgrading from older versions, update your document section names:
 - **Smart Processing**: Handles empty sections with professional defaults
 
 ## Current Status
-- **Version**: v3.9 "TESTIMONIAL & PRICING ENHANCEMENTS"
+- **Version**: v3.9.1 "WORD COMMENT CLEANUP FIX"
 - **Status**: Production ready - All 19 sections fully functional
 - **Server**: Running on port 8000, 8001, or 9000
 - **Latest Fixes**:
+  - ✅ Word document comment markers ([a], [b], [c], [1], [2]) now filtered out from HTML output
   - ✅ FLEXIBLE_PACKAGES_WRAPPER parser bug fixed (no more false "Pro" detection)
   - ✅ Copy button clipboard API issues resolved with fallback support
   - ✅ TESTIMONIAL_SECTION_CLUTCH fully integrated with optimized CSS

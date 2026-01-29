@@ -3711,9 +3711,17 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                 // Find project titles and descriptions
                 let projectLines = nonEmptyLines.slice(projectStartIndex);
                 let currentProject = null;
-                
+
+                console.log('[PORTFOLIO PARSER] Total project lines:', projectLines.length);
+                console.log('[PORTFOLIO PARSER] Project lines:', projectLines);
+
                 for (let i = 0; i < projectLines.length; i++) {
                     const line = projectLines[i].trim();
+
+                    // Debug: Log each line being processed
+                    if (line.toLowerCase().includes('see project') || line.toLowerCase().includes('http')) {
+                        console.log(`[PORTFOLIO PARSER] Line ${i}:`, line);
+                    }
 
                     // Check if this line contains button text with a link
                     // Patterns: "See Project Details (url)", "[See Project Details](url)", "See Project Details https://..."
@@ -3727,9 +3735,13 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                     for (let pattern of buttonWithLinkPatterns) {
                         const match = line.match(pattern);
                         if (match) {
+                            console.log('[PORTFOLIO PARSER] ✓ Found button with link!');
+                            console.log('[PORTFOLIO PARSER] Button text:', match[1]);
+                            console.log('[PORTFOLIO PARSER] Link URL:', match[2]);
                             if (currentProject) {
                                 currentProject.buttonText = match[1].trim();
                                 currentProject.link = match[2].trim();
+                                console.log('[PORTFOLIO PARSER] Assigned to current project');
                             }
                             foundButtonWithLink = true;
                             break;
@@ -3825,8 +3837,12 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                                     cleanDescription = remainingTitle + (cleanDescription ? ' ' + cleanDescription : '');
                                 }
                             }
-                            
-                            
+
+                            console.log('[PORTFOLIO PARSER] Saving project:');
+                            console.log('[PORTFOLIO PARSER] - Title:', finalTitle);
+                            console.log('[PORTFOLIO PARSER] - Button:', currentProject.buttonText || 'See Project Details');
+                            console.log('[PORTFOLIO PARSER] - Link:', currentProject.link || '#', '<-- LINK VALUE');
+
                             projects.push({
                                 title: finalTitle,
                                 description: cleanDescription,
@@ -3940,8 +3956,13 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
                             cleanDescription = remainingTitle + (cleanDescription ? ' ' + cleanDescription : '');
                         }
                     }
-                    
-                    
+
+
+                    console.log('[PORTFOLIO PARSER] Saving FINAL project:');
+                    console.log('[PORTFOLIO PARSER] - Title:', finalTitle);
+                    console.log('[PORTFOLIO PARSER] - Button:', currentProject.buttonText || 'See Project Details');
+                    console.log('[PORTFOLIO PARSER] - Link:', currentProject.link || '#', '<-- LINK VALUE');
+
                     projects.push({
                         title: finalTitle,
                         description: cleanDescription,
@@ -4456,8 +4477,7 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
             generateHeroSection(content) {
                 // Handle empty content with default static HTML
                 if (!content || (!content.main_heading && !content.description)) {
-                    return `<!-- Hero Section Start -->
-<section class="pt70 pb40 hero-section section-hero">
+                    return `<section class="pt70 pb40 hero-section section-hero">
 <div class="container-xl">
 <div class="row align-items-center">
 <div class="col-lg-7 col-md-12 banner-text">
@@ -4518,9 +4538,22 @@ LONG PARAGRAPH LONG PARAGRAPH LONG PARAGRAPH ← This is next description`;
 </div>
 </div>
 </section>
-<!-- Hero Section End -->`;
+
+<section class="pt40 pb40 client-section">
+<div class="container-xl">
+<div class="row align-items-center">
+<div class="col-lg-2 col-md-12 client-title">Our Valuable Clients</div>
+<div class="col-lg-10 col-md-12 client-logo">
+<img data-lazyloaded="1" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-01.svg" decoding="async" data-src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-01.svg" alt="client-logo" width="100" height="54" data-ll-status="loaded" class="entered litespeed-loaded">
+<img data-lazyloaded="1" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-02.svg" decoding="async" data-src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-02.svg" alt="client-logo" width="154" height="54" data-ll-status="loaded" class="entered litespeed-loaded">
+<img data-lazyloaded="1" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-03.svg" decoding="async" data-src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-03.svg" alt="client-logo" width="101" height="54" data-ll-status="loaded" class="entered litespeed-loaded">
+<img data-lazyloaded="1" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-04.svg" decoding="async" data-src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-04.svg" alt="client-logo" width="130" height="54" data-ll-status="loaded" class="entered litespeed-loaded">
+</div>
+</div>
+</div>
+</section>`;
                 }
-                
+
                 let bulletPoints = '';
                 let bulletSection = '';
                 
@@ -4536,8 +4569,7 @@ ${bulletPoints}
 `;
                 }
 
-                const template = `<!-- Hero Section Start -->
-<section class="pt70 pb40 hero-section section-hero">
+                const template = `<section class="pt70 pb40 hero-section section-hero">
 <div class="container-xl">
 <div class="row align-items-center">
 <div class="col-lg-7 col-md-12 banner-text">
@@ -4593,7 +4625,20 @@ ${bulletPoints}
 </div>
 </div>
 </section>
-<!-- Hero Section End -->`;
+
+<section class="pt40 pb40 client-section">
+<div class="container-xl">
+<div class="row align-items-center">
+<div class="col-lg-2 col-md-12 client-title">Our Valuable Clients</div>
+<div class="col-lg-10 col-md-12 client-logo">
+<img data-lazyloaded="1" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-01.svg" decoding="async" data-src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-01.svg" alt="client-logo" width="100" height="54" data-ll-status="loaded" class="entered litespeed-loaded">
+<img data-lazyloaded="1" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-02.svg" decoding="async" data-src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-02.svg" alt="client-logo" width="154" height="54" data-ll-status="loaded" class="entered litespeed-loaded">
+<img data-lazyloaded="1" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-03.svg" decoding="async" data-src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-03.svg" alt="client-logo" width="101" height="54" data-ll-status="loaded" class="entered litespeed-loaded">
+<img data-lazyloaded="1" src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-04.svg" decoding="async" data-src="https://www.spaceotechnologies.com/wp-content/uploads/2023/08/client-logo-04.svg" alt="client-logo" width="130" height="54" data-ll-status="loaded" class="entered litespeed-loaded">
+</div>
+</div>
+</div>
+</section>`;
 
                 const bulletIntroHtml = content.bullet_intro ? `<p class="fonts-18 mb-2 font-weight-bold">${content.bullet_intro}</p>` : '';
                 const additionalContentHtml = content.additional_content ? `<div class="mt-4">${content.additional_content}</div>` : '';
@@ -4612,8 +4657,7 @@ ${bulletPoints}
             generateFaqSection(content) {
                 // Handle empty content with default static HTML
                 if (!content || !content.faqs || content.faqs.length === 0) {
-                    return `<!-- FAQ Section Start -->
-<div class="faq pt80 pb50 section-faq" style="background: linear-gradient(var(--bg-color-9), #fff);">
+                    return `<div class="faq pt80 pb50 section-faq" style="background: linear-gradient(var(--bg-color-9), #fff);">
   <div class="container-xl">
     <h2 class="fonts-40 font-weight-bold text-center">Frequently Asked Questions</h2>
     <div id="accordion" class="text-left px-4">
@@ -4669,8 +4713,7 @@ Absolutely! We specialize in website redesigns, performance improvements, techno
 </div>
     </div>
   </div>
-</div>
-<!-- FAQ Section End -->`;
+</div>`;
                 }
                 
                 let faqItems = '';
@@ -4695,16 +4738,14 @@ ${faq.answer}
                     });
                 }
 
-                const template = `<!-- FAQ Section Start -->
-<div class="faq pt80 pb50 section-faq" style="background: linear-gradient(var(--bg-color-9), #fff);">
+                const template = `<div class="faq pt80 pb50 section-faq" style="background: linear-gradient(var(--bg-color-9), #fff);">
   <div class="container-xl">
     <h2 class="fonts-40 font-weight-bold text-center">{main_heading}</h2>
     <div id="accordion" class="text-left px-4">
 ${faqItems}
     </div>
   </div>
-</div>
-<!-- FAQ Section End -->`;
+</div>`;
 
                 return template
                     .replace('{main_heading}', content.main_heading || 'FAQs About Web Development Consulting');
@@ -6771,8 +6812,7 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 
                 // ALWAYS return the exact static HTML for blank/empty/image content
                 if (!content.brands || content.brands.length === 0) {
-                    return `<!-- Featured In Section Start -->
-<section class="featured-in pt80 pb80 bg-color">
+                    return `<section class="featured-in pt80 pb80 bg-color">
 <div class="container-xl">
 <h2 class="fonts-40 font-weight-bold text-center mb-5">Our Solutions Recognized & Featured In</h2>
 <div class="brand-listing">
@@ -6796,8 +6836,7 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
 </div>
 </div>
 </div>
-</section>
-<!-- Featured In Section End -->`;
+</section>`;
                 }
 
                 // If custom brands are provided, generate dynamic HTML
@@ -7596,14 +7635,23 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 const temp = document.createElement('div');
                 temp.innerHTML = html;
 
+                console.log('[LINK EXTRACTOR] Starting link extraction from HTML');
+                console.log('[LINK EXTRACTOR] HTML length:', html.length);
+
                 // Extract hyperlinks and convert to format: "text (url)"
                 const links = temp.querySelectorAll('a[href]');
-                links.forEach(link => {
+                console.log('[LINK EXTRACTOR] Found', links.length, 'hyperlinks');
+
+                links.forEach((link, index) => {
                     const text = link.textContent.trim();
                     const href = link.getAttribute('href');
 
+                    console.log(`[LINK EXTRACTOR] Link ${index + 1}:`, text, '→', href);
+
                     // Replace link with format: "text (url)"
-                    link.replaceWith(`${text} (${href})`);
+                    const replacement = `${text} (${href})`;
+                    console.log(`[LINK EXTRACTOR] Replacing with:`, replacement);
+                    link.replaceWith(replacement);
                 });
 
                 // Get plain text content
@@ -7612,11 +7660,14 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 // Clean up formatting
                 content = content
                     .replace(/\s+/g, ' ') // Normalize whitespace
+                    .replace(/\[([a-z])\]/g, '') // Remove Word document comment markers like [a], [b], [c]
+                    .replace(/\[(\d+)\]/g, '') // Remove numeric comment markers like [1], [2], [3]
                     .replace(/\[([A-Z_\s]+)\]/g, '\n\n[$1]\n') // Format section markers
                     .replace(/([.!?])\s+([A-Z])/g, '$1\n$2') // Line breaks after sentences
                     .replace(/\n{3,}/g, '\n\n') // Clean up extra line breaks
                     .trim();
 
+                console.log('[LINK EXTRACTOR] Final content (first 1000 chars):', content.substring(0, 1000));
                 return content;
             }
 

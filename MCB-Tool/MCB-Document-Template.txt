@@ -1,0 +1,501 @@
+================================================================================
+MCB DOCUMENT TO HTML CONVERTER - CONTENT WRITING TEMPLATE
+================================================================================
+
+HOW TO USE THIS TEMPLATE:
+1. Copy this file content into Microsoft Word
+2. Save as .docx format
+3. Replace example content with your actual content
+4. Keep the section markers exactly as shown: [SECTION_NAME] and [SECTION_NAME END]
+5. Upload the Word document to the MCB tool at: http://localhost:8001/web_ide_mcb.html
+
+IMPORTANT RULES:
+- Section markers MUST be in CAPS with underscores: [MCB_HERO_BANNER_WITH_FORM]
+- Each section MUST have an END marker: [MCB_HERO_BANNER_WITH_FORM END]
+- Keep one blank line between sections for better readability
+- Do NOT add extra formatting (bold, italic) to section markers
+- Content between markers can have any formatting you need
+
+================================================================================
+
+[MCB_HERO_BANNER_WITH_FORM]
+Web Development Services
+Monocubed provides web development services—from frontend and backend development to API integration, UI/UX design, and website redesign or modernization.
+
+Custom web development using modern technologies
+Mobile-first, responsive design
+Performance-optimized code
+SEO-friendly architecture
+[MCB_HERO_BANNER_WITH_FORM END]
+
+NOTES FOR HERO SECTION:
+- Line 1: Main heading (H1)
+- Line 2: Description paragraph
+- Line 3+: Bullet points (one per line)
+- Form is automatically added (no need to specify form fields)
+
+================================================================================
+
+[MCB_TRUSTED_BRANDS]
+Trusted by Top Brands
+sayyar.svg
+Slash.svg
+Invoice-OWL.svg
+Moov.svg
+Fieldcamp_.svg
+Interstride.svg
+[MCB_TRUSTED_BRANDS END]
+
+NOTES FOR TRUSTED BRANDS:
+- Line 1: Heading text
+- Line 2+: Logo filenames (one per line)
+- Use .svg or .png files
+- If you provide just filename, tool will auto-generate Monocubed URL
+- Or provide full URL: https://www.monocubed.com/wp-content/uploads/2025/10/logo.svg
+
+================================================================================
+
+[MCB_SERVICES_GRID]
+Web Development Services We Offer
+Monocubed is a custom web development agency providing end-to-end services.
+
+Website Development and Redesign
+We transform your digital presence with responsive, high-performing websites that drive conversions and engage users.
+
+Web Portal Development
+We create secure customer, partner, and employee portals with single sign-on capabilities and role-based access control.
+
+Custom Web Application Development
+We help businesses streamline operations by building custom web applications tailored to their unique workflows.
+
+API Development & Integration
+Our team develops RESTful and GraphQL APIs that connect your systems seamlessly with third-party services.
+
+E-commerce Solutions
+We build scalable e-commerce platforms with payment gateway integration, inventory management, and order tracking.
+
+Progressive Web Apps (PWA)
+Develop fast, reliable, and engaging web apps that work offline and provide native app-like experiences.
+[MCB_SERVICES_GRID END]
+
+NOTES FOR SERVICES GRID:
+- Line 1: Section heading
+- Line 2: Section description
+- Then pairs of lines:
+  - Service Title
+  - Service Description
+  - (repeat for each service)
+- Recommended: 3, 6, or 9 services for perfect grid layout
+
+================================================================================
+
+[MCB_STATS_BY_NUMBERS]
+Monocubed By the Numbers
+6+
+Years of Experience
+50+
+Expert Developers
+100+
+Satisfied Clients
+200+
+Projects Delivered
+[MCB_STATS_BY_NUMBERS END]
+
+NOTES FOR STATS:
+- Line 1: Section heading
+- Then pairs of lines:
+  - Number (e.g., "6+", "100+", "50%")
+  - Label description
+  - (repeat for each stat)
+- Recommended: 4 statistics for best layout
+- Numbers display large and bold
+
+================================================================================
+
+[MCB_BENEFITS_GRID]
+Why Choose Monocubed for Web Development
+Our AI-powered development approach, combined with years of industry experience, enables us to deliver custom web solutions that drive real business results.
+
+AI-Powered Development
+Automated code generation and testing reduce development time by 50% while maintaining high quality standards.
+
+Scalable Architecture
+Cloud-native solutions built on AWS and Azure that grow seamlessly with your business needs.
+
+Expert Team
+Senior developers with 8+ years of experience in enterprise-grade web application development.
+
+Agile Methodology
+Iterative sprints with continuous delivery ensure you see progress every two weeks.
+
+Security First
+SOC 2 compliant development practices with end-to-end encryption and regular security audits.
+
+24/7 Support
+Round-the-clock technical support and maintenance to keep your applications running smoothly.
+[MCB_BENEFITS_GRID END]
+
+NOTES FOR BENEFITS:
+- Line 1: Section heading
+- Line 2: Section description
+- Then pairs of lines:
+  - Benefit Title
+  - Benefit Description
+  - (repeat for each benefit)
+- Checkmark icons are added automatically
+- Recommended: 3, 6, or 9 benefits
+
+================================================================================
+
+[MCB_PROCESS_STEPS]
+Our Web Development Process
+Every successful web development project requires a structured approach that ensures quality, timelines, and business objectives are met.
+
+Discovery & Strategy Planning
+We begin with comprehensive business analysis and requirement gathering sessions to understand your goals and challenges.
+
+Design & User Experience
+You'll receive interactive wireframes and high-fidelity mockups that showcase the user journey and interface design.
+
+Development & Programming
+We use modern frameworks and coding best practices to build scalable, maintainable web applications.
+
+Testing & Quality Assurance
+Comprehensive functionality testing, cross-browser compatibility checks, and security auditing before launch.
+
+Deployment & Launch
+Seamless migration to live servers with CI/CD pipelines, monitoring systems, and rollback procedures.
+
+Support & Maintenance
+Continuous monitoring, regular updates, bug fixes, and feature enhancements to ensure optimal performance.
+[MCB_PROCESS_STEPS END]
+
+NOTES FOR PROCESS:
+- Line 1: Section heading
+- Line 2: Section description
+- Then pairs of lines:
+  - Step Title
+  - Step Description
+  - (repeat for each step)
+- Steps are auto-numbered (01, 02, 03...)
+- Recommended: 4-6 steps
+
+================================================================================
+
+[MCB_TECHNOLOGY_STACK]
+Web Development Technology Stack
+Our custom web development services utilize cutting-edge technologies and frameworks that ensure scalability, security, and performance.
+
+Frontend Technologies:
+React
+Vue.js
+Angular
+Next.js
+TypeScript
+HTML5
+CSS3
+
+Backend Technologies:
+Node.js
+Python
+PHP
+Ruby on Rails
+Django
+Laravel
+.NET Core
+
+Databases:
+PostgreSQL
+MySQL
+MongoDB
+Redis
+Elasticsearch
+
+Cloud & DevOps:
+AWS
+Google Cloud
+Azure
+Docker
+Kubernetes
+Jenkins
+GitHub Actions
+
+Mobile Technologies:
+React Native
+Flutter
+Ionic
+Progressive Web Apps
+[MCB_TECHNOLOGY_STACK END]
+
+NOTES FOR TECHNOLOGY STACK:
+- Line 1: Section heading
+- Line 2: Section description
+- Then category groups:
+  - Category Name: (with colon)
+  - Technology 1
+  - Technology 2
+  - (blank line)
+  - Next Category Name:
+  - Technology 1
+  - ...
+- Each technology gets an icon pill
+- Technologies display horizontally in rows
+
+================================================================================
+
+[MCB_FAQ_ACCORDION]
+Frequently Asked Questions About Our Web Development Services
+
+How much do your web development services cost?
+Our web development projects start at $10,000 for simple websites and can range up to $100,000+ for complex enterprise applications. The final cost depends on project scope, features, integrations, and timeline. We provide detailed proposals after our discovery session.
+
+What technologies do you use for web development?
+We specialize in modern JavaScript frameworks (React, Vue.js, Angular), Node.js for backend, PHP/Laravel, Python/Django, and cloud platforms like AWS and Azure. We select technologies based on your specific requirements, scalability needs, and existing infrastructure.
+
+How long does it take to develop a website or web application?
+Simple websites typically take 4-6 weeks, medium complexity applications take 2-3 months, and enterprise-grade platforms may require 4-6 months. Timeline depends on project scope, number of features, integrations, and your team's availability for feedback cycles.
+
+Do you provide ongoing maintenance and support?
+Yes, we offer comprehensive maintenance packages including security updates, bug fixes, performance optimization, feature enhancements, and 24/7 technical support. Monthly retainers start at $2,000 depending on your support needs.
+
+Can you integrate with our existing systems?
+Absolutely. We have extensive experience integrating with CRMs (Salesforce, HubSpot), ERPs (SAP, Oracle), payment gateways (Stripe, PayPal), and custom APIs. We'll assess your systems during discovery and plan the integration strategy.
+
+Do you sign NDAs and protect our intellectual property?
+Yes, we sign NDAs before any project discussions and include IP assignment clauses in our contracts to ensure all code and designs belong to you upon final payment.
+[MCB_FAQ_ACCORDION END]
+
+NOTES FOR FAQ:
+- Line 1: Section heading
+- Then pairs of lines:
+  - Question
+  - Answer (can be multiple sentences)
+  - (repeat for each FAQ)
+- First FAQ opens by default
+- Others are collapsed
+- Users can click to expand/collapse
+
+================================================================================
+
+[MCB_PORTFOLIO_PROJECTS]
+Our Web Development Projects – From Startups to Enterprise
+From MVP builds for startups to enterprise platforms handling millions of users, our web development firm delivers custom solutions that scale.
+[MCB_PORTFOLIO_PROJECTS END]
+
+NOTES FOR PORTFOLIO:
+- Line 1: Section heading
+- Line 2: Section description
+- Projects use default fallback (Moovstore example)
+- For custom projects, contact development team to add project data
+
+================================================================================
+
+[MCB_HIRE_DEVELOPERS]
+Hire Dedicated Web Developers
+Partner with our certified developers to strengthen your web development projects with expertise and efficiency.
+[MCB_HIRE_DEVELOPERS END]
+
+NOTES FOR HIRE DEVELOPERS:
+- Line 1: Section heading
+- Line 2: Section description
+- Uses default developer roles (Frontend, Backend, Full-Stack, etc.)
+- For custom roles, contact development team
+
+================================================================================
+
+[MCB_ENGAGEMENT_MODELS]
+Choose Your Web Developer Engagement Model
+Whether you need part-time support, full-time dedication, or hourly flexibility, our engagement models ensure you get the right expertise for your project needs.
+[MCB_ENGAGEMENT_MODELS END]
+
+NOTES FOR ENGAGEMENT MODELS:
+- Line 1: Section heading
+- Line 2: Section description
+- Displays 3 cards: Part-Time, Full-Time, Hourly
+- Cards show hours, pricing structure, and CTA buttons
+- Content is predefined in the tool
+
+================================================================================
+
+[MCB_TESTIMONIAL_CLUTCH_SLIDER]
+[MCB_TESTIMONIAL_CLUTCH_SLIDER END]
+
+NOTES FOR TESTIMONIALS:
+- Leave content empty for default testimonial
+- Shows Clutch-style layout with project summary and ratings
+- Uses default testimonial content
+
+================================================================================
+
+[MCB_CTA_SECTION]
+Ready to Transform Your Business with Custom Web Development?
+Join 100+ satisfied clients who trusted us to design, develop, and launch powerful web experiences that scale with their business growth.
+Start Your Web Project
+[MCB_CTA_SECTION END]
+
+NOTES FOR CTA SECTION:
+- Line 1: Main heading
+- Line 2: Subheading/description
+- Line 3: Button text
+- Displays as full-width box with blue border
+
+================================================================================
+
+[MCB_CTA_INLINE]
+Your Competitors Are Already Using AI-Powered Web Development
+Schedule Your Consultation Call
+[MCB_CTA_INLINE END]
+
+NOTES FOR INLINE CTA:
+- Line 1: Heading text (left side)
+- Line 2: Button text (right side)
+- Displays as horizontal banner
+- More compact than MCB_CTA_SECTION
+
+================================================================================
+
+COMPLETE EXAMPLE DOCUMENT:
+Below is a complete example showing multiple sections in order for a typical web development service page:
+
+================================================================================
+
+[MCB_HERO_BANNER_WITH_FORM]
+Professional Web Development Services for Growing Businesses
+Transform your digital presence with our expert web development team. We build scalable, secure, and high-performing web applications using modern technologies.
+
+Custom web solutions tailored to your business
+Agile development with 2-week sprints
+24/7 support and maintenance included
+[MCB_HERO_BANNER_WITH_FORM END]
+
+[MCB_TRUSTED_BRANDS]
+Trusted by Leading Companies
+sayyar.svg
+Slash.svg
+Invoice-OWL.svg
+Moov.svg
+Fieldcamp_.svg
+[MCB_TRUSTED_BRANDS END]
+
+[MCB_SERVICES_GRID]
+Comprehensive Web Development Services
+From concept to launch, we provide end-to-end web development services that drive business growth.
+
+Custom Web Application Development
+Build scalable web applications tailored to your unique business processes and workflows.
+
+E-commerce Development
+Launch powerful online stores with seamless checkout experiences and inventory management.
+
+API Development & Integration
+Connect your systems with robust APIs and integrate third-party services effortlessly.
+[MCB_SERVICES_GRID END]
+
+[MCB_STATS_BY_NUMBERS]
+Monocubed in Numbers
+6+
+Years of Excellence
+100+
+Projects Delivered
+50+
+Expert Developers
+98%
+Client Satisfaction
+[MCB_STATS_BY_NUMBERS END]
+
+[MCB_CTA_SECTION]
+Ready to Start Your Web Development Project?
+Let's discuss how we can help you build a powerful web solution that drives results.
+Get Free Consultation
+[MCB_CTA_SECTION END]
+
+[MCB_PROCESS_STEPS]
+Our Proven Development Process
+We follow a structured approach that ensures quality, on-time delivery, and alignment with your business goals.
+
+Discovery & Planning
+Deep dive into your requirements, goals, and technical needs to create a comprehensive project roadmap.
+
+Design & Prototyping
+Create intuitive user interfaces and interactive prototypes that showcase the final user experience.
+
+Agile Development
+Build your application in iterative sprints with continuous feedback and regular demonstrations.
+
+Quality Assurance
+Rigorous testing across devices, browsers, and scenarios to ensure flawless performance.
+
+Launch & Deployment
+Smooth deployment to production with monitoring, documentation, and knowledge transfer.
+
+Ongoing Support
+Continuous maintenance, updates, and enhancements to keep your application running optimally.
+[MCB_PROCESS_STEPS END]
+
+[MCB_TECHNOLOGY_STACK]
+Technologies We Use
+We leverage cutting-edge technologies to build robust, scalable web solutions.
+
+Frontend:
+React
+Next.js
+TypeScript
+Tailwind CSS
+
+Backend:
+Node.js
+Python
+PHP
+Laravel
+
+Database:
+PostgreSQL
+MongoDB
+Redis
+
+Cloud:
+AWS
+Azure
+Docker
+[MCB_TECHNOLOGY_STACK END]
+
+[MCB_FAQ_ACCORDION]
+Common Questions About Our Services
+
+What's included in your web development services?
+We provide complete end-to-end services including business analysis, UI/UX design, frontend and backend development, quality assurance, deployment, and post-launch support.
+
+How do you ensure project quality?
+We follow industry best practices including code reviews, automated testing, security audits, and performance optimization. All projects include comprehensive QA before launch.
+
+What is your development process?
+We use Agile methodology with 2-week sprints. You'll receive regular updates, participate in sprint planning, and have continuous visibility into development progress.
+[MCB_FAQ_ACCORDION END]
+
+================================================================================
+
+TIPS FOR BEST RESULTS:
+✅ Keep section markers on their own lines
+✅ Use consistent formatting throughout
+✅ Don't add extra spaces in section marker names
+✅ Provide meaningful content (avoid "Lorem ipsum")
+✅ Test with small documents first
+✅ Review generated HTML before using in production
+
+❌ Don't use old-style section names (they won't work)
+❌ Don't forget END markers
+❌ Don't add Word comments (they'll be filtered out but avoid them)
+❌ Don't mix MCB sections with SOI sections in same document
+
+================================================================================
+
+SAVE THIS FILE AS:
+File → Save As → "MCB-Content-Template.docx" → Save
+
+Then you can:
+1. Open MCB-Content-Template.docx
+2. Replace example content with your real content
+3. Upload to MCB tool at http://localhost:8001/web_ide_mcb.html
+4. Generate beautiful HTML!
+
+================================================================================

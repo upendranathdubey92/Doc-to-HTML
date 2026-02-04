@@ -2138,6 +2138,16 @@
                     'powerbi': 'Power-BI.svg',
                     'tableau': 'tableau.svg',
 
+                    // Business Platforms & ERP
+                    'salesforce': 'Salesforce.svg',
+                    'microsoft-dynamics-365': 'Microsoft-Dynamics-365.svg',
+                    'dynamics-365': 'Microsoft-Dynamics-365.svg',
+                    'dynamics365': 'Microsoft-Dynamics-365.svg',
+                    'odoo-erp': 'Odoo.svg',
+                    'odoo': 'Odoo.svg',
+                    'adobe-commerce': 'Adobe-Commerce.svg',
+                    'adobecommerce': 'Adobe-Commerce.svg',
+
                     // Other
                     'graphql': 'GraphQL.svg',
                     'grpc': 'gRPC.svg',
@@ -4912,7 +4922,7 @@ ${categoriesHTML}</div>
 
             generateGuaranteedSection(content) {
                 // Generate guaranteed section with fallback HTML
-                return `<div class="guaranteed_section pt80 pb60">
+                return `<div class="guaranteed_section pt80 pb60 bg-color">
    <div class="container-xl">
       <div class="row align-items-center">
          <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
@@ -4939,7 +4949,7 @@ ${categoriesHTML}</div>
 
             generateAwardsSection(content) {
                 // Generate awards section with fallback HTML
-                return `<section class="awards-section bg-color pt80 pb50">
+                return `<section class="awards-section pt80 pb50">
 <div class="container-xl">
 <h2 class="fonts-40 text-center font-weight-bold">${content.main_heading || 'Our Software Development Capabilities &amp; Recognition'}</h2>
 <div class="cards-grid">
@@ -6243,7 +6253,7 @@ ${portfolioItems}
             generateTestimonialSection(content) {
                 // Handle empty content with default static HTML
                 if (!content || (!content.main_heading && !content.testimonial_text && !content.client_name)) {
-                    return `<div class="blog-testimonial pb80 pt80 bg-color section-testimonial">
+                    return `<div class="blog-testimonial pb80 pt80  section-testimonial">
 <div class="container-xl">
 <h2 class="fonts-40 font-weight-bold text-center mb-5">Client Testimonials</h2>
 <div class="row align-items-center customer-feedback">
@@ -6268,7 +6278,7 @@ ${portfolioItems}
 </div>`;
                 }
                 
-                const template = `<div class="blog-testimonial pb80 pt80 bg-color section-testimonial">
+                const template = `<div class="blog-testimonial pb80 pt80 section-testimonial">
 <div class="container-xl">
 <h2 class="fonts-40 font-weight-bold text-center mb-5">{main_heading}</h2>
 <div class="row align-items-center customer-feedback">
@@ -6504,7 +6514,7 @@ ${portfolioItems}
             generateContentFormSection(content) {
                 // Handle empty content with default static HTML
                 if (!content || (!content.main_heading && !content.description)) {
-                    return `<section class="pt80 pb80 text-form-section">
+                    return `<section class="pt80 pb80 text-form-section bg-color">
 <div class="container-xl">
 <div class="row align-items-center">
 <div class="col-lg-7 col-md-6">
@@ -6578,7 +6588,7 @@ ${portfolioItems}
                     closingTextHtml = `\n<p>${content.closing_text}</p>`;
                 }
 
-                const template = `<section class="pt80 pb80 text-form-section">
+                const template = `<section class="pt80 pb80 text-form-section bg-color">
 <div class="container-xl">
 <div class="row align-items-center">
 <div class="col-lg-7 col-md-6">
@@ -6725,7 +6735,7 @@ ${portfolioItems}
             generateProcessSection(content) {
                 // If no processes provided or empty content, return default process HTML
                 if (!content.processes || content.processes.length === 0) {
-                    return `<section class="pt80 pb50 process-sec bg-color">
+                    return `<section class="pt80 pb50 process-sec">
 <div class="container-xl">
 <h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">Our Development Process</h2>
 ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + content.description + '</p>' : ''}
@@ -6792,7 +6802,7 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                     });
                 }
 
-                const template = `<section class="pt80 pb50 process-sec bg-color">
+                const template = `<section class="pt80 pb50 process-sec">
 <div class="container-xl">
 <h2 class="fonts-40 text-center font-weight-bold mb-2 mxw-900">{main_heading}</h2>
 {description}
@@ -6812,7 +6822,7 @@ ${content.description ? '<p class="fonts-18 text-center mxw-900 mb-4">' + conten
                 
                 // ALWAYS return the exact static HTML for blank/empty/image content
                 if (!content.brands || content.brands.length === 0) {
-                    return `<section class="featured-in pt80 pb80 bg-color">
+                    return `<section class="featured-in pt80 pb80">
 <div class="container-xl">
 <h2 class="fonts-40 font-weight-bold text-center mb-5">Our Solutions Recognized & Featured In</h2>
 <div class="brand-listing">

@@ -1,0 +1,300 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                 MCB DOCUMENT TO HTML - QUICK REFERENCE                    ║
+║                        Content Writer's Cheat Sheet                       ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+📋 BASIC RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Section names MUST be ALL CAPS with underscores
+✓ Every section NEEDS [START] and [END] markers
+✓ Keep markers on separate lines
+✓ One blank line between sections (optional but recommended)
+
+❌ Wrong: [mcb_hero_banner_with_form]
+✓ Right: [MCB_HERO_BANNER_WITH_FORM]
+
+❌ Wrong: [MCB_SERVICES_GRID] content here [MCB_SERVICES_GRID END]
+✓ Right:
+[MCB_SERVICES_GRID]
+content here
+[MCB_SERVICES_GRID END]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 SECTION FORMAT QUICK LOOKUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  HERO WITH FORM (2-column: content + form)
+───────────────────────────────────────────────────────────────────────────
+[MCB_HERO_BANNER_WITH_FORM]
+Main Heading
+Description paragraph
+Bullet point 1
+Bullet point 2
+[MCB_HERO_BANNER_WITH_FORM END]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2️⃣  BRAND LOGOS (horizontal bar)
+───────────────────────────────────────────────────────────────────────────
+[MCB_TRUSTED_BRANDS]
+Trusted by Top Brands
+logo1.svg
+logo2.svg
+logo3.svg
+[MCB_TRUSTED_BRANDS END]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3️⃣  SERVICES GRID (3-column layout)
+───────────────────────────────────────────────────────────────────────────
+[MCB_SERVICES_GRID]
+Main Heading
+Description
+
+Service Title 1
+Service Description 1
+
+Service Title 2
+Service Description 2
+[MCB_SERVICES_GRID END]
+
+💡 TIP: Use 3, 6, or 9 services for perfect grid
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4️⃣  STATISTICS (horizontal with dividers)
+───────────────────────────────────────────────────────────────────────────
+[MCB_STATS_BY_NUMBERS]
+Section Heading
+6+
+Years of Experience
+50+
+Team Members
+[MCB_STATS_BY_NUMBERS END]
+
+💡 TIP: Best with 4 statistics
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5️⃣  BENEFITS (with checkmark icons)
+───────────────────────────────────────────────────────────────────────────
+[MCB_BENEFITS_GRID]
+Main Heading
+Description
+
+Benefit Title 1
+Benefit Description 1
+
+Benefit Title 2
+Benefit Description 2
+[MCB_BENEFITS_GRID END]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6️⃣  PROCESS STEPS (auto-numbered)
+───────────────────────────────────────────────────────────────────────────
+[MCB_PROCESS_STEPS]
+Main Heading
+Description
+
+Step Title 1
+Step Description 1
+
+Step Title 2
+Step Description 2
+[MCB_PROCESS_STEPS END]
+
+💡 TIP: Steps auto-number as 01, 02, 03...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+7️⃣  TECHNOLOGY STACK (category + pills)
+───────────────────────────────────────────────────────────────────────────
+[MCB_TECHNOLOGY_STACK]
+Main Heading
+Description
+
+Frontend:
+React
+Vue.js
+Angular
+
+Backend:
+Node.js
+Python
+[MCB_TECHNOLOGY_STACK END]
+
+⚠️  IMPORTANT: Category names MUST end with colon (:)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+8️⃣  FAQ ACCORDION (collapsible)
+───────────────────────────────────────────────────────────────────────────
+[MCB_FAQ_ACCORDION]
+Main Heading
+
+Question 1
+Answer 1
+
+Question 2
+Answer 2
+[MCB_FAQ_ACCORDION END]
+
+💡 TIP: First FAQ opens by default
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+9️⃣  CTA SECTION (full-width box)
+───────────────────────────────────────────────────────────────────────────
+[MCB_CTA_SECTION]
+Main Heading
+Subheading/Description
+Button Text
+[MCB_CTA_SECTION END]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔟  CTA INLINE (horizontal banner)
+───────────────────────────────────────────────────────────────────────────
+[MCB_CTA_INLINE]
+Heading Text (left side)
+Button Text (right side)
+[MCB_CTA_INLINE END]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣1️⃣  AUTO-CONTENT SECTIONS (use defaults)
+───────────────────────────────────────────────────────────────────────────
+These sections generate beautiful default content automatically.
+Just add the markers with optional heading/description:
+
+[MCB_PORTFOLIO_PROJECTS]
+Optional Heading
+Optional Description
+[MCB_PORTFOLIO_PROJECTS END]
+
+[MCB_HIRE_DEVELOPERS]
+Optional Heading
+Optional Description
+[MCB_HIRE_DEVELOPERS END]
+
+[MCB_ENGAGEMENT_MODELS]
+Optional Heading
+Optional Description
+[MCB_ENGAGEMENT_MODELS END]
+
+[MCB_TESTIMONIAL_CLUTCH_SLIDER]
+[MCB_TESTIMONIAL_CLUTCH_SLIDER END]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 FORMATTING TIPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ You CAN use:
+  • Bold text
+  • Italic text
+  • Hyperlinks
+  • Bullet points (●)
+  • Numbers
+  • Multiple paragraphs
+
+❌ AVOID:
+  • Word comments (filtered automatically but causes clutter)
+  • Track changes (will appear in output)
+  • Tables inside sections (may not parse correctly)
+  • Images (handled separately via HTML)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 TYPICAL PAGE STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+For a standard service page, use this order:
+
+1. MCB_HERO_BANNER_WITH_FORM      ← Top of page with form
+2. MCB_TRUSTED_BRANDS             ← Logo bar
+3. MCB_SERVICES_GRID              ← What you offer
+4. MCB_STATS_BY_NUMBERS           ← Company stats
+5. MCB_CTA_SECTION                ← First conversion point
+6. MCB_BENEFITS_GRID              ← Why choose us
+7. MCB_PORTFOLIO_PROJECTS         ← Case studies
+8. MCB_PROCESS_STEPS              ← How we work
+9. MCB_TECHNOLOGY_STACK           ← Tech we use
+10. MCB_HIRE_DEVELOPERS           ← Team augmentation
+11. MCB_ENGAGEMENT_MODELS         ← Pricing options
+12. MCB_TESTIMONIAL_CLUTCH_SLIDER ← Social proof
+13. MCB_FAQ_ACCORDION             ← Common questions
+14. MCB_CTA_INLINE                ← Final conversion
+
+Not all pages need all sections. Choose what makes sense!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️  TOOL ACCESS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MCB Tool URL: http://localhost:8001/web_ide_mcb.html
+
+Steps:
+1. Write content in Word using section markers
+2. Save as .docx
+3. Upload to MCB tool
+4. Click "Generate HTML Code"
+5. Copy output HTML
+6. Include MCB-style.css in your page
+7. Done!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆘 TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Problem: Section not detected
+✓ Check section name is ALL CAPS
+✓ Verify both START and END markers exist
+✓ Make sure markers are on their own lines
+
+Problem: Content looks weird
+✓ Remove Word comments before uploading
+✓ Check for hidden formatting
+✓ Try "Clear Formatting" in Word first
+
+Problem: Missing content in output
+✓ Verify content is between [START] and [END] markers
+✓ Check if section name is spelled correctly
+✓ Look at browser console for errors
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 MORE HELP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Full Template: MCB-Document-Template.txt
+• Section Details: MCB_SECTIONS.md
+• Test File: mcb-test-document.txt
+• CSS File: MCB-style.css
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 ALL 14 MCB SECTIONS AT A GLANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. MCB_HERO_BANNER_WITH_FORM
+2. MCB_TRUSTED_BRANDS
+3. MCB_PORTFOLIO_PROJECTS
+4. MCB_CTA_SECTION
+5. MCB_TESTIMONIAL_CLUTCH_SLIDER
+6. MCB_SERVICES_GRID
+7. MCB_STATS_BY_NUMBERS
+8. MCB_HIRE_DEVELOPERS
+9. MCB_BENEFITS_GRID
+10. MCB_ENGAGEMENT_MODELS
+11. MCB_PROCESS_STEPS
+12. MCB_TECHNOLOGY_STACK
+13. MCB_FAQ_ACCORDION
+14. MCB_CTA_INLINE
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 REMEMBER: Copy these exact section names. Case matters!
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                          Happy Content Writing! 📝                        ║
+╚═══════════════════════════════════════════════════════════════════════════╝
